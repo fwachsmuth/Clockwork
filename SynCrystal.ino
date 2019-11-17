@@ -10,10 +10,13 @@
 #include <Arduino.h>
 #include <U8x8lib.h>          // Display Driver
 #include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
-#include <EasyButton.h>       // Button Handling and Debouncing
+#include <SwitchManager.h>    // Button Handling and Debouncing
 
 U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(U8X8_PIN_NONE);  // Instatiate the cheapo I2C OLED Display
 Adafruit_MCP4725 dac;                                   // Instantiate the DAC
+SwitchManager leftButton;                               // Instantiate the Button Handlers  
+SwitchManager midButton;
+SwitchManager rightButton;
 
 #define impDetectorPin    3  // Here goes the projector impulses
 
@@ -24,14 +27,9 @@ Adafruit_MCP4725 dac;                                   // Instantiate the DAC
 #define ledFasterRed      8  //  ++
 
 #define leftButtonPin        9
-#define BLOCKED_BY_TIMER1 10 // So do not use it! 
+#define BLOCKED_BY_TIMER1    10 // So do not use it! 
 #define midButtonPin         11
 #define rightButtonPin       12
-
-EasyButton leftButton(leftButtonPin);
-EasyButton midButton(midButtonPin);
-EasyButton rightButton(rightButtonPin);
-
 
 
 // Timer Variables
@@ -71,13 +69,9 @@ void setup() {
   pinMode(ledFasterYellow, OUTPUT);  //  +
   pinMode(ledFasterRed, OUTPUT);     //  ++
 
-  leftButton.begin();
-  leftButton.onPressed(onLeftPressed);
-  midButton.begin();
-  midButton.onPressed(onMidPressed);
-  rightButton.begin();
-  rightButton.onPressed(onRightPressed);
-
+  leftButton.begin(leftButtonPin, onLeftPressed);
+  midButton.begin(midButtonPin, onMidPressed);
+  rightButton.begin(rightButtonPin, onRightPressed);
 
   setupTimer1forFps(selectedSpeed); // takes 16, 1666, 18, 24 or 25 only
 
@@ -92,16 +86,16 @@ void setup() {
 }
 
 void loop() {
-  leftButton.read();  
-  midButton.read();
-  rightButton.read();
+  leftButton.check();  // check for presses  
+  midButton.check();
+  rightButton.check();
   
   millisNow = millis();
 
   frameDifference = timerFrames - projectorFrames;
   controlProjector(frameDifference);
 
-  if ((millisNow % 500 == 0) && (lastMillis != millisNow)) {
+  if ((millisNow % 10000 == 0) && (lastMillis != millisNow)) {
 
     Serial.print("Timer: ");
     Serial.print(timerFrames);
@@ -127,16 +121,25 @@ ISR(TIMER1_COMPA_vect) {
 
 }
 
-void onLeftPressed() {
-  Serial.println("Left has been pressed!");
+void handleSwitchPress (const byte newState, const unsigned long interval, const byte whichPin) {
+  if (interval >= 1000)
+    return;
 }
 
-void onMidPressed() {
-  Serial.println("Middle has been pressed!");
+  
+void onLeftPressed(const byte newState, const unsigned long interval, const byte whichPin) {
+  if (newState == LOW)
+    Serial.println("Left has been pressed!");
 }
 
-void onRightPressed() {
-  Serial.println("Right has been pressed!");
+void onMidPressed(const byte newState, const unsigned long interval, const byte whichPin) {
+  if (newState == LOW)
+    Serial.println("Middle has been pressed!");
+}
+
+void onRightPressed(const byte newState, const unsigned long interval, const byte whichPin) {
+  if (newState == LOW)
+    Serial.println("Right has been pressed!");
 }
 
 
