@@ -8,11 +8,15 @@
 */
 
 #include <Arduino.h>
-#include <U8x8lib.h>          // Display Driver
+// #include <U8x8lib.h>          // Cheap Display Driver
+#include <U8g2lib.h>             // Display Driver
+
 #include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
 #include <SwitchManager.h>    // Button Handling and Debouncing
 
-U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(U8X8_PIN_NONE);  // Instatiate the cheapo I2C OLED Display
+// U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(U8X8_PIN_NONE);  // Instatiate the cheapo I2C OLED Display
+U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+
 Adafruit_MCP4725 dac;                                   // Instantiate the DAC
 SwitchManager leftButton;                               // Instantiate the Button Handlers  
 SwitchManager midButton;
@@ -79,9 +83,18 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(impDetectorPin), projectorCountISR, CHANGE);
 
-  u8x8.begin();
-  u8x8.setPowerSave(0);
-  helloWorld();
+//  u8x8.begin();
+//  u8x8.setPowerSave(0);
+//  helloWorld();
+  u8g2.begin();  
+  u8g2.setFont(u8g2_font_helvR10_tr);
+
+  u8g2.firstPage();
+  do {
+    u8g2.drawStr(0,64,"18");
+    u8g2.drawStr(57,64,"24");
+    u8g2.drawStr(110,64,"25");
+  } while ( u8g2.nextPage() );
 
 }
 
@@ -153,9 +166,7 @@ void projectorCountISR() {
 }
 
 void helloWorld() {
-  u8x8.setFont(u8x8_font_profont29_2x3_r);
-  u8x8.setCursor(1, 3);
-  u8x8.print("hello.");
+
 }
 
 void setLeds(int bargraph) {
@@ -172,7 +183,7 @@ void setLeds(int bargraph) {
 
 void controlProjector(int correction) {
   if (correction != lastCorrection) {
-    if (correction == -2) {
+    if (correction <= -2) {
       setLeds(-2);
       dac.setVoltage(1710, false);
     } else if (correction == -1) {
@@ -184,7 +195,7 @@ void controlProjector(int correction) {
     } else if (correction == 1) {
       setLeds(1);
       dac.setVoltage(1500, false);  //1500
-    } else if (correction == 2) {
+    } else if (correction >= 2) {
       setLeds(2);
       dac.setVoltage(1395, false);
     }
