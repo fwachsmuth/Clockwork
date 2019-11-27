@@ -87,12 +87,18 @@ void setup() {
 //  u8x8.setPowerSave(0);
 //  helloWorld();
   u8g2.begin();  
-  u8g2.setFont(u8g2_font_helvR10_tr);
+  
 
   u8g2.firstPage();
   do {
+    u8g2.setFont(u8g2_font_helvR18_tr);
+    u8g2.drawStr(0,20,"17.5924 fps");
+    
+    u8g2.setFont(u8g2_font_helvR10_tr);
     u8g2.drawStr(0,64,"18");
+    u8g2.setFont(u8g2_font_helvR14_tr);
     u8g2.drawStr(57,64,"24");
+    u8g2.setFont(u8g2_font_helvR10_tr);
     u8g2.drawStr(110,64,"25");
   } while ( u8g2.nextPage() );
 
