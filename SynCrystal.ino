@@ -4,6 +4,24 @@
    for Projectors with TCA 955-driven DC motors
 
    Friedemann Wachsmuth 2 Nov 2019
+    Todo:
+    - Wait for the first projector impulse to set offset to 0
+    - Allow speed changes
+    - Build Menu
+    - Auto-Measure correction metrics with poor-mans freq measure
+    - Store them
+    - Correct Divider Errors
+    - Add SSR to decouple the Controller
+    - Measure the 678 voltage
+    - Consider an ePot
+    - Move to 3.3V Logic (OLED!)
+    - Wago Leiterplattenklemmen
+    - Verpolungsschutz
+    - slow pwm
+    - Testen ob 2. Display erkannt wird
+    
+    
+
 
 */
 
