@@ -1,4 +1,5 @@
 .vs*
+build/*
 
 # Do not push some proprietary infos
 *.pdf
