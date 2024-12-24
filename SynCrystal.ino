@@ -10,8 +10,8 @@ volatile unsigned long lastShaftPulseTime = 0;
 
 constexpr size_t WINDOW_SIZE = 12;        // Größe des Median-Fensters
 constexpr size_t STABILITY_CHECK = 24;    // Größe des Stabilitäts-Fensters
-constexpr unsigned long TOLERANCE = 200; // Fester Toleranzwert in Mikrosekunden
-constexpr unsigned long MIN_CHANGE = 200; // Minimale Abweichung für eine neue Stabilität
+constexpr unsigned long TOLERANCE = 800; // Fester Toleranzwert in Mikrosekunden
+constexpr unsigned long MIN_CHANGE = 800; // Minimale Abweichung für eine neue Stabilität
 
 volatile unsigned long medianBuffer[WINDOW_SIZE];
 volatile size_t medianIndex = 0;
