@@ -10,17 +10,16 @@ volatile unsigned long lastShaftPulseTime = 0;
 
 constexpr size_t WINDOW_SIZE = 12;        // Größe des Median-Fensters
 constexpr size_t STABILITY_CHECK = 24;    // Größe des Stabilitäts-Fensters
-constexpr unsigned long TOLERANCE = 800; // Fester Toleranzwert in Mikrosekunden
+constexpr unsigned long TOLERANCE = 1600;  // Fester Toleranzwert in Mikrosekunden
 constexpr unsigned long MIN_CHANGE = 800; // Minimale Abweichung für eine neue Stabilität
 
 volatile unsigned long medianBuffer[WINDOW_SIZE];
 volatile size_t medianIndex = 0;
 volatile unsigned long stabilityBuffer[STABILITY_CHECK];
 volatile size_t stabilityIndex = 0;
-volatile bool isStable = false;
-volatile unsigned long stableValue = 0;
 volatile unsigned long lastStableValue = 0; // Zuletzt erkannter stabiler Wert
 volatile unsigned long impulseCount = 0;
+volatile bool newValueAvailable = false;
 
 // Vergleichsfunktion für qsort
 int compare(const void *a, const void *b)
@@ -68,20 +67,36 @@ void setup()
 
 void loop()
 {
-    if (isStable)
+    // Prüfe, ob neue Werte verfügbar sind
+    if (newValueAvailable)
     {
-        // Ausgabe nur bei einer neuen Stabilität
-        Serial.print("New stability detected after ");
-        Serial.print(impulseCount);
-        Serial.print(" impulses. Stable Interval: ");
-        Serial.println(stableValue);
+        newValueAvailable = false; // Zurücksetzen des Flags
 
-        digitalWrite(greenLedPin, HIGH);
-        isStable = false; // Zurücksetzen für die nächste Stabilitätsprüfung
-    }
-    else
-    {
-        digitalWrite(greenLedPin, LOW);
+        // Median berechnen
+        unsigned long median = calculateMedian(medianBuffer, WINDOW_SIZE);
+        stabilityBuffer[stabilityIndex] = median;
+        stabilityIndex = (stabilityIndex + 1) % STABILITY_CHECK;
+
+        // Nur Stabilitätsprüfung durchführen, wenn der Buffer gefüllt ist
+        if (stabilityIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECK, TOLERANCE))
+        {
+            unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECK);
+
+            // Prüfe auf signifikante Änderung
+            if (abs((long)newStableValue - (long)lastStableValue) > MIN_CHANGE)
+            {
+                lastStableValue = newStableValue;
+
+                // Ausgabe
+                Serial.print("New stability detected after ");
+                Serial.print(impulseCount);
+                Serial.print(" impulses. Stable Interval: ");
+                Serial.print(lastStableValue);
+                Serial.print(" equals ");
+                Serial.print(1000000.0f / 12.0f / (float)lastStableValue, 2); // Ausgabe mit 2 Dezimalstellen
+                Serial.println(" fps ");
+            }
+        }
     }
 }
 
@@ -93,25 +108,10 @@ void onShaftImpulse()
 
     impulseCount++;
 
-    // Median berechnen
+    // Median-Berechnung im loop(), nicht hier
     medianBuffer[medianIndex] = interval;
     medianIndex = (medianIndex + 1) % WINDOW_SIZE;
-    unsigned long median = calculateMedian(medianBuffer, WINDOW_SIZE);
 
-    // Stabilität prüfen
-    stabilityBuffer[stabilityIndex] = median;
-    stabilityIndex = (stabilityIndex + 1) % STABILITY_CHECK;
-
-    if (stabilityIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECK, TOLERANCE))
-    {
-        unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECK);
-
-        // Prüfe, ob sich der neue Wert signifikant vom letzten unterscheidet
-        if (abs((long)newStableValue - (long)lastStableValue) > MIN_CHANGE)
-        {
-            lastStableValue = newStableValue;
-            isStable = true;
-            stableValue = newStableValue;
-        }
-    }
+    // Markiere, dass ein neuer Wert verfügbar ist
+    newValueAvailable = true;
 }
