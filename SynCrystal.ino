@@ -1,6 +1,5 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <stdlib.h>
 
 // Pins und Variablen
 constexpr int shaftPulsePin = 2;
@@ -21,23 +20,31 @@ volatile unsigned long lastStableValue = 0; // Zuletzt erkannter stabiler Wert
 volatile unsigned long impulseCount = 0;
 volatile bool newValueAvailable = false;
 
-// Vergleichsfunktion für qsort
-int compare(const void *a, const void *b)
-{
-    unsigned long intA = *(unsigned long *)a;
-    unsigned long intB = *(unsigned long *)b;
-    return (intA > intB) - (intA < intB);
-}
 
 // Median berechnen
-unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
+
+unsigned long calculateMedianSmallArray(volatile unsigned long *buffer, size_t size)
 {
     unsigned long temp[size];
     for (size_t i = 0; i < size; i++)
     {
         temp[i] = buffer[i];
     }
-    qsort(temp, size, sizeof(unsigned long), compare);
+
+    // Einfache Sortierung (Insertion Sort)
+    for (size_t i = 1; i < size; i++)
+    {
+        unsigned long key = temp[i];
+        size_t j = i;
+        while (j > 0 && temp[j - 1] > key)
+        {
+            temp[j] = temp[j - 1];
+            j--;
+        }
+        temp[j] = key;
+    }
+
+    // Determine Median 
     return (size % 2 == 0) ? (temp[size / 2 - 1] + temp[size / 2]) / 2 : temp[size / 2];
 }
 
@@ -73,14 +80,14 @@ void loop()
         newValueAvailable = false; // Zurücksetzen des Flags
 
         // Median berechnen
-        unsigned long median = calculateMedian(medianBuffer, WINDOW_SIZE);
+        unsigned long median = calculateMedianSmallArray(medianBuffer, WINDOW_SIZE);
         stabilityBuffer[stabilityIndex] = median;
         stabilityIndex = (stabilityIndex + 1) % STABILITY_CHECK;
 
         // Nur Stabilitätsprüfung durchführen, wenn der Buffer gefüllt ist
         if (stabilityIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECK, TOLERANCE))
         {
-            unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECK);
+            unsigned long newStableValue = calculateMedianSmallArray(stabilityBuffer, STABILITY_CHECK);
 
             // Prüfe auf signifikante Änderung
             if (abs((long)newStableValue - (long)lastStableValue) > MIN_CHANGE)
