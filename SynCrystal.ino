@@ -7,25 +7,27 @@ constexpr int greenLedPin = 7;
 constexpr int redLedPin = 9;
 volatile unsigned long lastShaftPulseTime = 0;
 
-constexpr size_t WINDOW_SIZE = 12;        // Größe des Median-Fensters
-constexpr size_t STABILITY_CHECK = 24;    // Größe des Stabilitäts-Fensters
-constexpr unsigned long TOLERANCE = 1600;  // Fester Toleranzwert in Mikrosekunden
-constexpr unsigned long MIN_CHANGE = 800; // Minimale Abweichung für eine neue Stabilität
+// This is for the median approach, which finds stable freq detection after 48 impulses (4 frames). 
+constexpr size_t STABILITY_WINDOW_SIZE = 12;        // Größe des Median-Fensters
+constexpr size_t STABILITY_CHECKS = 24;             // Größe des Stabilitäts-Fensters
+constexpr unsigned long TOLERANCE = 1600;           // Fester Toleranzwert in Mikrosekunden
+constexpr unsigned long MIN_CHANGE = 800;           // Minimale Abweichung für eine neue Stabilität
 
-volatile unsigned long medianBuffer[WINDOW_SIZE];
-volatile size_t medianIndex = 0;
-volatile unsigned long stabilityBuffer[STABILITY_CHECK];
-volatile size_t stabilityIndex = 0;
-volatile unsigned long lastStableValue = 0; // Zuletzt erkannter stabiler Wert
-volatile unsigned long impulseCount = 0;
-volatile bool newValueAvailable = false;
+volatile unsigned long freqMedianBuffer[STABILITY_WINDOW_SIZE];
+volatile size_t freqMedianIndex = 0;
+volatile unsigned long stabilityBuffer[STABILITY_CHECKS];
+volatile size_t freqBufferIndex = 0;
+volatile unsigned long lastStableFreqValue = 0; // Zuletzt erkannter stabiler Wert
+volatile unsigned long shaftImpulseCount = 0;
+volatile bool newShaftImpulseAvailable = false;
 
 
 // Median berechnen
 
-unsigned long calculateMedianSmallArray(volatile unsigned long *buffer, size_t size)
+unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
 {
     unsigned long temp[size];
+    // We need a copy of the array to not get interference with the ISR. Intereference doesnt seem likely, wo maybe 100B to save here
     for (size_t i = 0; i < size; i++)
     {
         temp[i] = buffer[i];
@@ -69,38 +71,38 @@ void setup()
     pinMode(shaftPulsePin, INPUT);
     pinMode(greenLedPin, OUTPUT);
     pinMode(redLedPin, OUTPUT);
-    attachInterrupt(digitalPinToInterrupt(shaftPulsePin), onShaftImpulse, RISING);
+    attachInterrupt(digitalPinToInterrupt(shaftPulsePin), onShaftImpulse, RISING); // We only want one edge of the signal to not be duty cycle dependent
 }
 
 void loop()
 {
     // Prüfe, ob neue Werte verfügbar sind
-    if (newValueAvailable)
+    if (newShaftImpulseAvailable)
     {
-        newValueAvailable = false; // Zurücksetzen des Flags
+        newShaftImpulseAvailable = false; // Zurücksetzen des ISR Flags
 
         // Median berechnen
-        unsigned long median = calculateMedianSmallArray(medianBuffer, WINDOW_SIZE);
-        stabilityBuffer[stabilityIndex] = median;
-        stabilityIndex = (stabilityIndex + 1) % STABILITY_CHECK;
+        unsigned long median = calculateMedian(freqMedianBuffer, STABILITY_WINDOW_SIZE);
+        stabilityBuffer[freqBufferIndex] = median;
+        freqBufferIndex = (freqBufferIndex + 1) % STABILITY_CHECKS;
 
         // Nur Stabilitätsprüfung durchführen, wenn der Buffer gefüllt ist
-        if (stabilityIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECK, TOLERANCE))
+        if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, TOLERANCE))
         {
-            unsigned long newStableValue = calculateMedianSmallArray(stabilityBuffer, STABILITY_CHECK);
+            unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
 
             // Prüfe auf signifikante Änderung
-            if (abs((long)newStableValue - (long)lastStableValue) > MIN_CHANGE)
+            if (abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE)
             {
-                lastStableValue = newStableValue;
+                lastStableFreqValue = newStableValue;
 
                 // Ausgabe
                 Serial.print("New stability detected after ");
-                Serial.print(impulseCount);
+                Serial.print(shaftImpulseCount);
                 Serial.print(" impulses. Stable Interval: ");
-                Serial.print(lastStableValue);
+                Serial.print(lastStableFreqValue);
                 Serial.print(" equals ");
-                Serial.print(1000000.0f / 12.0f / (float)lastStableValue, 2); // Ausgabe mit 2 Dezimalstellen
+                Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 2); // Ausgabe mit 2 Dezimalstellen
                 Serial.println(" fps ");
             }
         }
@@ -113,12 +115,12 @@ void onShaftImpulse()
     unsigned long interval = currentTime - lastShaftPulseTime;
     lastShaftPulseTime = currentTime;
 
-    impulseCount++;
+    shaftImpulseCount++;
 
     // Median-Berechnung im loop(), nicht hier
-    medianBuffer[medianIndex] = interval;
-    medianIndex = (medianIndex + 1) % WINDOW_SIZE;
+    freqMedianBuffer[freqMedianIndex] = interval;
+    freqMedianIndex = (freqMedianIndex + 1) % STABILITY_WINDOW_SIZE;
 
     // Markiere, dass ein neuer Wert verfügbar ist
-    newValueAvailable = true;
+    newShaftImpulseAvailable = true;
 }
