@@ -6,12 +6,12 @@ constexpr int shaftPulsePin = 2;
 constexpr int greenLedPin = 7;
 constexpr int redLedPin = 9;
 volatile unsigned long lastShaftPulseTime = 0;
-constexpr unsigned long STOP_THRESHOLD = 20000; // Threshold in microseconds to detect a stop
+constexpr unsigned long STOP_THRESHOLD = 10000; // Threshold in microseconds to detect a stop
 
 // This is for the median approach, which finds stable freq detection after 48 impulses (4 frames). 
 constexpr size_t STABILITY_WINDOW_SIZE = 12;        // Größe des Median-Fensters
-constexpr size_t STABILITY_CHECKS = 24;             // Größe des Stabilitäts-Fensters
-constexpr unsigned long TOLERANCE = 1600;           // Fester Toleranzwert in Mikrosekunden
+constexpr size_t STABILITY_CHECKS = 36;             // Größe des Stabilitäts-Fensters
+constexpr unsigned long SPEED_DETECT_TOLERANCE = 1600;           // Fester Toleranzwert in Mikrosekunden
 constexpr unsigned long MIN_CHANGE = 800;           // Minimale Abweichung für eine neue Stabilität
 
 volatile unsigned long freqMedianBuffer[STABILITY_WINDOW_SIZE];
@@ -22,8 +22,7 @@ volatile unsigned long lastStableFreqValue = 0; // Zuletzt erkannter stabiler We
 volatile unsigned long shaftImpulseCount = 0;
 volatile bool newShaftImpulseAvailable = false;
 volatile bool projectorRunning = true; // true = Running, false = Stopped
-constexpr int PROJECTOR_RUNNING = 1;
-constexpr int PROJECTOR_STOPPED = 0;
+
 
 // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
 
@@ -90,7 +89,7 @@ void loop()
     freqBufferIndex = (freqBufferIndex + 1) % STABILITY_CHECKS;
 
     // Perform stability check if the buffer is full
-    if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, TOLERANCE))
+    if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
     {
         unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
 
@@ -99,14 +98,11 @@ void loop()
         {
             lastStableFreqValue = newStableValue;
             projectorRunning = true; // Projector is running again
-
-            // Output stability detection
-            Serial.print(!projectorRunning ? "Projector restarted. " : "New stability detected. ");
-            Serial.print("Stable Interval: ");
-            Serial.print(lastStableFreqValue);
-            Serial.print(" equals ");
-            Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 2); // FPS
-            Serial.println(" fps");
+            Serial.print("[DEBUG] Projector running stable with ~");
+            Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 1); // FPS
+            Serial.print(" fps after ");
+            Serial.print(shaftImpulseCount);
+            Serial.println(" impulses.");
         }
     }
 }
@@ -127,7 +123,8 @@ void onShaftImpulse()
     if (interval > STOP_THRESHOLD && projectorRunning)
     {
         projectorRunning = false; // Projector is stopped
-        Serial.println("Projector stopped due to large intervals.");
+        Serial.println("[DEBUG] Projector stopped.");
+        shaftImpulseCount = 0;
     }
 
     // Mark new data available
