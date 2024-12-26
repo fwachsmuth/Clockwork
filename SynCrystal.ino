@@ -20,9 +20,10 @@ volatile size_t freqBufferIndex = 0;
 volatile unsigned long lastStableFreqValue = 0; // Zuletzt erkannter stabiler Wert
 volatile unsigned long shaftImpulseCount = 0;
 volatile bool newShaftImpulseAvailable = false;
+volatile int projectorRunState = 1; // 1 = Running, 0 = Stopped
 
 
-// Median berechnen
+// Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
 
 unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
 {
@@ -76,35 +77,37 @@ void setup()
 
 void loop()
 {
-    // Prüfe, ob neue Werte verfügbar sind
-    if (newShaftImpulseAvailable)
+    if (!newShaftImpulseAvailable)
+        return; // Exit early if no new data is available
+
+    newShaftImpulseAvailable = false; // Reset the ISR flag
+
+    // Calculate the median for the frequency buffer
+    unsigned long median = calculateMedian(freqMedianBuffer, STABILITY_WINDOW_SIZE);
+
+    // Store the median in the stability buffer
+    stabilityBuffer[freqBufferIndex] = median;
+    freqBufferIndex = (freqBufferIndex + 1) % STABILITY_CHECKS;
+
+    // Perform stability check when the stability buffer is full
+    if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, TOLERANCE))
     {
-        newShaftImpulseAvailable = false; // Zurücksetzen des ISR Flags
+        unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
 
-        // Median berechnen
-        unsigned long median = calculateMedian(freqMedianBuffer, STABILITY_WINDOW_SIZE);
-        stabilityBuffer[freqBufferIndex] = median;
-        freqBufferIndex = (freqBufferIndex + 1) % STABILITY_CHECKS;
-
-        // Nur Stabilitätsprüfung durchführen, wenn der Buffer gefüllt ist
-        if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, TOLERANCE))
+        // Update stability if there's a significant change or the projector was stopped
+        if (abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE || projectorRunState == 0)
         {
-            unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
+            lastStableFreqValue = newStableValue;
+            projectorRunState = 1; // Projector is running again
 
-            // Prüfe auf signifikante Änderung
-            if (abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE)
-            {
-                lastStableFreqValue = newStableValue;
-
-                // Ausgabe
-                Serial.print("New stability detected after ");
-                Serial.print(shaftImpulseCount);
-                Serial.print(" impulses. Stable Interval: ");
-                Serial.print(lastStableFreqValue);
-                Serial.print(" equals ");
-                Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 2); // Ausgabe mit 2 Dezimalstellen
-                Serial.println(" fps ");
-            }
+            // Output stability detection
+            Serial.print("New stability detected after ");
+            Serial.print(shaftImpulseCount);
+            Serial.print(" impulses. Stable Interval: ");
+            Serial.print(lastStableFreqValue);
+            Serial.print(" equals ");
+            Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 2); // FPS
+            Serial.println(" fps");
         }
     }
 }
@@ -117,10 +120,17 @@ void onShaftImpulse()
 
     shaftImpulseCount++;
 
-    // Median-Berechnung im loop(), nicht hier
+    // Update the frequency buffer and index
     freqMedianBuffer[freqMedianIndex] = interval;
     freqMedianIndex = (freqMedianIndex + 1) % STABILITY_WINDOW_SIZE;
 
-    // Markiere, dass ein neuer Wert verfügbar ist
+    // Detect if the interval exceeds twice the last stable interval
+    if (lastStableFreqValue > 0 && interval > 2 * lastStableFreqValue)
+    {
+        projectorRunState = 0; // Stop the projector immediately
+        Serial.println("Projector stopped due to large intervals.");
+    }
+
+    // Mark new data available for the main loop
     newShaftImpulseAvailable = true;
 }
