@@ -23,6 +23,8 @@ volatile unsigned long shaftImpulseCount = 0;
 volatile bool newShaftImpulseAvailable = false;
 volatile int projectorRunState = 1; // 1 = Running, 0 = Stopped
 volatile bool restartPending = false; // Tracks if the system is transitioning from stopped to running
+constexpr int PROJECTOR_RUNNING = 1;
+constexpr int PROJECTOR_STOPPED = 0;
 
 // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
 
@@ -78,78 +80,34 @@ void setup()
 
 void loop()
 {
-    unsigned long currentTime = micros();
+    if (!newShaftImpulseAvailable)
+        return; // Skip processing if no new data
 
-    // Handle projector restart
-    if (restartPending)
+    newShaftImpulseAvailable = false; // Reset the ISR flag
+
+    // Calculate median and store it in the stability buffer
+    unsigned long median = calculateMedian(freqMedianBuffer, STABILITY_WINDOW_SIZE);
+    stabilityBuffer[freqBufferIndex] = median;
+    freqBufferIndex = (freqBufferIndex + 1) % STABILITY_CHECKS;
+
+    // Perform stability check if the buffer is full
+    if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, TOLERANCE))
     {
-        if (newShaftImpulseAvailable)
+        unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
+
+        // Handle projector restart or stability change
+        if (projectorRunState == PROJECTOR_STOPPED || abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE)
         {
-            newShaftImpulseAvailable = false; // Reset ISR flag
+            lastStableFreqValue = newStableValue;
+            projectorRunState = PROJECTOR_RUNNING;
 
-            // Calculate the median for the frequency buffer
-            unsigned long median = calculateMedian(freqMedianBuffer, STABILITY_WINDOW_SIZE);
-
-            // Store the median in the stability buffer
-            stabilityBuffer[freqBufferIndex] = median;
-            freqBufferIndex = (freqBufferIndex + 1) % STABILITY_CHECKS;
-
-            // Perform stability check when the stability buffer is full
-            if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, TOLERANCE))
-            {
-                unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
-
-                // Update stability and mark the projector as running
-                if (newStableValue != lastStableFreqValue || projectorRunState == 0)
-                {
-                    lastStableFreqValue = newStableValue;
-                    projectorRunState = 1;  // Mark as running
-                    restartPending = false; // Clear the restart pending flag
-                    freqBufferIndex = 0;    // Reset stability buffer index
-
-                    // Output stability detection
-                    Serial.print("Projector restarted. Stable Interval: ");
-                    Serial.print(lastStableFreqValue);
-                    Serial.print(" equals ");
-                    Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 2); // FPS
-                    Serial.println(" fps");
-                }
-            }
-        }
-        return; // Skip further processing while restart is pending
-    }
-
-    // Handle new impulses during normal operation
-    if (newShaftImpulseAvailable)
-    {
-        newShaftImpulseAvailable = false; // Reset ISR flag
-
-        // Calculate the median for the frequency buffer
-        unsigned long median = calculateMedian(freqMedianBuffer, STABILITY_WINDOW_SIZE);
-
-        // Store the median in the stability buffer
-        stabilityBuffer[freqBufferIndex] = median;
-        freqBufferIndex = (freqBufferIndex + 1) % STABILITY_CHECKS;
-
-        // Perform stability check when the stability buffer is full
-        if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, TOLERANCE))
-        {
-            unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
-
-            // Update stability if there's a significant change
-            if (abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE)
-            {
-                lastStableFreqValue = newStableValue;
-
-                // Output stability detection
-                Serial.print("New stability detected after ");
-                Serial.print(shaftImpulseCount);
-                Serial.print(" impulses. Stable Interval: ");
-                Serial.print(lastStableFreqValue);
-                Serial.print(" equals ");
-                Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 2); // FPS
-                Serial.println(" fps");
-            }
+            // Output stability detection
+            Serial.print(projectorRunState == PROJECTOR_STOPPED ? "Projector restarted. " : "New stability detected. ");
+            Serial.print("Stable Interval: ");
+            Serial.print(lastStableFreqValue);
+            Serial.print(" equals ");
+            Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 2); // FPS
+            Serial.println(" fps");
         }
     }
 }
@@ -162,23 +120,17 @@ void onShaftImpulse()
 
     shaftImpulseCount++;
 
-    // Update the frequency buffer and index
+    // Update the frequency buffer
     freqMedianBuffer[freqMedianIndex] = interval;
     freqMedianIndex = (freqMedianIndex + 1) % STABILITY_WINDOW_SIZE;
 
     // Detect if the interval exceeds the stop threshold
-    if (interval > STOP_THRESHOLD)
+    if (interval > STOP_THRESHOLD && projectorRunState == PROJECTOR_RUNNING)
     {
-        if (projectorRunState != 0) // Print only once when transitioning to stopped state
-        {
-            projectorRunState = 0; // Mark projector as stopped
-            restartPending = true; // Set the restart pending flag
-            Serial.println("Projector stopped due to large intervals.");
-        }
+        projectorRunState = PROJECTOR_STOPPED;
+        Serial.println("Projector stopped due to large intervals.");
     }
-    else
-    {
-        // Mark new data available for stability checks
-        newShaftImpulseAvailable = true;
-    }
+
+    // Mark new data available
+    newShaftImpulseAvailable = true;
 }
