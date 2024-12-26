@@ -21,7 +21,7 @@ volatile size_t freqBufferIndex = 0;
 volatile unsigned long lastStableFreqValue = 0; // Zuletzt erkannter stabiler Wert
 volatile unsigned long shaftImpulseCount = 0;
 volatile bool newShaftImpulseAvailable = false;
-volatile bool projectorRunning = true; // true = Running, false = Stopped
+volatile bool projectorRunning = false; // true = Running, false = Stopped
 
 
 // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
