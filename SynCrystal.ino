@@ -21,8 +21,7 @@ volatile size_t freqBufferIndex = 0;
 volatile unsigned long lastStableFreqValue = 0; // Zuletzt erkannter stabiler Wert
 volatile unsigned long shaftImpulseCount = 0;
 volatile bool newShaftImpulseAvailable = false;
-volatile int projectorRunState = 1; // 1 = Running, 0 = Stopped
-volatile bool restartPending = false; // Tracks if the system is transitioning from stopped to running
+volatile bool projectorRunning = true; // true = Running, false = Stopped
 constexpr int PROJECTOR_RUNNING = 1;
 constexpr int PROJECTOR_STOPPED = 0;
 
@@ -96,13 +95,13 @@ void loop()
         unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
 
         // Handle projector restart or stability change
-        if (projectorRunState == PROJECTOR_STOPPED || abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE)
+        if (!projectorRunning || abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE)
         {
             lastStableFreqValue = newStableValue;
-            projectorRunState = PROJECTOR_RUNNING;
+            projectorRunning = true; // Projector is running again
 
             // Output stability detection
-            Serial.print(projectorRunState == PROJECTOR_STOPPED ? "Projector restarted. " : "New stability detected. ");
+            Serial.print(!projectorRunning ? "Projector restarted. " : "New stability detected. ");
             Serial.print("Stable Interval: ");
             Serial.print(lastStableFreqValue);
             Serial.print(" equals ");
@@ -125,9 +124,9 @@ void onShaftImpulse()
     freqMedianIndex = (freqMedianIndex + 1) % STABILITY_WINDOW_SIZE;
 
     // Detect if the interval exceeds the stop threshold
-    if (interval > STOP_THRESHOLD && projectorRunState == PROJECTOR_RUNNING)
+    if (interval > STOP_THRESHOLD && projectorRunning)
     {
-        projectorRunState = PROJECTOR_STOPPED;
+        projectorRunning = false; // Projector is stopped
         Serial.println("Projector stopped due to large intervals.");
     }
 
