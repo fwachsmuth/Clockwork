@@ -97,12 +97,22 @@ void loop()
         if (!projectorRunning || abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE)
         {
             lastStableFreqValue = newStableValue;
+            float detectedFrequency = 1000000.0f / 12.0f / (float)lastStableFreqValue;
             projectorRunning = true; // Projector is running again
             Serial.print("[DEBUG] Projector running stable with ~");
-            Serial.print(1000000.0f / 12.0f / (float)lastStableFreqValue, 1); // FPS
+            Serial.print(detectedFrequency, 1); // FPS
             Serial.print(" fps after ");
             Serial.print(shaftImpulseCount);
-            Serial.println(" impulses.");
+            Serial.print(" impulses. ");
+            Serial.println(1000000 / STABILITY_WINDOW_SIZE / lastStableFreqValue);
+            if ((detectedFrequency > 16) || (detectedFrequency < 20))
+            {
+                projectorSpeedSwitchPos = 18;
+            }
+            else if ((detectedFrequency > 22) || (detectedFrequency < 26)) 
+            {
+                projectorSpeedSwitchPos = 24;
+            }
         }
     }
 }
