@@ -22,11 +22,13 @@ volatile unsigned long lastStableFreqValue = 0; // Zuletzt erkannter stabiler We
 volatile unsigned long shaftImpulseCount = 0;
 volatile bool newShaftImpulseAvailable = false;
 volatile bool projectorRunning = false; // true = Running, false = Stopped
-
+volatile byte projectorSpeedSwitchPos; // holds the (guessed) current speed switch position (18 or 24)
+volatile unsigned long timer2OverflowCount = 0; // Globale Zähler-Variable für Timer2-Überläufe
 
 // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
 
-unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
+unsigned long
+calculateMedian(volatile unsigned long *buffer, size_t size)
 {
     unsigned long temp[size];
     // We need a copy of the array to not get interference with the ISR. Intereference doesnt seem likely, wo maybe 100B to save here
@@ -69,6 +71,12 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 
 void setup()
 {
+    // Timer2 konfigurieren
+    TCCR2A = 0;            // Normaler Modus
+    TCCR2B = (1 << CS22);  // Prescaler = 64 (1 Tick = 4 µs bei 16 MHz)
+    TCNT2 = 0;             // Timer2 zurücksetzen
+    TIMSK2 = (1 << TOIE2); // Overflow Interrupt aktivieren
+    
     Serial.begin(115200);
     pinMode(shaftPulsePin, INPUT);
     pinMode(greenLedPin, OUTPUT);
@@ -105,11 +113,11 @@ void loop()
             Serial.print(shaftImpulseCount);
             Serial.print(" impulses. ");
             Serial.println(1000000 / STABILITY_WINDOW_SIZE / lastStableFreqValue);
-            if ((detectedFrequency > 16) || (detectedFrequency < 20))
+            if (detectedFrequency > 16 && detectedFrequency < 20)
             {
                 projectorSpeedSwitchPos = 18;
             }
-            else if ((detectedFrequency > 22) || (detectedFrequency < 26)) 
+            else if (detectedFrequency > 22 && detectedFrequency < 26)
             {
                 projectorSpeedSwitchPos = 24;
             }
@@ -117,26 +125,38 @@ void loop()
     }
 }
 
+
+ISR(TIMER2_OVF_vect)
+{
+    timer2OverflowCount++; // Überlaufzähler inkrementieren
+}
+
 void onShaftImpulse()
 {
-    unsigned long currentTime = micros();
-    unsigned long interval = currentTime - lastShaftPulseTime;
-    lastShaftPulseTime = currentTime;
+    static unsigned long lastTimer2Value = 0;
 
-    shaftImpulseCount++;
+    // Kombiniere Überläufe und Timer-Zähler
+    unsigned long currentTimer2Value = (timer2OverflowCount << 8) | TCNT2; // 8-Bit Timer2 mit Überläufen
+    unsigned long elapsedTicks = currentTimer2Value - lastTimer2Value;     // Differenz der Ticks
+    lastTimer2Value = currentTimer2Value;
 
-    // Update the frequency buffer
-    freqMedianBuffer[freqMedianIndex] = interval;
+    // Umrechnung in Mikrosekunden
+    unsigned long intervalMicros = elapsedTicks * 4; // 4 µs pro Tick bei Prescaler 64
+    lastShaftPulseTime += intervalMicros;            // Aktualisiere den letzten Impulszeitpunkt
+
+    // Frequenz-Puffer aktualisieren
+    freqMedianBuffer[freqMedianIndex] = intervalMicros;
     freqMedianIndex = (freqMedianIndex + 1) % STABILITY_WINDOW_SIZE;
 
-    // Detect if the interval exceeds the stop threshold
-    if (interval > STOP_THRESHOLD && projectorRunning)
+    // Prüfe, ob das Intervall den Stopp-Schwellenwert überschreitet
+    if (intervalMicros > STOP_THRESHOLD && projectorRunning)
     {
-        projectorRunning = false; // Projector is stopped
+        projectorRunning = false; // Projektor gestoppt
         Serial.println("[DEBUG] Projector stopped.");
         shaftImpulseCount = 0;
     }
 
-    // Mark new data available
+    // Neue Daten verfügbar machen
+    shaftImpulseCount++;
     newShaftImpulseAvailable = true;
 }
