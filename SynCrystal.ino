@@ -1,10 +1,42 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <Wire.h>
+#include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
+
+Adafruit_MCP4725 dac; // Instantiate the DAC
 
 // Pins und Variablen
 constexpr int shaftPulsePin = 2;
 constexpr int greenLedPin = 7;
 constexpr int redLedPin = 9;
+
+const byte ledSlowerRed = 5;    //  --
+const byte ledSlowerYellow = 6; //  -
+const byte ledGreen = 7;        //  o
+const byte ledFasterYellow = 8; //  +
+const byte ledFasterRed = 9;    //  ++
+
+// to get the DAC value for any desired fps per a * x * x + b * x + c
+const float a = 0.6126;
+const float b = 155.44;
+const float c = -1459.34;
+
+#define FPS_18 1
+#define FPS_24 2
+#define FPS_25 3
+#define FPS_9 4
+#define FPS_16_2_3 5
+int timerFactor = 0;           // this is used for the Timer1 postscaler, since multiples of 18 and 24 Hz give better accuracy
+volatile int timerDivider = 0; // For Modulo in the ISR, to compensate the timerFactor
+volatile long timerFrames = 0; // This is the timer1 frequency / timerFactor — equalling actual desired fps (no multiple)
+
+const byte projectorSegmentCount = 12; // What kind of Shutter Blade do we have?
+volatile int projectorDivider = 0; // For Modulo in the ISR, to compensate the multiple pulses per revolution
+volatile long projectorFrames = 0; // This is the actually advanced frames (puleses / segmentCount)
+
+volatile bool projectorFrameCountUpdated;
+volatile bool timerFrameCountUpdated;
+
 volatile unsigned long lastShaftPulseTime = 0;
 constexpr unsigned long STOP_THRESHOLD = 10000; // Threshold in microseconds to detect a stop
 
@@ -82,10 +114,42 @@ void setup()
     pinMode(greenLedPin, OUTPUT);
     pinMode(redLedPin, OUTPUT);
     attachInterrupt(digitalPinToInterrupt(shaftPulsePin), onShaftImpulse, RISING); // We only want one edge of the signal to not be duty cycle dependent
+    dac.begin(0x60);
+
+    dac.setVoltage(1480, false); // 1537 is petty much 18 fps
 }
 
 void loop()
 {
+    static long lastDifference = 0; // Stores the last output difference
+    long localTimerFrames, localProjectorFrames;
+    long currentDifference;
+
+    if (projectorFrameCountUpdated && timerFrameCountUpdated)
+    {
+        noInterrupts();
+        localTimerFrames = timerFrames;
+        localProjectorFrames = projectorFrames;
+        interrupts();
+
+        currentDifference = localTimerFrames - localProjectorFrames;
+
+        projectorFrameCountUpdated = false;
+        timerFrameCountUpdated = false;
+    }
+
+    // Print only if the difference has changed
+    if (currentDifference != lastDifference)
+    {
+        Serial.print("localTimerFrames: ");
+        Serial.print(localTimerFrames);
+        Serial.print(", localProjectorFrames: ");
+        Serial.print(localProjectorFrames);
+        Serial.print(", Difference: ");
+        Serial.println(currentDifference);
+
+        lastDifference = currentDifference; // Update the lastDifference
+    }
     if (!newShaftImpulseAvailable)
         return; // Skip processing if no new data
 
@@ -111,11 +175,11 @@ void loop()
             Serial.print(detectedFrequency, 1); // FPS
             Serial.print(" fps after ");
             Serial.print(shaftImpulseCount);
-            Serial.print(" impulses. ");
-            Serial.println(1000000 / STABILITY_WINDOW_SIZE / lastStableFreqValue);
+            Serial.println(" impulses. ");
             if (detectedFrequency > 16 && detectedFrequency < 20)
             {
                 projectorSpeedSwitchPos = 18;
+                setupTimer1forFps(FPS_18);              
             }
             else if (detectedFrequency > 22 && detectedFrequency < 26)
             {
@@ -125,6 +189,131 @@ void loop()
     }
 }
 
+void setLeds(int bargraph)
+{
+    switch (bargraph)
+    {
+    case -2:
+        digitalWrite(ledSlowerRed, HIGH);
+        digitalWrite(ledSlowerYellow, LOW);
+        digitalWrite(ledGreen, LOW);
+        digitalWrite(ledFasterYellow, LOW);
+        digitalWrite(ledFasterRed, LOW);
+        break;
+    case -1:
+        digitalWrite(ledSlowerRed, LOW);
+        digitalWrite(ledSlowerYellow, HIGH);
+        digitalWrite(ledGreen, LOW);
+        digitalWrite(ledFasterYellow, LOW);
+        digitalWrite(ledFasterRed, LOW);
+        break;
+    case 0:
+        digitalWrite(ledSlowerRed, LOW);
+        digitalWrite(ledSlowerYellow, LOW);
+        digitalWrite(ledGreen, HIGH);
+        digitalWrite(ledFasterYellow, LOW);
+        digitalWrite(ledFasterRed, LOW);
+        break;
+    case 1:
+        digitalWrite(ledSlowerRed, LOW);
+        digitalWrite(ledSlowerYellow, LOW);
+        digitalWrite(ledGreen, LOW);
+        digitalWrite(ledFasterYellow, HIGH);
+        digitalWrite(ledFasterRed, LOW);
+        break;
+    case 2:
+        digitalWrite(ledSlowerRed, LOW);
+        digitalWrite(ledSlowerYellow, LOW);
+        digitalWrite(ledGreen, LOW);
+        digitalWrite(ledFasterYellow, LOW);
+        digitalWrite(ledFasterRed, HIGH);
+        break;
+    default:
+        break;
+    }
+}
+
+bool setupTimer1forFps(byte sollFpsState)
+{
+    // start with a new sync point, no need to catch up differences from before.
+    timerFrames = 0;
+    projectorFrames = 0;
+    timerDivider = 0;
+
+    if (sollFpsState >= 1 && sollFpsState <= 5)
+    {
+        Serial.print(F("New Timer FPS State: "));
+        Serial.println(sollFpsState);
+
+        noInterrupts();
+        // Clear registers
+        TCCR1A = 0;
+        TCCR1B = 0;
+        TCNT1 = 0;
+        // CTC
+        TCCR1B |= (1 << WGM12);
+
+        switch (sollFpsState)
+        {
+        case FPS_9:
+            OCR1A = 10100; // 198.000198000198 Hz (16000000/((10100+1)*8)),
+            //              divided by 22 is 9,000009.. Hz
+            //
+            TCCR1B |= (1 << CS11); // Prescaler 8
+            timerFactor = 22;
+
+            break;
+        case FPS_16_2_3:
+            OCR1A = 14999;                       // 16 2/3 Hz (16000000/((14999+1)*64))
+            TCCR1B |= (1 << CS11) | (1 << CS10); // Prescaler 64
+            timerFactor = 1;
+
+            break;
+        case FPS_18:
+            OCR1A = 10100; // 198.000198000198 Hz (16000000/((10100+1)*8)),
+            //              divided by 11 is 18.000018.. Hz
+            //              or 18 2/111,111
+            //              or 2,000,000/111,111
+            //
+            TCCR1B |= (1 << CS11); // Prescaler 8
+            timerFactor = 11;
+
+            break;
+        case FPS_24:
+            OCR1A = 60605; // 264.000264000264 Hz (16000000/((60605+1)*1)),
+            //               divided by 11 is 24.000024.. Hz
+            //               or 24 8/333,333
+            //               or 8,000,000 / 333,333
+            //
+            TCCR1B |= (1 << CS10); // Prescaler 1
+            timerFactor = 11;
+
+            break;
+        case FPS_25:
+            OCR1A = 624;                         // 25 Hz (16000000/((624+1)*1024))
+            TCCR1B |= (1 << CS12) | (1 << CS10); // Prescaler 1024
+            timerFactor = 1;
+
+            break;
+        default:
+            break;
+        }
+        // Output Compare Match A Interrupt Enable
+        TIMSK1 |= (1 << OCIE1A);
+        interrupts();
+    }
+    else
+    {
+        // invalid fps requested
+        Serial.println(F("Invalid FPS request"));
+        return false;
+    }
+}
+
+int calculateValue(float x, float a, float b, float c)
+{
+    return a * x * x + b * x + c; // Berechnung der quadratischen Funktion
+}
 
 ISR(TIMER2_OVF_vect)
 {
@@ -133,6 +322,7 @@ ISR(TIMER2_OVF_vect)
 
 void onShaftImpulse()
 {
+    // For stability detection in free running mode, we use timer2 with overflow instead of micros() — it's cheaper.
     static unsigned long lastTimer2Value = 0;
 
     // Kombiniere Überläufe und Timer-Zähler
@@ -153,10 +343,38 @@ void onShaftImpulse()
     {
         projectorRunning = false; // Projektor gestoppt
         Serial.println("[DEBUG] Projector stopped.");
+        stopTimer1();
         shaftImpulseCount = 0;
     }
 
     // Neue Daten verfügbar machen
     shaftImpulseCount++;
     newShaftImpulseAvailable = true;
+
+    if (projectorDivider == 0)
+    {
+        projectorFrames++;
+        projectorFrameCountUpdated = true;
+    }
+    projectorDivider++;
+    projectorDivider %= (projectorSegmentCount); 
+}
+
+ISR(TIMER1_COMPA_vect)
+{
+    if (timerDivider == 0)
+    {
+        timerFrames++;
+        timerFrameCountUpdated = true;
+    }
+    timerDivider++;
+    timerDivider %= timerFactor;
+}
+
+void stopTimer1()
+{ // Stops Timer1, for when we are not in craystal running mode
+    // TCCR1B &= ~(1 << CS11);
+    noInterrupts();
+    TIMSK1 &= ~(1 << OCIE1A);
+    interrupts();
 }
