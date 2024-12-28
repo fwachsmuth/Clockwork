@@ -2,6 +2,7 @@
 #include <avr/interrupt.h>
 #include <Wire.h>
 #include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
+#include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
 
 Adafruit_MCP4725 dac; // Instantiate the DAC
 
@@ -16,7 +17,7 @@ const byte ledGreen = 7;        //  o
 const byte ledFasterYellow = 8; //  +
 const byte ledFasterRed = 9;    //  ++
 
-uint16_t dacValue = 1537; // start somewhere. This is about 17.6 fps on my projector
+uint16_t dacValue = 1200; // start somewhere, e.g. 1537. This is about 17.6 fps on my projector
 
 // to get the approx. DAC value for any desired fps per a * x * x + b * x + c
 const float a = 0.6126;
@@ -60,6 +61,11 @@ volatile bool newShaftImpulseAvailable = false;
 volatile bool projectorRunning = false; // true = Running, false = Stopped
 volatile byte projectorSpeedSwitchPos; // holds the (guessed) current speed switch position (18 or 24)
 volatile unsigned long timer2OverflowCount = 0; // Globale Zähler-Variable für Timer2-Überläufe
+
+// PID stuff
+double Setpoint, Input, Output;
+double Kp = 10, Ki = 5, Kd = 1;
+PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, REVERSE); // P_ON_M?
 
 // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
 
@@ -121,6 +127,12 @@ void setup()
     dac.begin(0x60);
 
     dac.setVoltage(dacValue, false); // 1537 is petty much 18 fps
+
+    Input = 0;
+    Setpoint = 0;
+    myPID.SetMode(AUTOMATIC);
+    myPID.SetOutputLimits(0, 4095);
+    myPID.SetSampleTime(26); // Nyquist: Measure twice in 1/18 Sek (= 26 msec)
 }
 
 void loop()
@@ -144,22 +156,31 @@ void loop()
 
         projectorFrameCountUpdated = false;
         timerFrameCountUpdated = false;
+
+        Input = currentPulseDifference;
+        myPID.Compute();
+        newDacValue = dacValue + Output;
+        dac.setVoltage(newDacValue, false);
     }
 
     // Print only if the difference has changed
     if (currentPulseDifference != lastDifference)
     {
-        Serial.print("localTimerFrames: ");
-        Serial.print(localTimerFrames);
-        Serial.print(", localProjectorFrames: ");
-        Serial.print(localProjectorFrames);
-        Serial.print(", Difference: ");
-        Serial.print(currentPulseDifference);
-        Serial.print(", correct to ");
+        // Serial.print("localTimerFrames: ");
+        // Serial.print(localTimerFrames);
+        // Serial.print(", localProjectorFrames: ");
+        // Serial.print(localProjectorFrames);
+        // Serial.print(", correct to ");
 
-        correctionSignal = currentPulseDifference * 2;
-        
-        newDacValue = dacValue + correctionSignal;
+        // correctionSignal = currentPulseDifference * 2;
+
+        Serial.print("Input: ");
+        Serial.print(currentPulseDifference);
+        Serial.print(", Output: ");
+        Serial.print(Output);
+        Serial.print(", new DAC: ");
+
+        //newDacValue = dacValue + correctionSignal;
         // Ensure newDacValue stays in [0, 4095]
         if (newDacValue < 0)
         {
@@ -169,7 +190,9 @@ void loop()
         {
             newDacValue = 4095;
         }
+
         Serial.println(newDacValue);
+
         dac.setVoltage(newDacValue, false);
         lastDifference = currentPulseDifference; // Update the lastDifference
         // dacValue = newDacValue;
