@@ -16,7 +16,9 @@ const byte ledGreen = 7;        //  o
 const byte ledFasterYellow = 8; //  +
 const byte ledFasterRed = 9;    //  ++
 
-// to get the DAC value for any desired fps per a * x * x + b * x + c
+uint16_t dacValue = 1537; // start somewhere. This is about 17.6 fps on my projector
+
+// to get the approx. DAC value for any desired fps per a * x * x + b * x + c
 const float a = 0.6126;
 const float b = 155.44;
 const float c = -1459.34;
@@ -26,14 +28,16 @@ const float c = -1459.34;
 #define FPS_25 3
 #define FPS_9 4
 #define FPS_16_2_3 5
-int timerFactor = 0;           // this is used for the Timer1 postscaler, since multiples of 18 and 24 Hz give better accuracy
-volatile int timerDivider = 0; // For Modulo in the ISR, to compensate the timerFactor
-volatile long timerFrames = 0; // This is the timer1 frequency / timerFactor — equalling actual desired fps (no multiple)
 
-const byte projectorSegmentCount = 12; // What kind of Shutter Blade do we have?
-volatile int projectorDivider = 0; // For Modulo in the ISR, to compensate the multiple pulses per revolution
-volatile long projectorFrames = 0; // This is the actually advanced frames (puleses / segmentCount)
+int timerFactor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
+volatile int timerModulus = 0; // For Modulo in the ISR, to compensate the timerFactor
+volatile long timerFrames = 0; // This is the timer1 (frequency / timerFactor) — equalling actual desired fps (no multiples)
 
+const byte shaftSegmentDiscDivider = 1; // Increase this if we only want to use every nth pulse
+volatile int shaftModulus = 0; // For Modulo in the ISR, to compensate the multiple pulses per revolution
+volatile long projectorFrames = 0; // This is the actually advanced frames (pulses / shaftSegmentDiscDivider)
+
+// flags to assure reading only once both ISRs have done theri duty
 volatile bool projectorFrameCountUpdated;
 volatile bool timerFrameCountUpdated;
 
@@ -103,7 +107,7 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 
 void setup()
 {
-    // Timer2 konfigurieren
+    // Timer2 konfigurieren (replaces micros() in the ISR)
     TCCR2A = 0;            // Normaler Modus
     TCCR2B = (1 << CS22);  // Prescaler = 64 (1 Tick = 4 µs bei 16 MHz)
     TCNT2 = 0;             // Timer2 zurücksetzen
@@ -113,18 +117,22 @@ void setup()
     pinMode(shaftPulsePin, INPUT);
     pinMode(greenLedPin, OUTPUT);
     pinMode(redLedPin, OUTPUT);
-    attachInterrupt(digitalPinToInterrupt(shaftPulsePin), onShaftImpulse, RISING); // We only want one edge of the signal to not be duty cycle dependent
+    attachInterrupt(digitalPinToInterrupt(shaftPulsePin), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
-    dac.setVoltage(1480, false); // 1537 is petty much 18 fps
+    dac.setVoltage(dacValue, false); // 1537 is petty much 18 fps
 }
 
 void loop()
 {
     static long lastDifference = 0; // Stores the last output difference
-    long localTimerFrames, localProjectorFrames;
-    long currentDifference;
+    static long localTimerFrames = 0;
+    static long localProjectorFrames = 0;
+    static long currentPulseDifference = 0;
+    static long correctionSignal = 0;
+    uint16_t newDacValue = 0;
 
+    // only read a difference if both ISRs did their updates yet, otherwise we get plenty of false changes
     if (projectorFrameCountUpdated && timerFrameCountUpdated)
     {
         noInterrupts();
@@ -132,25 +140,42 @@ void loop()
         localProjectorFrames = projectorFrames;
         interrupts();
 
-        currentDifference = localTimerFrames - localProjectorFrames;
+        currentPulseDifference = localTimerFrames - localProjectorFrames;
 
         projectorFrameCountUpdated = false;
         timerFrameCountUpdated = false;
     }
 
     // Print only if the difference has changed
-    if (currentDifference != lastDifference)
+    if (currentPulseDifference != lastDifference)
     {
         Serial.print("localTimerFrames: ");
         Serial.print(localTimerFrames);
         Serial.print(", localProjectorFrames: ");
         Serial.print(localProjectorFrames);
         Serial.print(", Difference: ");
-        Serial.println(currentDifference);
+        Serial.print(currentPulseDifference);
+        Serial.print(", correct to ");
 
-        lastDifference = currentDifference; // Update the lastDifference
+        correctionSignal = currentPulseDifference * 2;
+        
+        newDacValue = dacValue + correctionSignal;
+        // Ensure newDacValue stays in [0, 4095]
+        if (newDacValue < 0)
+        {
+            newDacValue = 0;
+        }
+        else if (newDacValue > 4095)
+        {
+            newDacValue = 4095;
+        }
+        Serial.println(newDacValue);
+        dac.setVoltage(newDacValue, false);
+        lastDifference = currentPulseDifference; // Update the lastDifference
+        // dacValue = newDacValue;
     }
-    if (!newShaftImpulseAvailable)
+
+        if (!newShaftImpulseAvailable)
         return; // Skip processing if no new data
 
     newShaftImpulseAvailable = false; // Reset the ISR flag
@@ -238,7 +263,7 @@ bool setupTimer1forFps(byte sollFpsState)
     // start with a new sync point, no need to catch up differences from before.
     timerFrames = 0;
     projectorFrames = 0;
-    timerDivider = 0;
+    timerModulus = 0;
 
     if (sollFpsState >= 1 && sollFpsState <= 5)
     {
@@ -270,13 +295,28 @@ bool setupTimer1forFps(byte sollFpsState)
 
             break;
         case FPS_18:
-            OCR1A = 10100; // 198.000198000198 Hz (16000000/((10100+1)*8)),
-            //              divided by 11 is 18.000018.. Hz
-            //              or 18 2/111,111
-            //              or 2,000,000/111,111
-            //
-            TCCR1B |= (1 << CS11); // Prescaler 8
-            timerFactor = 11;
+            // Very acurate but not firing at 18 * 12 Hz
+            // OCR1A = 10100; // 198.000198000198 Hz (16000000/((10100+1)*8)),
+            // //              divided by 11 is 18.000018.. Hz
+            // //              or 18 2/111,111
+            // //              or 2,000,000/111,111
+            // //
+            // TCCR1B |= (1 << CS11); // Prescaler 8
+            // timerFactor = 11;
+
+            // Less acurate but giving (18*12=) 216 Hz
+            // 1) Compare Match-Interrupt für Timer1 erlauben
+            TIMSK1 = (1 << OCIE1A); // Compare A Match Interrupt Enable
+
+            // 2) Timer1 in den CTC-Modus setzen (WGM12 = 1)
+            TCCR1A = 0;            // WGM10=0, WGM11=0
+            TCCR1B = (1 << WGM12); // WGM12=1 => CTC mit OCR1A
+            //    + Prescaler 8 (CS11=1)
+            TCCR1B |= (1 << CS11);
+
+            // 3) OCR1A setzen
+            OCR1A = 9258;
+            timerFactor = 1;
 
             break;
         case FPS_24:
@@ -320,7 +360,7 @@ ISR(TIMER2_OVF_vect)
     timer2OverflowCount++; // Überlaufzähler inkrementieren
 }
 
-void onShaftImpulse()
+void onShaftImpulseISR()
 {
     // For stability detection in free running mode, we use timer2 with overflow instead of micros() — it's cheaper.
     static unsigned long lastTimer2Value = 0;
@@ -351,24 +391,24 @@ void onShaftImpulse()
     shaftImpulseCount++;
     newShaftImpulseAvailable = true;
 
-    if (projectorDivider == 0)
+    if (shaftModulus == 0)
     {
         projectorFrames++;
         projectorFrameCountUpdated = true;
     }
-    projectorDivider++;
-    projectorDivider %= (projectorSegmentCount); 
+    shaftModulus++;
+    shaftModulus %= (shaftSegmentDiscDivider); 
 }
 
 ISR(TIMER1_COMPA_vect)
 {
-    if (timerDivider == 0)
+    if (timerModulus == 0)
     {
         timerFrames++;
         timerFrameCountUpdated = true;
     }
-    timerDivider++;
-    timerDivider %= timerFactor;
+    timerModulus++;
+    timerModulus %= timerFactor;
 }
 
 void stopTimer1()
