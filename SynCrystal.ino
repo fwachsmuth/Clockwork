@@ -5,8 +5,8 @@
 - add an enable pin for optional "crystalization"
 - save new baseline in EEPROM and read it from there
 - tune the PID further
-- fix that the pid never corrects below the initial dac value (dac_value never gets updated)
-- dither to 216 Hz (and other freqs, where necessary)
+- fix that the pid never corrects below the initial dac value (dac_initial_value never gets updated)
+- test prescaler 1 or dither to 216 Hz (and other freqs, where necessary)
 
 
 Irgendwann
@@ -23,8 +23,6 @@ Irgendwann
 #include <Wire.h>             // i2c to talk to the DAC
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
 
-Adafruit_MCP4725 dac; // Instantiate the DAC
-
 // pins and consts
 constexpr int shaft_pulse_pin = 2;
 constexpr int greenLedPin = 7;
@@ -36,7 +34,8 @@ const byte ledGreen = 7;        //  o
 const byte ledFasterYellow = 8; //  +
 const byte ledFasterRed = 9;    //  ++
 
-uint16_t dac_value = 1200; // start somewhere, e.g. 1537. This is about 17.6 fps on my projector
+const uint16_t dac_initial_value = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
+
 
 // to get the approx. DAC value for any desired fps per a * x * x + b * x + c
 const float a = 0.6126;
@@ -84,13 +83,15 @@ volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable f�
 // PID stuff
 double pid_setpoint, pid_input, pid_output;
 double pid_Kp = 30, pid_Ki = 15, pid_Kd = 3;
-PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE); 
+PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
-// Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
+// Instantiate the DAC
+Adafruit_MCP4725 dac;
 
-unsigned long
-calculateMedian(volatile unsigned long *buffer, size_t size)
+
+unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
 {
+    // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
     unsigned long temp[size];
     // We need a copy of the array to not get interference with the ISR. Intereference doesnt seem likely, wo maybe 100B to save here
     for (size_t i = 0; i < size; i++)
@@ -145,7 +146,7 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(shaft_pulse_pin), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
-    dac.setVoltage(dac_value, false); // 1537 is petty much 18 fps
+    dac.setVoltage(dac_initial_value, false); // 1537 is petty much 18 fps and 24 fps
 
     pid_input = 0;
     pid_setpoint = 0;
@@ -157,11 +158,11 @@ void loop()
 {
     static long last_framecount_difference = 0; // Stores the last output difference
     static long local_timer_frames = 0; // for atomic reads
-    static long local_shaft_frames = 0;
+    static long local_shaft_frames = 0; // for atomic reads
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
 
-    // only read a difference if both ISRs did their updates yet, otherwise we get plenty of false changes
+    // only read a difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
     if (shaft_frame_count_updated && timer_frame_count_updated)
     {
         noInterrupts();
@@ -171,23 +172,26 @@ void loop()
 
         current_pulse_difference = local_timer_frames - local_shaft_frames;
 
+        // mark these counts as read
         shaft_frame_count_updated = false;
         timer_frame_count_updated = false;
 
         pid_input = current_pulse_difference;
         myPID.Compute();
-        new_dac_value = dac_value + pid_output;
+        new_dac_value = dac_initial_value + pid_output;
         dac.setVoltage(new_dac_value, false);
     }
 
     // Print only if the difference has changed
     if (current_pulse_difference != last_framecount_difference)
     {
-        Serial.print("Input: ");
+        Serial.print("Target FPS: ");
+        Serial.print(projector_speed_switch_pos);
+        Serial.print(", Error: ");
         Serial.print(current_pulse_difference);
-        Serial.print(", Output: ");
+        Serial.print(", PID-Output: ");
         Serial.print(pid_output);
-        Serial.print(", new DAC: ");
+        Serial.print(", new DAC value: ");
 
         // This is probably no longer needed
         if (new_dac_value < 0)
@@ -240,7 +244,13 @@ void loop()
             else if (detected_frequency > 22 && detected_frequency < 26)
             {
                 projector_speed_switch_pos = 24;
+                setupTimer1forFps(FPS_24);
+            } 
+            else
+            {
+                Serial.println("[DEBUG] *** This is an unsupported running speed. ***");
             }
+        
         }
     }
 }
@@ -326,38 +336,24 @@ bool setupTimer1forFps(byte sollFpsState)
 
             break;
         case FPS_18:
-            // Very acurate but not firing at 18 * 12 Hz
-            // OCR1A = 10100; // 198.000198000198 Hz (16000000/((10100+1)*8)),
-            // //              divided by 11 is 18.000018.. Hz
-            // //              or 18 2/111,111
-            // //              or 2,000,000/111,111
-            // //
-            // TCCR1B |= (1 << CS11); // Prescaler 8
-            // timer_factor = 11;
-
-            // Less acurate but giving (18*12=) 216 Hz
-            // 1) Compare Match-Interrupt für Timer1 erlauben
+            // Goal: (18*12=) 216 Hz
+            // this config gives approx 216,00605 Hz, so ~28 ppm off
+            // Prescaoer 1 oder Dithering würden helfen
             TIMSK1 = (1 << OCIE1A); // Compare A Match Interrupt Enable
-
-            // 2) Timer1 in den CTC-Modus setzen (WGM12 = 1)
             TCCR1A = 0;            // WGM10=0, WGM11=0
-            TCCR1B = (1 << WGM12); // WGM12=1 => CTC mit OCR1A
-            //    + Prescaler 8 (CS11=1)
-            TCCR1B |= (1 << CS11);
-
-            // 3) OCR1A setzen
+            TCCR1B = (1 << WGM12) | (1 << CS11);
             OCR1A = 9258;
             timer_factor = 1;
 
             break;
         case FPS_24:
-            OCR1A = 60605; // 264.000264000264 Hz (16000000/((60605+1)*1)),
-            //               divided by 11 is 24.000024.. Hz
-            //               or 24 8/333,333
-            //               or 8,000,000 / 333,333
-            //
-            TCCR1B |= (1 << CS10); // Prescaler 1
-            timer_factor = 11;
+            // Goal: (24*12=) 288 Hz
+            // this config gives approx (3x288) 864.02 Hz, so ~23 ppm off
+            TIMSK1 = (1 << OCIE1A);
+            TCCR1A = 0;
+            TCCR1B = (1 << WGM12) | (1 << CS11);
+            OCR1A = 2314;
+            timer_factor = 3;
 
             break;
         case FPS_25:
@@ -416,6 +412,7 @@ void onShaftImpulseISR()
         Serial.println("[DEBUG] Projector stopped.");
         stopTimer1();
         shaft_impulse_count = 0;
+        dac.setVoltage(dac_initial_value, false); // reset the DAc to compensate for wound-up break corrections
     }
 
     // Neue Daten verfügbar machen
