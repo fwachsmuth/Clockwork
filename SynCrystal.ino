@@ -1,13 +1,15 @@
 /* Todo
 
+- check impact of the DAC on "free running" projector speed — do we need a switch here to connect it?
 - english comments only
 - add an enable pin for optional "crystalization"
 - add a LED to show "crystal mode enabled"
 - save new baseline in EEPROM and read it from there
 - tune the PID further
-- fix that the pid never corrects below the initial dac value (DAC_INITIAL_VALUE never gets updated)
 - test prescaler 1 or dither to 216 Hz (and other freqs, where necessary)
 - update stop detection to a timeout (instead of period length)
+- support more speeds and selector switch
+- add +/- button tactile switches support
 
 Irgendwann
 - Fernstart/stop support
@@ -181,7 +183,6 @@ void loop()
 
         pid_input = current_pulse_difference;
         myPID.Compute();
-        // new_dac_value = DAC_INITIAL_VALUE + pid_output;
         new_dac_value = pid_output;
         dac.setVoltage(new_dac_value, false);
     }
@@ -209,12 +210,10 @@ void loop()
 
         Serial.println(new_dac_value);
 
-        dac.setVoltage(new_dac_value, false);
         last_framecount_difference = current_pulse_difference; // Update the last_framecount_difference
-        // dacValue = new_dac_value;
     }
 
-        if (!new_shaft_impulse_available)
+    if (!new_shaft_impulse_available)
         return; // Skip processing if no new data
 
     new_shaft_impulse_available = false; // Reset the ISR flag
@@ -411,14 +410,16 @@ void onShaftImpulseISR()
         Serial.println("[DEBUG] Projector stopped.");
         projector_speed_switch_pos = 0; // forget the previously determined switch pos, it might be changed
         stopTimer1();
+        timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
         shaft_impulse_count = 0;
+        // Reset DAC and PID
         dac.setVoltage(DAC_INITIAL_VALUE, false); // reset the DAc to compensate for wound-up break corrections
         myPID.SetMode(MANUAL);
         pid_output = DAC_INITIAL_VALUE;
         pid_input = 0;
-        Serial.print("[DEBUG] PID set to Output=");
-        Serial.println(DAC_INITIAL_VALUE);
-
+        myPID.Compute();
+        Serial.print("PID Reset to initial DAC value: ");
+        Serial.println(pid_output);
         myPID.SetMode(AUTOMATIC);
     }
 
