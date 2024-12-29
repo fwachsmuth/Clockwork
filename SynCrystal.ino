@@ -83,7 +83,7 @@ volatile unsigned long timer2_overflow_count = 0; // Globale Z√§hler-Variable f√
 
 // PID stuff
 double pid_setpoint, pid_input, pid_output;
-double pid_Kp = 10, pid_Ki = 5, pid_Kd = 1;
+double pid_Kp = 18, pid_Ki = 10, pid_Kd = 1;
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE); 
 
 // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
@@ -151,7 +151,6 @@ void setup()
     pid_setpoint = 0;
     myPID.SetMode(AUTOMATIC);
     myPID.SetOutputLimits(0, 4095);
-    myPID.SetSampleTime(26); // Nyquist: Measure twice in 1/18 Sek (= 26 msec)
 }
 
 void loop()
