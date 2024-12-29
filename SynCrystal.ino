@@ -1,13 +1,13 @@
 /* Todo
 
 - english comments only
-- support 24 fps in dumb mode
 - add an enable pin for optional "crystalization"
+- add a LED to show "crystal mode enabled"
 - save new baseline in EEPROM and read it from there
 - tune the PID further
-- fix that the pid never corrects below the initial dac value (dac_initial_value never gets updated)
+- fix that the pid never corrects below the initial dac value (DAC_INITIAL_VALUE never gets updated)
 - test prescaler 1 or dither to 216 Hz (and other freqs, where necessary)
-
+- update stop detection to a timeout (instead of period length)
 
 Irgendwann
 - Fernstart/stop support
@@ -24,7 +24,7 @@ Irgendwann
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
 
 // pins and consts
-constexpr int shaft_pulse_pin = 2;
+constexpr int SHAFT_PULSE_PIN = 2;
 constexpr int greenLedPin = 7;
 constexpr int redLedPin = 9;
 
@@ -34,8 +34,10 @@ const byte ledGreen = 7;        //  o
 const byte ledFasterYellow = 8; //  +
 const byte ledFasterRed = 9;    //  ++
 
-const uint16_t dac_initial_value = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
+const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
 
+// Threshold in microseconds to detect a stop. (This is between shaft pulses, so too big vlaues might never happen!)
+constexpr unsigned long STOP_THRESHOLD = 15000; 
 
 // to get the approx. DAC value for any desired fps per a * x * x + b * x + c
 const float a = 0.6126;
@@ -61,7 +63,6 @@ volatile bool shaft_frame_count_updated;
 volatile bool timer_frame_count_updated;
 
 volatile unsigned long last_shaft_pulse_time = 0;
-constexpr unsigned long STOP_THRESHOLD = 10000; // Threshold in microseconds to detect a stop
 
 // This is for the median approach, which finds stable freq detection after 48 impulses (4 frames). 
 constexpr size_t STABILITY_WINDOW_SIZE = 12;        // Größe des Median-Fensters
@@ -140,29 +141,31 @@ void setup()
     TIMSK2 = (1 << TOIE2); // Overflow Interrupt aktivieren
     
     Serial.begin(115200);
-    pinMode(shaft_pulse_pin, INPUT);
+    pinMode(SHAFT_PULSE_PIN, INPUT);
     pinMode(greenLedPin, OUTPUT);
     pinMode(redLedPin, OUTPUT);
-    attachInterrupt(digitalPinToInterrupt(shaft_pulse_pin), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
+    attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
-    dac.setVoltage(dac_initial_value, false); // 1537 is petty much 18 fps and 24 fps
+    dac.setVoltage(DAC_INITIAL_VALUE, false); // 1537 is petty much 18 fps and 24 fps
 
     pid_input = 0;
     pid_setpoint = 0;
-    myPID.SetMode(AUTOMATIC);
     myPID.SetOutputLimits(0, 4095);
+    myPID.SetMode(MANUAL);
+    pid_output = DAC_INITIAL_VALUE;
+    myPID.SetMode(AUTOMATIC);
 }
 
 void loop()
 {
-    static long last_framecount_difference = 0; // Stores the last output difference
     static long local_timer_frames = 0; // for atomic reads
     static long local_shaft_frames = 0; // for atomic reads
+    static long last_framecount_difference = 0; // Stores the last output difference
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
 
-    // only read a difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
+    // only read a pulse difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
     if (shaft_frame_count_updated && timer_frame_count_updated)
     {
         noInterrupts();
@@ -178,12 +181,13 @@ void loop()
 
         pid_input = current_pulse_difference;
         myPID.Compute();
-        new_dac_value = dac_initial_value + pid_output;
+        // new_dac_value = DAC_INITIAL_VALUE + pid_output;
+        new_dac_value = pid_output;
         dac.setVoltage(new_dac_value, false);
     }
 
-    // Print only if the difference has changed
-    if (current_pulse_difference != last_framecount_difference)
+    // Print only if the difference has changed AND the projector is actually running
+    if ((current_pulse_difference != last_framecount_difference) && projector_speed_switch_pos != 0)
     {
         Serial.print("Target FPS: ");
         Serial.print(projector_speed_switch_pos);
@@ -220,7 +224,7 @@ void loop()
     stability_buffer[freq_buffer_index] = median;
     freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
 
-    // Perform stability check if the buffer is full
+    // Perform running frequency stability check if the buffer is full AND we don't know the fps-switch pos yet
     if (projector_speed_switch_pos == 0 && freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
     {
         unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
@@ -408,7 +412,14 @@ void onShaftImpulseISR()
         projector_speed_switch_pos = 0; // forget the previously determined switch pos, it might be changed
         stopTimer1();
         shaft_impulse_count = 0;
-        dac.setVoltage(dac_initial_value, false); // reset the DAc to compensate for wound-up break corrections
+        dac.setVoltage(DAC_INITIAL_VALUE, false); // reset the DAc to compensate for wound-up break corrections
+        myPID.SetMode(MANUAL);
+        pid_output = DAC_INITIAL_VALUE;
+        pid_input = 0;
+        Serial.print("[DEBUG] PID set to Output=");
+        Serial.println(DAC_INITIAL_VALUE);
+
+        myPID.SetMode(AUTOMATIC);
     }
 
     // Neue Daten verfügbar machen
