@@ -193,10 +193,12 @@ void loop()
 {
     static long local_timer_frames = 0; // for atomic reads
     static long local_shaft_frames = 0; // for atomic reads
-    static long last_framecount_difference = 0; // Stores the last output difference
+    static long last_pulse_difference = 0; // Stores the last output difference
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
     static uint8_t button, last_button = BTTN_NONE;
+    static long last_pid_update_millis = millis();
+    static long current_pid_update_millis;
 
     button = checkButtons();
     if (button != last_button)
@@ -229,8 +231,10 @@ void loop()
     }
 
     // Print only if the difference has changed AND the projector is actually running
-    if ((current_pulse_difference != last_framecount_difference) && projector_speed_switch_pos != 0)
+    if ((current_pulse_difference != last_pulse_difference) && projector_speed_switch_pos != 0)
     {
+        current_pid_update_millis = millis();
+
         Serial.print("Target FPS: ");
         Serial.print(projector_speed_switch_pos);
         Serial.print(", Error: ");
@@ -239,19 +243,23 @@ void loop()
         Serial.print(pid_output);
         Serial.print(", new DAC value: ");
 
-        // This is probably no longer needed
-        if (new_dac_value < 0)
-        {
-            new_dac_value = 0;
-        }
-        else if (new_dac_value > 4095)
-        {
-            new_dac_value = 4095;
-        }
+        // // This is probably no longer needed
+        // if (new_dac_value < 0)
+        // {
+        //     new_dac_value = 0;
+        // }
+        // else if (new_dac_value > 4095)
+        // {
+        //     new_dac_value = 4095;
+        // }
 
-        Serial.println(new_dac_value);
+        Serial.print(new_dac_value);
+        Serial.print(" after ");
+        Serial.print(current_pid_update_millis - last_pid_update_millis);
+        Serial.println("ms of stability");
 
-        last_framecount_difference = current_pulse_difference; // Update the last_framecount_difference
+        last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
+        last_pid_update_millis = current_pid_update_millis;
     }
 
     if (!new_shaft_impulse_available)
