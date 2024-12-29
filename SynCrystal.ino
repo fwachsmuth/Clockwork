@@ -1,14 +1,23 @@
 /* Todo
 
+Hardware
 - check impact of the DAC on "free running" projector speed — do we need a switch here to connect it?
 - add an enable pin for optional "crystalization"
 - add a LED to show "crystal mode enabled"
+- add a selector switch
+- add +/- button tactile switches support
+- add i2c display
+
+Code
 - save new baseline in EEPROM and read it from there
+- Add FreqMeasure
+- support the buttons:
+    - +/- one frame
+    - chose target speed
 - tune the PID further
 - test prescaler 1 or dither to 216 Hz (and other freqs, where necessary)
 - update stop detection to a timeout (instead of period length)
-- support more speeds and selector switch
-- add +/- button tactile switches support
+- support more speeds
 
 Irgendwann
 - Fernstart/stop support
@@ -17,7 +26,6 @@ Irgendwann
 
 */
 
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
@@ -25,9 +33,11 @@ Irgendwann
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
 
 // pins and consts
-constexpr int SHAFT_PULSE_PIN = 2;
-constexpr int greenLedPin = 7;
-constexpr int redLedPin = 9;
+const byte SHAFT_PULSE_PIN = 2;
+const byte LED_GREEN_PIN = 7;
+const byte LEFT_BTTN_PIN = 10;
+const byte RIGHT_BTTN_PIN = A3;
+const byte redLedPin = 9;
 
 const byte ledSlowerRed = 5;    //  --
 const byte ledSlowerYellow = 6; //  -
@@ -45,11 +55,15 @@ const float a = 0.6126;
 const float b = 155.44;
 const float c = -1459.34;
 
-#define FPS_18 1
-#define FPS_24 2
-#define FPS_25 3
-#define FPS_9 4
-#define FPS_16_2_3 5
+#define FPS_9 1
+#define FPS_16_2_3 2
+#define FPS_18 3
+#define FPS_24 4
+#define FPS_25 5
+
+#define BTTN_NONE 0
+#define BTTN_LEFT 1
+#define BTTN_RIGHT 2
 
 int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
 volatile int timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
@@ -143,7 +157,9 @@ void setup()
     
     Serial.begin(115200);
     pinMode(SHAFT_PULSE_PIN, INPUT);
-    pinMode(greenLedPin, OUTPUT);
+    pinMode(LED_GREEN_PIN, OUTPUT);
+    pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
+    pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
     pinMode(redLedPin, OUTPUT);
     attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
@@ -158,6 +174,21 @@ void setup()
     myPID.SetMode(AUTOMATIC);
 }
 
+uint8_t checkButtons()
+{
+    if (digitalRead(LEFT_BTTN_PIN) == LOW)
+    {
+        return BTTN_LEFT;
+    } 
+    else if (digitalRead(RIGHT_BTTN_PIN) == LOW)
+    {
+        return BTTN_RIGHT;
+    }
+    else {
+        return BTTN_NONE;
+    }
+}
+
 void loop()
 {
     static long local_timer_frames = 0; // for atomic reads
@@ -165,6 +196,17 @@ void loop()
     static long last_framecount_difference = 0; // Stores the last output difference
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
+    static uint8_t button, last_button = BTTN_NONE;
+
+    button = checkButtons();
+    if (button != last_button)
+    {
+        last_button = button;
+        if (button != BTTN_NONE)
+        {
+            Serial.println(button);
+        }
+    }
 
     // only read a pulse difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
     if (shaft_frame_count_updated && timer_frame_count_updated)
