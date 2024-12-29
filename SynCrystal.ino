@@ -1,12 +1,31 @@
+/* Todo
+
+- english comments only
+- support 24 fps in dumb mode
+- add an enable pin for optional "crystalization"
+- save new baseline in EEPROM and read it from there
+- tune the PID further
+- fix that the pid never corrects below the initial dac value (dac_value never gets updated)
+- dither to 216 Hz (and other freqs, where necessary)
+
+
+Irgendwann
+- Fernstart/stop support
+- ESS support
+
+
+*/
+
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <Wire.h>
 #include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
+#include <Wire.h>             // i2c to talk to the DAC
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
 
 Adafruit_MCP4725 dac; // Instantiate the DAC
 
-// Pins und Variablen
+// pins and consts
 constexpr int shaft_pulse_pin = 2;
 constexpr int greenLedPin = 7;
 constexpr int redLedPin = 9;
@@ -137,65 +156,55 @@ void setup()
 
 void loop()
 {
-    static long lastDifference = 0; // Stores the last output difference
-    static long localTimerFrames = 0;
-    static long localProjectorFrames = 0;
-    static long currentPulseDifference = 0;
-    static long correctionSignal = 0;
-    uint16_t newDacValue = 0;
+    static long last_framecount_difference = 0; // Stores the last output difference
+    static long local_timer_frames = 0; // for atomic reads
+    static long local_shaft_frames = 0;
+    static long current_pulse_difference = 0;
+    uint16_t new_dac_value = 0;
 
     // only read a difference if both ISRs did their updates yet, otherwise we get plenty of false changes
     if (shaft_frame_count_updated && timer_frame_count_updated)
     {
         noInterrupts();
-        localTimerFrames = timer_frames;
-        localProjectorFrames = shaft_frames;
+        local_timer_frames = timer_frames;
+        local_shaft_frames = shaft_frames;
         interrupts();
 
-        currentPulseDifference = localTimerFrames - localProjectorFrames;
+        current_pulse_difference = local_timer_frames - local_shaft_frames;
 
         shaft_frame_count_updated = false;
         timer_frame_count_updated = false;
 
-        pid_input = currentPulseDifference;
+        pid_input = current_pulse_difference;
         myPID.Compute();
-        newDacValue = dac_value + pid_output;
-        dac.setVoltage(newDacValue, false);
+        new_dac_value = dac_value + pid_output;
+        dac.setVoltage(new_dac_value, false);
     }
 
     // Print only if the difference has changed
-    if (currentPulseDifference != lastDifference)
+    if (current_pulse_difference != last_framecount_difference)
     {
-        // Serial.print("localTimerFrames: ");
-        // Serial.print(localTimerFrames);
-        // Serial.print(", localProjectorFrames: ");
-        // Serial.print(localProjectorFrames);
-        // Serial.print(", correct to ");
-
-        // correctionSignal = currentPulseDifference * 2;
-
         Serial.print("Input: ");
-        Serial.print(currentPulseDifference);
+        Serial.print(current_pulse_difference);
         Serial.print(", Output: ");
         Serial.print(pid_output);
         Serial.print(", new DAC: ");
 
-        //newDacValue = dac_value + correctionSignal;
-        // Ensure newDacValue stays in [0, 4095]
-        if (newDacValue < 0)
+        // This is probably no longer needed
+        if (new_dac_value < 0)
         {
-            newDacValue = 0;
+            new_dac_value = 0;
         }
-        else if (newDacValue > 4095)
+        else if (new_dac_value > 4095)
         {
-            newDacValue = 4095;
+            new_dac_value = 4095;
         }
 
-        Serial.println(newDacValue);
+        Serial.println(new_dac_value);
 
-        dac.setVoltage(newDacValue, false);
-        lastDifference = currentPulseDifference; // Update the lastDifference
-        // dacValue = newDacValue;
+        dac.setVoltage(new_dac_value, false);
+        last_framecount_difference = current_pulse_difference; // Update the last_framecount_difference
+        // dacValue = new_dac_value;
     }
 
         if (!new_shaft_impulse_available)
@@ -211,25 +220,25 @@ void loop()
     // Perform stability check if the buffer is full
     if (freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
     {
-        unsigned long newStableValue = calculateMedian(stability_buffer, STABILITY_CHECKS);
+        unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
 
         // Handle projector restart or stability change
-        if (!projector_running || abs((long)newStableValue - (long)last_stable_freq_value) > MIN_CHANGE)
+        if (!projector_running || abs((long)new_stable_value - (long)last_stable_freq_value) > MIN_CHANGE)
         {
-            last_stable_freq_value = newStableValue;
-            float detectedFrequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
+            last_stable_freq_value = new_stable_value;
+            float detected_frequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
             projector_running = true; // Projector is running again
             Serial.print("[DEBUG] Projector running stable with ~");
-            Serial.print(detectedFrequency, 1); // FPS
+            Serial.print(detected_frequency, 1); // FPS
             Serial.print(" fps after ");
             Serial.print(shaft_impulse_count);
             Serial.println(" impulses. ");
-            if (detectedFrequency > 16 && detectedFrequency < 20)
+            if (detected_frequency > 16 && detected_frequency < 20)
             {
                 projector_speed_switch_pos = 18;
                 setupTimer1forFps(FPS_18);              
             }
-            else if (detectedFrequency > 22 && detectedFrequency < 26)
+            else if (detected_frequency > 22 && detected_frequency < 26)
             {
                 projector_speed_switch_pos = 24;
             }
@@ -386,23 +395,23 @@ ISR(TIMER2_OVF_vect)
 void onShaftImpulseISR()
 {
     // For stability detection in free running mode, we use timer2 with overflow instead of micros() — it's cheaper.
-    static unsigned long lastTimer2Value = 0;
+    static unsigned long last_timer2_value = 0;
 
     // Kombiniere Überläufe und Timer-Zähler
-    unsigned long currentTimer2Value = (timer2_overflow_count << 8) | TCNT2; // 8-Bit Timer2 mit Überläufen
-    unsigned long elapsedTicks = currentTimer2Value - lastTimer2Value;     // Differenz der Ticks
-    lastTimer2Value = currentTimer2Value;
+    unsigned long current_timer2_value = (timer2_overflow_count << 8) | TCNT2; // 8-Bit Timer2 mit Überläufen
+    unsigned long elapsed_ticks = current_timer2_value - last_timer2_value;     // Differenz der Ticks
+    last_timer2_value = current_timer2_value;
 
     // Umrechnung in Mikrosekunden
-    unsigned long intervalMicros = elapsedTicks * 4; // 4 µs pro Tick bei Prescaler 64
-    last_shaft_pulse_time += intervalMicros;            // Aktualisiere den letzten Impulszeitpunkt
+    unsigned long interval_micros = elapsed_ticks * 4; // 4 µs pro Tick bei Prescaler 64
+    last_shaft_pulse_time += interval_micros;            // Aktualisiere den letzten Impulszeitpunkt
 
     // Frequenz-Puffer aktualisieren
-    freq_median_buffer[freq_median_index] = intervalMicros;
+    freq_median_buffer[freq_median_index] = interval_micros;
     freq_median_index = (freq_median_index + 1) % STABILITY_WINDOW_SIZE;
 
     // Prüfe, ob das Intervall den Stopp-Schwellenwert überschreitet
-    if (intervalMicros > STOP_THRESHOLD && projector_running)
+    if (interval_micros > STOP_THRESHOLD && projector_running)
     {
         projector_running = false; // Projektor gestoppt
         Serial.println("[DEBUG] Projector stopped.");
