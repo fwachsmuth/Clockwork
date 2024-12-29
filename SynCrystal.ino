@@ -197,7 +197,7 @@ void loop()
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
     static uint8_t button, last_button = BTTN_NONE;
-    static long last_pid_update_millis = millis();
+    static long last_pid_update_millis;
     static long current_pid_update_millis;
 
     button = checkButtons();
@@ -234,6 +234,9 @@ void loop()
     if ((current_pulse_difference != last_pulse_difference) && projector_speed_switch_pos != 0)
     {
         current_pid_update_millis = millis();
+        Serial.print(", which was stable for ");
+        Serial.print(current_pid_update_millis - last_pid_update_millis);
+        Serial.println(" ms");
 
         Serial.print("Target FPS: ");
         Serial.print(projector_speed_switch_pos);
@@ -242,24 +245,20 @@ void loop()
         Serial.print(", PID-Output: ");
         Serial.print(pid_output);
         Serial.print(", new DAC value: ");
-
-        // // This is probably no longer needed
-        // if (new_dac_value < 0)
-        // {
-        //     new_dac_value = 0;
-        // }
-        // else if (new_dac_value > 4095)
-        // {
-        //     new_dac_value = 4095;
-        // }
-
         Serial.print(new_dac_value);
-        Serial.print(" after ");
-        Serial.print(current_pid_update_millis - last_pid_update_millis);
-        Serial.println("ms of stability");
 
         last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
         last_pid_update_millis = current_pid_update_millis;
+
+        /* Todo:
+        Check if the error was 0. If so and the lifetime was >20s, store 
+        it in the eeprom, unless a similar value (<=100 pooints) is already saved there. Also, avoid saving a vlaue taht is > x off
+
+        Also, init the based DAC values with values from EEPROM.
+
+        Also, check if the EEPROM already contains base configs. If not, write 1500 to the DAC's eeprom 
+        and init the EEPROM with calculated init values for each freq.
+        */
     }
 
     if (!new_shaft_impulse_available)
@@ -287,7 +286,7 @@ void loop()
             Serial.print(detected_frequency, 1); // FPS
             Serial.print(" fps after ");
             Serial.print(shaft_impulse_count);
-            Serial.println(" impulses. ");
+            last_pid_update_millis = millis(); // this is needed to calculate the lifetime of the first pid output
             if (detected_frequency <= 21)
             {
                 projector_speed_switch_pos = 18;
