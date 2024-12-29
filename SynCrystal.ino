@@ -7,7 +7,7 @@
 Adafruit_MCP4725 dac; // Instantiate the DAC
 
 // Pins und Variablen
-constexpr int shaftPulsePin = 2;
+constexpr int shaft_pulse_pin = 2;
 constexpr int greenLedPin = 7;
 constexpr int redLedPin = 9;
 
@@ -17,7 +17,7 @@ const byte ledGreen = 7;        //  o
 const byte ledFasterYellow = 8; //  +
 const byte ledFasterRed = 9;    //  ++
 
-uint16_t dacValue = 1200; // start somewhere, e.g. 1537. This is about 17.6 fps on my projector
+uint16_t dac_value = 1200; // start somewhere, e.g. 1537. This is about 17.6 fps on my projector
 
 // to get the approx. DAC value for any desired fps per a * x * x + b * x + c
 const float a = 0.6126;
@@ -30,19 +30,19 @@ const float c = -1459.34;
 #define FPS_9 4
 #define FPS_16_2_3 5
 
-int timerFactor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
-volatile int timerModulus = 0; // For Modulo in the ISR, to compensate the timerFactor
-volatile long timerFrames = 0; // This is the timer1 (frequency / timerFactor) — equalling actual desired fps (no multiples)
+int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
+volatile int timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
+volatile long timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
 
-const byte shaftSegmentDiscDivider = 1; // Increase this if we only want to use every nth pulse
-volatile int shaftModulus = 0; // For Modulo in the ISR, to compensate the multiple pulses per revolution
-volatile long projectorFrames = 0; // This is the actually advanced frames (pulses / shaftSegmentDiscDivider)
+const byte shaft_segment_disc_divider = 1; // Increase this if we only want to use every nth pulse
+volatile int shaft_modulus = 0; // For Modulo in the ISR, to compensate the multiple pulses per revolution
+volatile long shaft_frames = 0; // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
 
 // flags to assure reading only once both ISRs have done theri duty
-volatile bool projectorFrameCountUpdated;
-volatile bool timerFrameCountUpdated;
+volatile bool shaft_frame_count_updated;
+volatile bool timer_frame_count_updated;
 
-volatile unsigned long lastShaftPulseTime = 0;
+volatile unsigned long last_shaft_pulse_time = 0;
 constexpr unsigned long STOP_THRESHOLD = 10000; // Threshold in microseconds to detect a stop
 
 // This is for the median approach, which finds stable freq detection after 48 impulses (4 frames). 
@@ -51,21 +51,21 @@ constexpr size_t STABILITY_CHECKS = 36;             // Größe des Stabilitäts-
 constexpr unsigned long SPEED_DETECT_TOLERANCE = 1600;           // Fester Toleranzwert in Mikrosekunden
 constexpr unsigned long MIN_CHANGE = 800;           // Minimale Abweichung für eine neue Stabilität
 
-volatile unsigned long freqMedianBuffer[STABILITY_WINDOW_SIZE];
-volatile size_t freqMedianIndex = 0;
-volatile unsigned long stabilityBuffer[STABILITY_CHECKS];
-volatile size_t freqBufferIndex = 0;
-volatile unsigned long lastStableFreqValue = 0; // Zuletzt erkannter stabiler Wert
-volatile unsigned long shaftImpulseCount = 0;
-volatile bool newShaftImpulseAvailable = false;
-volatile bool projectorRunning = false; // true = Running, false = Stopped
-volatile byte projectorSpeedSwitchPos; // holds the (guessed) current speed switch position (18 or 24)
-volatile unsigned long timer2OverflowCount = 0; // Globale Zähler-Variable für Timer2-Überläufe
+volatile unsigned long freq_median_buffer[STABILITY_WINDOW_SIZE];
+volatile size_t freq_median_index = 0;
+volatile unsigned long stability_buffer[STABILITY_CHECKS];
+volatile size_t freq_buffer_index = 0;
+volatile unsigned long last_stable_freq_value = 0; // Zuletzt erkannter stabiler Wert
+volatile unsigned long shaft_impulse_count = 0;
+volatile bool new_shaft_impulse_available = false;
+volatile bool projector_running = false; // true = Running, false = Stopped
+volatile byte projector_speed_switch_pos; // holds the (guessed) current speed switch position (18 or 24)
+volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
 
 // PID stuff
-double Setpoint, Input, Output;
-double Kp = 10, Ki = 5, Kd = 1;
-PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, REVERSE); // P_ON_M?
+double pid_setpoint, pid_input, pid_output;
+double pid_Kp = 10, pid_Ki = 5, pid_Kd = 1;
+PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE); 
 
 // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
 
@@ -120,16 +120,16 @@ void setup()
     TIMSK2 = (1 << TOIE2); // Overflow Interrupt aktivieren
     
     Serial.begin(115200);
-    pinMode(shaftPulsePin, INPUT);
+    pinMode(shaft_pulse_pin, INPUT);
     pinMode(greenLedPin, OUTPUT);
     pinMode(redLedPin, OUTPUT);
-    attachInterrupt(digitalPinToInterrupt(shaftPulsePin), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
+    attachInterrupt(digitalPinToInterrupt(shaft_pulse_pin), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
-    dac.setVoltage(dacValue, false); // 1537 is petty much 18 fps
+    dac.setVoltage(dac_value, false); // 1537 is petty much 18 fps
 
-    Input = 0;
-    Setpoint = 0;
+    pid_input = 0;
+    pid_setpoint = 0;
     myPID.SetMode(AUTOMATIC);
     myPID.SetOutputLimits(0, 4095);
     myPID.SetSampleTime(26); // Nyquist: Measure twice in 1/18 Sek (= 26 msec)
@@ -145,21 +145,21 @@ void loop()
     uint16_t newDacValue = 0;
 
     // only read a difference if both ISRs did their updates yet, otherwise we get plenty of false changes
-    if (projectorFrameCountUpdated && timerFrameCountUpdated)
+    if (shaft_frame_count_updated && timer_frame_count_updated)
     {
         noInterrupts();
-        localTimerFrames = timerFrames;
-        localProjectorFrames = projectorFrames;
+        localTimerFrames = timer_frames;
+        localProjectorFrames = shaft_frames;
         interrupts();
 
         currentPulseDifference = localTimerFrames - localProjectorFrames;
 
-        projectorFrameCountUpdated = false;
-        timerFrameCountUpdated = false;
+        shaft_frame_count_updated = false;
+        timer_frame_count_updated = false;
 
-        Input = currentPulseDifference;
+        pid_input = currentPulseDifference;
         myPID.Compute();
-        newDacValue = dacValue + Output;
+        newDacValue = dac_value + pid_output;
         dac.setVoltage(newDacValue, false);
     }
 
@@ -177,10 +177,10 @@ void loop()
         Serial.print("Input: ");
         Serial.print(currentPulseDifference);
         Serial.print(", Output: ");
-        Serial.print(Output);
+        Serial.print(pid_output);
         Serial.print(", new DAC: ");
 
-        //newDacValue = dacValue + correctionSignal;
+        //newDacValue = dac_value + correctionSignal;
         // Ensure newDacValue stays in [0, 4095]
         if (newDacValue < 0)
         {
@@ -198,40 +198,40 @@ void loop()
         // dacValue = newDacValue;
     }
 
-        if (!newShaftImpulseAvailable)
+        if (!new_shaft_impulse_available)
         return; // Skip processing if no new data
 
-    newShaftImpulseAvailable = false; // Reset the ISR flag
+    new_shaft_impulse_available = false; // Reset the ISR flag
 
     // Calculate median and store it in the stability buffer
-    unsigned long median = calculateMedian(freqMedianBuffer, STABILITY_WINDOW_SIZE);
-    stabilityBuffer[freqBufferIndex] = median;
-    freqBufferIndex = (freqBufferIndex + 1) % STABILITY_CHECKS;
+    unsigned long median = calculateMedian(freq_median_buffer, STABILITY_WINDOW_SIZE);
+    stability_buffer[freq_buffer_index] = median;
+    freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
 
     // Perform stability check if the buffer is full
-    if (freqBufferIndex == 0 && checkStability(stabilityBuffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
+    if (freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
     {
-        unsigned long newStableValue = calculateMedian(stabilityBuffer, STABILITY_CHECKS);
+        unsigned long newStableValue = calculateMedian(stability_buffer, STABILITY_CHECKS);
 
         // Handle projector restart or stability change
-        if (!projectorRunning || abs((long)newStableValue - (long)lastStableFreqValue) > MIN_CHANGE)
+        if (!projector_running || abs((long)newStableValue - (long)last_stable_freq_value) > MIN_CHANGE)
         {
-            lastStableFreqValue = newStableValue;
-            float detectedFrequency = 1000000.0f / 12.0f / (float)lastStableFreqValue;
-            projectorRunning = true; // Projector is running again
+            last_stable_freq_value = newStableValue;
+            float detectedFrequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
+            projector_running = true; // Projector is running again
             Serial.print("[DEBUG] Projector running stable with ~");
             Serial.print(detectedFrequency, 1); // FPS
             Serial.print(" fps after ");
-            Serial.print(shaftImpulseCount);
+            Serial.print(shaft_impulse_count);
             Serial.println(" impulses. ");
             if (detectedFrequency > 16 && detectedFrequency < 20)
             {
-                projectorSpeedSwitchPos = 18;
+                projector_speed_switch_pos = 18;
                 setupTimer1forFps(FPS_18);              
             }
             else if (detectedFrequency > 22 && detectedFrequency < 26)
             {
-                projectorSpeedSwitchPos = 24;
+                projector_speed_switch_pos = 24;
             }
         }
     }
@@ -284,9 +284,9 @@ void setLeds(int bargraph)
 bool setupTimer1forFps(byte sollFpsState)
 {
     // start with a new sync point, no need to catch up differences from before.
-    timerFrames = 0;
-    projectorFrames = 0;
-    timerModulus = 0;
+    timer_frames = 0;
+    shaft_frames = 0;
+    timer_modulus = 0;
 
     if (sollFpsState >= 1 && sollFpsState <= 5)
     {
@@ -308,13 +308,13 @@ bool setupTimer1forFps(byte sollFpsState)
             //              divided by 22 is 9,000009.. Hz
             //
             TCCR1B |= (1 << CS11); // Prescaler 8
-            timerFactor = 22;
+            timer_factor = 22;
 
             break;
         case FPS_16_2_3:
             OCR1A = 14999;                       // 16 2/3 Hz (16000000/((14999+1)*64))
             TCCR1B |= (1 << CS11) | (1 << CS10); // Prescaler 64
-            timerFactor = 1;
+            timer_factor = 1;
 
             break;
         case FPS_18:
@@ -325,7 +325,7 @@ bool setupTimer1forFps(byte sollFpsState)
             // //              or 2,000,000/111,111
             // //
             // TCCR1B |= (1 << CS11); // Prescaler 8
-            // timerFactor = 11;
+            // timer_factor = 11;
 
             // Less acurate but giving (18*12=) 216 Hz
             // 1) Compare Match-Interrupt für Timer1 erlauben
@@ -339,7 +339,7 @@ bool setupTimer1forFps(byte sollFpsState)
 
             // 3) OCR1A setzen
             OCR1A = 9258;
-            timerFactor = 1;
+            timer_factor = 1;
 
             break;
         case FPS_24:
@@ -349,13 +349,13 @@ bool setupTimer1forFps(byte sollFpsState)
             //               or 8,000,000 / 333,333
             //
             TCCR1B |= (1 << CS10); // Prescaler 1
-            timerFactor = 11;
+            timer_factor = 11;
 
             break;
         case FPS_25:
             OCR1A = 624;                         // 25 Hz (16000000/((624+1)*1024))
             TCCR1B |= (1 << CS12) | (1 << CS10); // Prescaler 1024
-            timerFactor = 1;
+            timer_factor = 1;
 
             break;
         default:
@@ -380,7 +380,7 @@ int calculateValue(float x, float a, float b, float c)
 
 ISR(TIMER2_OVF_vect)
 {
-    timer2OverflowCount++; // Überlaufzähler inkrementieren
+    timer2_overflow_count++; // Überlaufzähler inkrementieren
 }
 
 void onShaftImpulseISR()
@@ -389,49 +389,49 @@ void onShaftImpulseISR()
     static unsigned long lastTimer2Value = 0;
 
     // Kombiniere Überläufe und Timer-Zähler
-    unsigned long currentTimer2Value = (timer2OverflowCount << 8) | TCNT2; // 8-Bit Timer2 mit Überläufen
+    unsigned long currentTimer2Value = (timer2_overflow_count << 8) | TCNT2; // 8-Bit Timer2 mit Überläufen
     unsigned long elapsedTicks = currentTimer2Value - lastTimer2Value;     // Differenz der Ticks
     lastTimer2Value = currentTimer2Value;
 
     // Umrechnung in Mikrosekunden
     unsigned long intervalMicros = elapsedTicks * 4; // 4 µs pro Tick bei Prescaler 64
-    lastShaftPulseTime += intervalMicros;            // Aktualisiere den letzten Impulszeitpunkt
+    last_shaft_pulse_time += intervalMicros;            // Aktualisiere den letzten Impulszeitpunkt
 
     // Frequenz-Puffer aktualisieren
-    freqMedianBuffer[freqMedianIndex] = intervalMicros;
-    freqMedianIndex = (freqMedianIndex + 1) % STABILITY_WINDOW_SIZE;
+    freq_median_buffer[freq_median_index] = intervalMicros;
+    freq_median_index = (freq_median_index + 1) % STABILITY_WINDOW_SIZE;
 
     // Prüfe, ob das Intervall den Stopp-Schwellenwert überschreitet
-    if (intervalMicros > STOP_THRESHOLD && projectorRunning)
+    if (intervalMicros > STOP_THRESHOLD && projector_running)
     {
-        projectorRunning = false; // Projektor gestoppt
+        projector_running = false; // Projektor gestoppt
         Serial.println("[DEBUG] Projector stopped.");
         stopTimer1();
-        shaftImpulseCount = 0;
+        shaft_impulse_count = 0;
     }
 
     // Neue Daten verfügbar machen
-    shaftImpulseCount++;
-    newShaftImpulseAvailable = true;
+    shaft_impulse_count++;
+    new_shaft_impulse_available = true;
 
-    if (shaftModulus == 0)
+    if (shaft_modulus == 0)
     {
-        projectorFrames++;
-        projectorFrameCountUpdated = true;
+        shaft_frames++;
+        shaft_frame_count_updated = true;
     }
-    shaftModulus++;
-    shaftModulus %= (shaftSegmentDiscDivider); 
+    shaft_modulus++;
+    shaft_modulus %= (shaft_segment_disc_divider); 
 }
 
 ISR(TIMER1_COMPA_vect)
 {
-    if (timerModulus == 0)
+    if (timer_modulus == 0)
     {
-        timerFrames++;
-        timerFrameCountUpdated = true;
+        timer_frames++;
+        timer_frame_count_updated = true;
     }
-    timerModulus++;
-    timerModulus %= timerFactor;
+    timer_modulus++;
+    timer_modulus %= timer_factor;
 }
 
 void stopTimer1()
