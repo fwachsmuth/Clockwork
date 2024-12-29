@@ -77,7 +77,7 @@ volatile unsigned long last_stable_freq_value = 0; // Zuletzt erkannter stabiler
 volatile unsigned long shaft_impulse_count = 0;
 volatile bool new_shaft_impulse_available = false;
 volatile bool projector_running = false; // true = Running, false = Stopped
-volatile byte projector_speed_switch_pos; // holds the (guessed) current speed switch position (18 or 24)
+volatile byte projector_speed_switch_pos = 0; // holds the (guessed) current speed switch position (18 or 24)
 volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
 
 // PID stuff
@@ -221,7 +221,7 @@ void loop()
     freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
 
     // Perform stability check if the buffer is full
-    if (freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
+    if (projector_speed_switch_pos == 0 && freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
     {
         unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
 
@@ -236,21 +236,16 @@ void loop()
             Serial.print(" fps after ");
             Serial.print(shaft_impulse_count);
             Serial.println(" impulses. ");
-            if (detected_frequency > 16 && detected_frequency < 20)
+            if (detected_frequency <= 21)
             {
                 projector_speed_switch_pos = 18;
-                setupTimer1forFps(FPS_18);              
+                setupTimer1forFps(FPS_18);
             }
-            else if (detected_frequency > 22 && detected_frequency < 26)
+            else if (detected_frequency > 21)
             {
                 projector_speed_switch_pos = 24;
                 setupTimer1forFps(FPS_24);
-            } 
-            else
-            {
-                Serial.println("[DEBUG] *** This is an unsupported running speed. ***");
-            }
-        
+            }       
         }
     }
 }
@@ -408,8 +403,9 @@ void onShaftImpulseISR()
     // Prüfe, ob das Intervall den Stopp-Schwellenwert überschreitet
     if (interval_micros > STOP_THRESHOLD && projector_running)
     {
-        projector_running = false; // Projektor gestoppt
+        projector_running = false; // Projector stopped
         Serial.println("[DEBUG] Projector stopped.");
+        projector_speed_switch_pos = 0; // forget the previously determined switch pos, it might be changed
         stopTimer1();
         shaft_impulse_count = 0;
         dac.setVoltage(dac_initial_value, false); // reset the DAc to compensate for wound-up break corrections
