@@ -22,6 +22,7 @@ Code
 Irgendwann
 - Fernstart/stop support
 - ESS support
+- Add Realtime Timecode
 
 
 */
@@ -31,6 +32,7 @@ Irgendwann
 #include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
 #include <Wire.h>             // i2c to talk to the DAC
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
+#include <EEPROM.h>
 
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
@@ -95,6 +97,23 @@ volatile bool new_shaft_impulse_available = false;
 volatile bool projector_running = false; // true = Running, false = Stopped
 volatile byte projector_speed_switch_pos = 0; // holds the (guessed) current speed switch position (18 or 24)
 volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
+
+/* Below is the EEPROM struct to save Projector Configs.
+ *  Before the structs start, there are header bytes:
+ *  EEPROM.read(0, magic)
+ *  EEPROM.read(1, projectorCount);
+ *  EEPROM.read(2, lastProjectorUsed);
+ */
+// struct Projector
+// { // 19 Bytes per Projector
+//     byte index;
+//     byte shutterBladeCount;
+//     byte startmarkOffset;
+//     byte p;
+//     byte i;
+//     byte d;
+//     char name[maxProjectorNameLength + 1];
+// };
 
 // PID stuff
 double pid_setpoint, pid_input, pid_output;
@@ -502,4 +521,86 @@ void stopTimer1()
     noInterrupts();
     TIMSK1 &= ~(1 << OCIE1A);
     interrupts();
+}
+
+void cleanEEPROM() {
+    Serial.print("Deleting EEPROM...");
+    for (int i = 0; i < EEPROM.length(); i++)
+    {
+        EEPROM.write(i, 0);
+    }
+    Serial.println(" Done.");
+}
+
+void e2reader()
+{
+    char buffer[16];
+    char valuePrint[4];
+    byte value;
+    unsigned int address;
+    uint8_t trailingSpace = 2;
+
+    for (address = 0; address <= 127; address++)
+    {
+        // read a byte from the current address of the EEPROM
+        value = EEPROM.read(address);
+
+        // add space between two sets of 8 bytes
+        if (address % 8 == 0)
+            Serial.print(F("  "));
+
+        // newline and address for every 16 bytes
+        if (address % 16 == 0)
+        {
+            // print the buffer
+            if (address > 0 && address % 16 == 0)
+                printASCII(buffer);
+
+            sprintf(buffer, "\n 0x%05X: ", address);
+            Serial.print(buffer);
+
+            // clear the buffer for the next data block
+            memset(buffer, 32, 16);
+        }
+
+        // save the value in temporary storage
+        buffer[address % 16] = value;
+
+        // print the formatted value
+        sprintf(valuePrint, " %02X", value);
+        Serial.print(valuePrint);
+    }
+
+    if (address % 16 > 0)
+    {
+        if (address % 16 < 9)
+            trailingSpace += 2;
+
+        trailingSpace += (16 - address % 16) * 3;
+    }
+
+    for (int i = trailingSpace; i > 0; i--)
+        Serial.print(F(" "));
+
+    // last line of data and a new line
+    printASCII(buffer);
+    Serial.println();
+}
+
+void printASCII(char *buffer)
+{
+    for (int i = 0; i < 16; i++)
+    {
+        if (i == 8)
+            Serial.print(" ");
+
+        if (buffer[i] > 31 and buffer[i] < 127)
+        {
+            Serial.print(buffer[i]);
+        }
+        else
+        {
+            Serial.print(F("."));
+        }
+    }
 }
