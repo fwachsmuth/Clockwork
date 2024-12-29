@@ -1,7 +1,6 @@
 /* Todo
 
 - check impact of the DAC on "free running" projector speed — do we need a switch here to connect it?
-- english comments only
 - add an enable pin for optional "crystalization"
 - add a LED to show "crystal mode enabled"
 - save new baseline in EEPROM and read it from there
@@ -66,11 +65,11 @@ volatile bool timer_frame_count_updated;
 
 volatile unsigned long last_shaft_pulse_time = 0;
 
-// This is for the median approach, which finds stable freq detection after 48 impulses (4 frames). 
-constexpr size_t STABILITY_WINDOW_SIZE = 12;        // Größe des Median-Fensters
-constexpr size_t STABILITY_CHECKS = 36;             // Größe des Stabilitäts-Fensters
-constexpr unsigned long SPEED_DETECT_TOLERANCE = 1600;           // Fester Toleranzwert in Mikrosekunden
-constexpr unsigned long MIN_CHANGE = 800;           // Minimale Abweichung für eine neue Stabilität
+// These consts are used in the median approach, which finds stable freq detection after ~ 48 impulses (4 frames). 
+constexpr size_t STABILITY_WINDOW_SIZE = 12;        // Size of the Median Window. We use 12 to capture one entire shaft revolution
+constexpr size_t STABILITY_CHECKS = 36;             // Window size to determine stability
+constexpr unsigned long SPEED_DETECT_TOLERANCE = 1600; // allowed tolerance between pulses in microseconds
+constexpr unsigned long MIN_CHANGE = 800;           // minimum deviation to determine a new stability
 
 volatile unsigned long freq_median_buffer[STABILITY_WINDOW_SIZE];
 volatile size_t freq_median_index = 0;
@@ -94,15 +93,15 @@ Adafruit_MCP4725 dac;
 
 unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
 {
-    // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
+    // Calculates the median. A rolling average might be cehaper and good enough, esp with filtering outliers.
     unsigned long temp[size];
-    // We need a copy of the array to not get interference with the ISR. Intereference doesnt seem likely, wo maybe 100B to save here
+    // We need a copy of the array to not get interference with the ISR. Intereference doesnt seem likely, so maybe 100B could be saved here
     for (size_t i = 0; i < size; i++)
     {
         temp[i] = buffer[i];
     }
 
-    // Einfache Sortierung (Insertion Sort)
+    // Simple Insertion Sort
     for (size_t i = 1; i < size; i++)
     {
         unsigned long key = temp[i];
@@ -119,9 +118,9 @@ unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
     return (size % 2 == 0) ? (temp[size / 2 - 1] + temp[size / 2]) / 2 : temp[size / 2];
 }
 
-// Stabilitätsprüfung
 bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long tolerance)
 {
+    // Stebility check
     unsigned long minVal = buffer[0];
     unsigned long maxVal = buffer[0];
     for (size_t i = 1; i < size; i++)
@@ -136,11 +135,11 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 
 void setup()
 {
-    // Timer2 konfigurieren (replaces micros() in the ISR)
-    TCCR2A = 0;            // Normaler Modus
-    TCCR2B = (1 << CS22);  // Prescaler = 64 (1 Tick = 4 µs bei 16 MHz)
-    TCNT2 = 0;             // Timer2 zurücksetzen
-    TIMSK2 = (1 << TOIE2); // Overflow Interrupt aktivieren
+    // Configre Timer2 (replaces micros() in the ISR, since it is cehaper)
+    TCCR2A = 0;            // Normal Mode
+    TCCR2B = (1 << CS22);  // Prescaler = 64 (1 Tick = 4 µs at 16 MHz)
+    TCNT2 = 0;             // Timer2 Reset
+    TIMSK2 = (1 << TOIE2); // Activate Overflow Interrupt 
     
     Serial.begin(115200);
     pinMode(SHAFT_PULSE_PIN, INPUT);
@@ -377,12 +376,12 @@ bool setupTimer1forFps(byte sollFpsState)
 
 int calculateValue(float x, float a, float b, float c)
 {
-    return a * x * x + b * x + c; // Berechnung der quadratischen Funktion
+    return a * x * x + b * x + c; // calculates DAC value for any needed frequency. Probably not needed anymore
 }
 
 ISR(TIMER2_OVF_vect)
 {
-    timer2_overflow_count++; // Überlaufzähler inkrementieren
+    timer2_overflow_count++; // increment overflow counter
 }
 
 void onShaftImpulseISR()
@@ -390,20 +389,21 @@ void onShaftImpulseISR()
     // For stability detection in free running mode, we use timer2 with overflow instead of micros() — it's cheaper.
     static unsigned long last_timer2_value = 0;
 
-    // Kombiniere Überläufe und Timer-Zähler
-    unsigned long current_timer2_value = (timer2_overflow_count << 8) | TCNT2; // 8-Bit Timer2 mit Überläufen
-    unsigned long elapsed_ticks = current_timer2_value - last_timer2_value;     // Differenz der Ticks
+    // ombine overflow and timer counters
+    unsigned long current_timer2_value = (timer2_overflow_count << 8) | TCNT2; // 8-Bit Timer2 plus overflows
+    unsigned long elapsed_ticks = current_timer2_value - last_timer2_value;     // tick difference
     last_timer2_value = current_timer2_value;
 
-    // Umrechnung in Mikrosekunden
-    unsigned long interval_micros = elapsed_ticks * 4; // 4 µs pro Tick bei Prescaler 64
-    last_shaft_pulse_time += interval_micros;            // Aktualisiere den letzten Impulszeitpunkt
+    // convert to microseonds
+    unsigned long interval_micros = elapsed_ticks * 4; // 4 µs per tick with prescaler 64
+    last_shaft_pulse_time += interval_micros;            // update last pulse timestamp
 
-    // Frequenz-Puffer aktualisieren
+    // update the frequencies buffer
     freq_median_buffer[freq_median_index] = interval_micros;
     freq_median_index = (freq_median_index + 1) % STABILITY_WINDOW_SIZE;
 
-    // Prüfe, ob das Intervall den Stopp-Schwellenwert überschreitet
+    // Check if the interval length qualifies to recognize a stopped projector
+    // Todo: This should probably better use a timeout
     if (interval_micros > STOP_THRESHOLD && projector_running)
     {
         projector_running = false; // Projector stopped
@@ -423,7 +423,7 @@ void onShaftImpulseISR()
         myPID.SetMode(AUTOMATIC);
     }
 
-    // Neue Daten verfügbar machen
+    // Expose the news
     shaft_impulse_count++;
     new_shaft_impulse_available = true;
 
