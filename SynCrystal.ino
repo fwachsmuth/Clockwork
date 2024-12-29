@@ -83,7 +83,7 @@ volatile unsigned long timer2_overflow_count = 0; // Globale Z√§hler-Variable f√
 
 // PID stuff
 double pid_setpoint, pid_input, pid_output;
-double pid_Kp = 50, pid_Ki = 20, pid_Kd = 1;
+double pid_Kp = 50, pid_Ki = 15, pid_Kd = 1;
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE); 
 
 // Median berechnen. A rolling average might be cehaper and good enough, esp with filtering outliers.
