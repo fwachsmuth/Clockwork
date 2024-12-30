@@ -26,11 +26,11 @@ Speeds:
 - Auto
 - 16 2/3
 - 18
-- 23.'976023 = 24 * 1000 / 1001
+- (23.'976023 = 24 * 1000 / 1001)
 - 24
 - 25
-- 29.97'002997' = 30 * 1000 / 1001
-- 30
+- (29.97'002997' = 30 * 1000 / 1001)
+- (30)
 
 
 Irgendwann
@@ -51,15 +51,16 @@ Irgendwann
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
 const byte LED_GREEN_PIN = 7;
+const byte ENABLE_PIN = 9;
 const byte LEFT_BTTN_PIN = 10;
 const byte RIGHT_BTTN_PIN = A3;
-const byte redLedPin = 9;
+//const byte redLedPin = 9;
 
 const byte ledSlowerRed = 5;    //  --
 const byte ledSlowerYellow = 6; //  -
 const byte ledGreen = 7;        //  o
 const byte ledFasterYellow = 8; //  +
-const byte ledFasterRed = 9;    //  ++
+//const byte ledFasterRed = 9;    //  ++
 
 const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
 
@@ -177,9 +178,10 @@ void setup()
     
     pinMode(SHAFT_PULSE_PIN, INPUT);
     pinMode(LED_GREEN_PIN, OUTPUT);
+    pinMode(ENABLE_PIN, OUTPUT);
     pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
     pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
-    pinMode(redLedPin, OUTPUT);
+    // pinMode(redLedPin, OUTPUT);
     attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
@@ -198,7 +200,7 @@ uint8_t checkButtons()
 {
     if (digitalRead(LEFT_BTTN_PIN) == LOW)
     {
-        return BTTN_LEFT;
+        return BTTN_LEFT;        
     } 
     else if (digitalRead(RIGHT_BTTN_PIN) == LOW)
     {
@@ -228,10 +230,12 @@ void loop()
         {
             if (button == 1) {
                 Serial.println("Button 1");
+                digitalWrite(ENABLE_PIN, HIGH);
             }
             else if (button == 2)
             {
                 Serial.println("Button 2");
+                digitalWrite(ENABLE_PIN, LOW);
             }
         }
     }
@@ -324,59 +328,18 @@ void loop()
             {
                 projector_speed_switch_pos = 18;
                 setupTimer1forFps(FPS_18);
+                digitalWrite(ENABLE_PIN, HIGH);
             }
             else if (detected_frequency > 21)
             {
                 projector_speed_switch_pos = 24;
                 setupTimer1forFps(FPS_24);
+                digitalWrite(ENABLE_PIN, HIGH);
             }       
         }
     }
 }
 
-void setLeds(int bargraph)
-{
-    switch (bargraph)
-    {
-    case -2:
-        digitalWrite(ledSlowerRed, HIGH);
-        digitalWrite(ledSlowerYellow, LOW);
-        digitalWrite(ledGreen, LOW);
-        digitalWrite(ledFasterYellow, LOW);
-        digitalWrite(ledFasterRed, LOW);
-        break;
-    case -1:
-        digitalWrite(ledSlowerRed, LOW);
-        digitalWrite(ledSlowerYellow, HIGH);
-        digitalWrite(ledGreen, LOW);
-        digitalWrite(ledFasterYellow, LOW);
-        digitalWrite(ledFasterRed, LOW);
-        break;
-    case 0:
-        digitalWrite(ledSlowerRed, LOW);
-        digitalWrite(ledSlowerYellow, LOW);
-        digitalWrite(ledGreen, HIGH);
-        digitalWrite(ledFasterYellow, LOW);
-        digitalWrite(ledFasterRed, LOW);
-        break;
-    case 1:
-        digitalWrite(ledSlowerRed, LOW);
-        digitalWrite(ledSlowerYellow, LOW);
-        digitalWrite(ledGreen, LOW);
-        digitalWrite(ledFasterYellow, HIGH);
-        digitalWrite(ledFasterRed, LOW);
-        break;
-    case 2:
-        digitalWrite(ledSlowerRed, LOW);
-        digitalWrite(ledSlowerYellow, LOW);
-        digitalWrite(ledGreen, LOW);
-        digitalWrite(ledFasterYellow, LOW);
-        digitalWrite(ledFasterRed, HIGH);
-        break;
-    default:
-        break;
-    }
-}
 
 bool setupTimer1forFps(byte sollFpsState)
 {
@@ -503,6 +466,7 @@ void onShaftImpulseISR()
         Serial.print("PID Reset to initial DAC value: ");
         Serial.println(pid_output);
         myPID.SetMode(AUTOMATIC);
+        digitalWrite(ENABLE_PIN, LOW);
     }
 
     // Expose the news
