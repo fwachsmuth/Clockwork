@@ -1,26 +1,22 @@
 /* Todo
 
 Hardware
-- check impact of the DAC on "free running" projector speed — do we need a switch here to connect it?
-- add an enable pin for optional "crystalization"
-- add a LED to show "crystal mode enabled"
 - add a selector switch
 - add +/- button tactile switches support
 - add i2c display
 
 Code
-- save new baseline in EEPROM and read it from there
+- consider an adaptive PID
 - Add FreqMeasure
 - support the buttons:
     - +/- one frame
     - chose target speed
-- tune the PID further
 - test prescaler 1 or dither to 216 Hz (and other freqs, where necessary)
 - update stop detection to a timeout (instead of period length)
 - support more speeds
 - move the Serial.print out of the ISR
 - Allow changing speed in manual mode at runtime (longpress)
-- consider a two-stage PID
+
 
 Speeds:
 - Auto
@@ -46,7 +42,8 @@ Irgendwann
 #include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
 #include <Wire.h>             // i2c to talk to the DAC
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
-#include <EEPROM.h>
+#include <SwitchManager.h>    // http://gammon.com.au/Arduino/SwitchManager.zip
+#include <FreqMeasure.h>
 
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
@@ -123,8 +120,12 @@ PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERS
 // Instantiate the DAC
 Adafruit_MCP4725 dac;
 
+// Instantiate the Buttons
+SwitchManager leftButton;
+SwitchManager rightButton;
 
-unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
+unsigned long
+calculateMedian(volatile unsigned long *buffer, size_t size)
 {
     // Calculates the median. A rolling average might be cehaper and good enough, esp with filtering outliers.
     unsigned long temp[size];
@@ -168,6 +169,9 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 
 void setup()
 {
+    leftButton.begin(LEFT_BTTN_PIN, handleButtonPress);
+    rightButton.begin(RIGHT_BTTN_PIN, handleButtonPress);
+
     Serial.begin(115200);
 
     // Configre Timer2 (replaces micros() in the ISR, since it is cehaper)
@@ -187,29 +191,49 @@ void setup()
 
     dac.setVoltage(DAC_INITIAL_VALUE, false); // 1537 is petty much 18 fps and 24 fps
 
+    // Init the PID
     pid_input = 0;
     pid_setpoint = 0;
     myPID.SetOutputLimits(0, 4095);
     myPID.SetSampleTime(50);
     myPID.SetMode(MANUAL);
-    pid_output = DAC_INITIAL_VALUE;
+    pid_output = DAC_INITIAL_VALUE; // This avoids starting with a 0-Output signal
     myPID.SetMode(AUTOMATIC);
 }
 
-uint8_t checkButtons()
+void handleButtonPress(const byte newState, const unsigned long interval, const byte whichPin)
 {
-    if (digitalRead(LEFT_BTTN_PIN) == LOW)
+    // newState: LOW or HIGH (current state)
+    // interval: how many ms between the opposite state and this one
+    // whichPin: which pin caused this change (so we can share the function across multiple switches)
+    if (newState == HIGH)
     {
-        return BTTN_LEFT;        
-    } 
-    else if (digitalRead(RIGHT_BTTN_PIN) == LOW)
-    {
-        return BTTN_RIGHT;
-    }
-    else {
-        return BTTN_NONE;
+        if (whichPin == LEFT_BTTN_PIN)
+        {
+            Serial.println("Crystal ON");
+            digitalWrite(ENABLE_PIN, HIGH);
+        }
+        else if (whichPin == RIGHT_BTTN_PIN)
+        {
+            Serial.println("Crystal OFF");
+            digitalWrite(ENABLE_PIN, LOW);
+        }
     }
 }
+// uint8_t checkButtons()
+// {
+//     if (digitalRead(LEFT_BTTN_PIN) == LOW)
+//     {
+//         return BTTN_LEFT;        
+//     } 
+//     else if (digitalRead(RIGHT_BTTN_PIN) == LOW)
+//     {
+//         return BTTN_RIGHT;
+//     }
+//     else {
+//         return BTTN_NONE;
+//     }
+// }
 
 void loop()
 {
@@ -222,23 +246,26 @@ void loop()
     static long last_pid_update_millis;
     static long current_pid_update_millis;
 
-    button = checkButtons();
-    if (button != last_button)
-    {
-        last_button = button;
-        if (button != BTTN_NONE)
-        {
-            if (button == 1) {
-                Serial.println("Button 1");
-                digitalWrite(ENABLE_PIN, HIGH);
-            }
-            else if (button == 2)
-            {
-                Serial.println("Button 2");
-                digitalWrite(ENABLE_PIN, LOW);
-            }
-        }
-    }
+    leftButton.check();
+    rightButton.check();
+
+    // button = checkButtons();
+    // if (button != last_button)
+    // {
+    //     last_button = button;
+    //     if (button != BTTN_NONE)
+    //     {
+    //         if (button == 1) {
+    //             Serial.println("Button 1");
+    //             digitalWrite(ENABLE_PIN, HIGH);
+    //         }
+    //         else if (button == 2)
+    //         {
+    //             Serial.println("Button 2");
+    //             digitalWrite(ENABLE_PIN, LOW);
+    //         }
+    //     }
+    // }
 
     // only read a pulse difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
     if (shaft_frame_count_updated && timer_frame_count_updated)
@@ -339,6 +366,7 @@ void loop()
         }
     }
 }
+
 
 
 bool setupTimer1forFps(byte sollFpsState)
