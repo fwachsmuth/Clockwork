@@ -114,42 +114,8 @@ volatile bool projector_running = false; // true = Running, false = Stopped
 volatile byte projector_speed_switch_pos = 0; // holds the (guessed) current speed switch position (18 or 24)
 volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
 
-enum DACValueIndex
-{
-    AUTO = 0,
-    DAC_16_2_3,
-    DAC_18,
-    DAC_23_9_NTSC,
-    DAC_24,
-    DAC_25,
-    DAC_29_9_NTSC,
-    DAC_30,
-    DAC_SPEEDS // Automatically equals the number of entries in the enum
-};
-enum ProjSpeedIndex
-{
-    PROJ_18 = 0,
-    PROJ_24 = 1,
-    PROJ_SPEEDS
-};
-
-// 2D array for DAC values: Rows for DAC speeds, Columns for projector speeds
-uint16_t dacValues[DAC_SPEEDS][PROJ_SPEEDS] = {
-    {1500, 1500}, // AUTO
-    {1300, 1300}, // DAC_16_2_3
-    {1500, 1500}, // DAC_18
-    {1700, 1700}, // DAC_23_9_NTSC
-    {1900, 1900}, // DAC_24
-    {2100, 2100}, // DAC_25
-    {2300, 2300}, // DAC_29_9_NTSC
-    {2500, 2500}  // DAC_30
-};
-// e.g. dacValues[AUTO][PROJ_18];
-
 // PID stuff
-double pid_setpoint,
-    pid_input, pid_output;
-//double pid_Kp = 30, pid_Ki = 15, pid_Kd = 3;
+double pid_setpoint, pid_input, pid_output;
 double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0;
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
@@ -202,20 +168,6 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 void setup()
 {
     Serial.begin(115200);
-
-    
-
-    // Check if EEPROM has the magic marker
-    if (EEPROM.read(0) != 0xBA) // BA is for BA...UER!
-    {
-        Serial.println("EEPROM not initialized. Fixing this now...");
-        EEPROM.write(0, 0xBA); // Marker schreiben
-        saveDACLUTtoEEPROM();    }
-    else
-    {
-        Serial.println("EEPROM looks valid. Loading values...");
-        loadDACLUTfromEEPROM();
-    }
 
     // Configre Timer2 (replaces micros() in the ISR, since it is cehaper)
     TCCR2A = 0;            // Normal Mode
@@ -275,13 +227,11 @@ void loop()
         if (button != BTTN_NONE)
         {
             if (button == 1) {
-                Serial.println("EEPROM Dump:");
-                dumpEEPROMToSerial();
+                Serial.println("Button 1");
             }
             else if (button == 2)
             {
-                Serial.println("!!!!!!!! Formatting EEPROM !!!!!!!!");
-                cleanEEPROM();
+                Serial.println("Button 2");
             }
         }
     }
@@ -585,173 +535,4 @@ void stopTimer1()
     noInterrupts();
     TIMSK1 &= ~(1 << OCIE1A);
     interrupts();
-}
-
-void cleanEEPROM() {
-    Serial.print("Deleting EEPROM...");
-    for (int i = 0; i < EEPROM.length(); i++)
-    {
-        EEPROM.write(i, 0);
-    }
-    Serial.println(" Done.");
-}
-
-void dumpEEPROMToSerial()
-{
-    // First 2D array constants
-    const int ROWS = DAC_SPEEDS;     // Number of rows (enum DACValueIndex count)
-    const int COLS = PROJ_SPEEDS;   // Number of columns (enum ProjSpeedIndex count)
-    int address = 1;                // Start reading after the marker byte
-
-    Serial.println("DAC Values from EEPROM:");
-    Serial.println("Index\tPROJ_18\tPROJ_24");
-
-    for (int i = 0; i < ROWS; ++i)
-    {
-        // Convert enum to a readable name
-        const char *dacName;
-        switch (i)
-        {
-        case AUTO:             dacName = "AUTO"; break;
-        case DAC_16_2_3:       dacName = "DAC_16_2_3"; break;
-        case DAC_18:           dacName = "DAC_18"; break;
-        case DAC_23_9_NTSC:    dacName = "DAC_23_9_NTSC"; break;
-        case DAC_24:           dacName = "DAC_24"; break;
-        case DAC_25:           dacName = "DAC_25"; break;
-        case DAC_29_9_NTSC:    dacName = "DAC_29_9_NTSC"; break;
-        case DAC_30:           dacName = "DAC_30"; break;
-        default:               dacName = "UNKNOWN"; break;
-        }
-
-        Serial.print(dacName);
-        Serial.print("\t");
-
-        for (int j = 0; j < COLS; ++j)
-        {
-            uint16_t value;
-            EEPROM.get(address, value);
-            address += sizeof(uint16_t);
-
-            Serial.print(value);
-            if (j < COLS - 1)
-                Serial.print("\t");
-        }
-        Serial.println();
-    }
-}
-
-void e2reader()
-{
-    char buffer[16];
-    char valuePrint[4];
-    byte value;
-    unsigned int address;
-    uint8_t trailingSpace = 2;
-
-    for (address = 0; address <= 127; address++)
-    {
-        // read a byte from the current address of the EEPROM
-        value = EEPROM.read(address);
-
-        // add space between two sets of 8 bytes
-        if (address % 8 == 0)
-            Serial.print(F("  "));
-
-        // newline and address for every 16 bytes
-        if (address % 16 == 0)
-        {
-            // print the buffer
-            if (address > 0 && address % 16 == 0)
-                printASCII(buffer);
-
-            sprintf(buffer, "\n 0x%05X: ", address);
-            Serial.print(buffer);
-
-            // clear the buffer for the next data block
-            memset(buffer, 32, 16);
-        }
-
-        // save the value in temporary storage
-        buffer[address % 16] = value;
-
-        // print the formatted value
-        sprintf(valuePrint, " %02X", value);
-        Serial.print(valuePrint);
-    }
-
-    if (address % 16 > 0)
-    {
-        if (address % 16 < 9)
-            trailingSpace += 2;
-
-        trailingSpace += (16 - address % 16) * 3;
-    }
-
-    for (int i = trailingSpace; i > 0; i--)
-        Serial.print(F(" "));
-
-    // last line of data and a new line
-    printASCII(buffer);
-    Serial.println();
-}
-
-void printASCII(char *buffer)
-{
-    for (int i = 0; i < 16; i++)
-    {
-        if (i == 8)
-            Serial.print(" ");
-
-        if (buffer[i] > 31 and buffer[i] < 127)
-        {
-            Serial.print(buffer[i]);
-        }
-        else
-        {
-            Serial.print(F("."));
-        }
-    }
-}
-
-// Save the array to EEPROM
-void saveDACLUTtoEEPROM()
-{
-    int address = 1;
-    for (int i = 0; i < DAC_SPEEDS; ++i)
-    {
-        for (int j = 0; j < PROJ_SPEEDS; ++j)
-        {
-            EEPROM.put(address, dacValues[i][j]);
-            address += sizeof(uint16_t);
-        }
-    }
-}
-
-// Load the array from EEPROM
-void loadDACLUTfromEEPROM()
-{
-    int address = 1;
-    for (int i = 0; i < DAC_SPEEDS; ++i)
-    {
-        for (int j = 0; j < PROJ_SPEEDS; ++j)
-        {
-            EEPROM.get(address, dacValues[i][j]);
-            address += sizeof(uint16_t);
-        }
-    }
-}
-
-void updateEEPROMValue(DACValueIndex dacIndex, ProjSpeedIndex speedIndex, uint16_t newValue)
-{
-    int address = 1 + (dacIndex * PROJ_SPEEDS + speedIndex) * sizeof(uint16_t);
-    EEPROM.put(address, newValue);
-    dacValues[dacIndex][speedIndex] = newValue; // Update in RAM for consistency
-}
-
-uint16_t readEEPROMValue(DACValueIndex dacIndex, ProjSpeedIndex speedIndex)
-{
-    int address = 1 + (dacIndex * PROJ_SPEEDS + speedIndex) * sizeof(uint16_t);
-    uint16_t value;
-    EEPROM.get(address, value);
-    return value;
 }
