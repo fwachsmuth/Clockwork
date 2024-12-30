@@ -19,6 +19,8 @@ Code
 - update stop detection to a timeout (instead of period length)
 - support more speeds
 - move the Serial.print out of the ISR
+- Allow changing speed in manual mode at runtime (longpress)
+- consider a two-stage PID
 
 Speeds:
 - Auto
@@ -62,7 +64,9 @@ const byte ledFasterRed = 9;    //  ++
 const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
 
 // Threshold in microseconds to detect a stop. (This is between shaft pulses, so too big vlaues might never happen!)
-constexpr unsigned long STOP_THRESHOLD = 15000; 
+const unsigned long STOP_THRESHOLD = 15000; 
+
+const unsigned long SAVE_THRESHOLD = 10000; // ms until a stable DAC value will be considered as new EPROM default
 
 // to get the approx. DAC value for any desired fps per a * x * x + b * x + c
 const float a = 0.6126;
@@ -145,7 +149,8 @@ uint16_t dacValues[DAC_SPEEDS][PROJ_SPEEDS] = {
 // PID stuff
 double pid_setpoint,
     pid_input, pid_output;
-double pid_Kp = 30, pid_Ki = 15, pid_Kd = 3;
+//double pid_Kp = 30, pid_Ki = 15, pid_Kd = 3;
+double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0;
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
 // Instantiate the DAC
@@ -231,6 +236,7 @@ void setup()
     pid_input = 0;
     pid_setpoint = 0;
     myPID.SetOutputLimits(0, 4095);
+    myPID.SetSampleTime(50);
     myPID.SetMode(MANUAL);
     pid_output = DAC_INITIAL_VALUE;
     myPID.SetMode(AUTOMATIC);
@@ -317,8 +323,15 @@ void loop()
         Serial.print(", new DAC value: ");
         Serial.print(new_dac_value);
 
+        if ((current_pulse_difference == 0) && ((current_pid_update_millis - last_pid_update_millis) > SAVE_THRESHOLD))
+        {
+            Serial.print(" This would be a winner: ");
+            Serial.println((current_pid_update_millis - last_pid_update_millis) / 1000);
+        }
+
         last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
         last_pid_update_millis = current_pid_update_millis;
+
 
         /* Todo:
         Check if the error was 0. If so and the lifetime was >20s, store 
