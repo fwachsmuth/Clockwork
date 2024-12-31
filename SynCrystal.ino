@@ -141,13 +141,13 @@ enum RunModes
 };
 byte current_run_mode = XTAL_AUTO;
 
-enum ProjectorStates
-{
-    PROJ_IDLE,
-    PROJ_RUNNING_FREE,
-    PROJ_RUNNING_XTAL,
-};
-byte current_projector_state = 0;
+// enum ProjectorStates
+// {
+//     PROJ_IDLE,
+//     PROJ_RUNNING_FREE,
+//     PROJ_RUNNING_XTAL,
+// };
+// byte current_projector_state = 0;
 
 enum SyncStates
 {
@@ -279,30 +279,37 @@ void handleButtonPress(const byte newState, const unsigned long interval, const 
     // newState: LOW or HIGH (current state)
     // interval: how many ms between the opposite state and this one
     // whichPin: which pin caused this change (so we can share the function across multiple switches)
-    
-    if (newState == HIGH) 
+
+    if (newState == HIGH) // on button release
     {
-        if (whichPin == LEFT_BTTN_PIN)
+        if (!projector_running || interval > 1500) // Change mode if not running or long press detected
         {
-            // Decrement run_mode
-            if (current_run_mode == 0)
-                current_run_mode = MODES_COUNT - 1; // Roll over to the last run_mode
-            else
-                current_run_mode--;
-            changeRunMode(current_run_mode);
+            if (whichPin == LEFT_BTTN_PIN)
+            {
+                // Decrement run_mode
+                if (current_run_mode == 0)
+                    current_run_mode = MODES_COUNT - 1; // Roll over to the last run_mode
+                else
+                    current_run_mode--;
+                changeRunMode(current_run_mode);
+            }
+            else if (whichPin == RIGHT_BTTN_PIN)
+            {
+                // Increment run_mode
+                if (current_run_mode == MODES_COUNT - 1)
+                    current_run_mode = 0; // Roll over to the first run_mode
+                else
+                    current_run_mode++;
+                changeRunMode(current_run_mode);
+            }
         }
-        else if (whichPin == RIGHT_BTTN_PIN)
+        else
         {
-            // Increment run_mode
-            if (current_run_mode == MODES_COUNT - 1)
-                current_run_mode = 0; // Roll over to the first run_mode
-            else
-                current_run_mode++;
-            changeRunMode(current_run_mode);
+            // Optionally, provide feedback for ignored button press
+            Serial.println("Short press ignored while projector is running.");
         }
     }
 }
-
 
 // uint8_t checkButtons()
 // {
