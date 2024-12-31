@@ -4,6 +4,8 @@ Hardware
 - add a selector switch
 - add +/- button tactile switches support
 - add i2c display
+- debonce with the schmitt triggers (https://electronics.stackexchange.com/questions/531167/suitable-rc-debouncing-circuit)
+https://hackaday.com/2015/12/09/embed-with-elliot-debounce-your-noisy-buttons-part-i/
 
 Code
 - consider an adaptive PID
@@ -124,6 +126,36 @@ Adafruit_MCP4725 dac;
 SwitchManager leftButton;
 SwitchManager rightButton;
 
+// State Machine!
+
+enum RunModes
+{
+    XTAL_NONE,
+    XTAL_AUTO,
+    XTAL_16_2_3,
+    XTAL_18,
+    XTAL_23_976,
+    XTAL_24,
+    XTAL_25,
+    MODES_COUNT // Automatically equals the number of entries in the enum
+};
+byte current_run_mode = XTAL_AUTO;
+
+enum ProjectorStates
+{
+    PROJ_IDLE,
+    PROJ_RUNNING_FREE,
+    PROJ_RUNNING_XTAL,
+};
+byte current_projector_state = 0;
+
+enum SyncStates
+{
+    SYNC_LOCKED,
+    SYNC_PROJ_TOO_FAST,
+    SYNC_PROJ_TOO_SLOW
+};
+
 unsigned long
 calculateMedian(volatile unsigned long *buffer, size_t size)
 {
@@ -199,6 +231,47 @@ void setup()
     myPID.SetMode(MANUAL);
     pid_output = DAC_INITIAL_VALUE; // This avoids starting with a 0-Output signal
     myPID.SetMode(AUTOMATIC);
+
+    changeRunMode(current_run_mode);
+}
+
+void changeRunMode(byte run_mode)
+{
+    switch (run_mode)
+    {
+    case XTAL_NONE:
+        Serial.println("XTAL_NONE");
+        digitalWrite(ENABLE_PIN, LOW);
+        break;
+    case XTAL_AUTO:
+        Serial.println("XTAL_AUTO");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_16_2_3:
+        Serial.println("XTAL_16_2_3");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_18:
+        Serial.println("XTAL_18");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_23_976:
+        Serial.println("XTAL_23_976");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_24:
+        Serial.println("XTAL_24");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_25:
+        Serial.println("XTAL_25");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    default:
+        Serial.println("Unknown Mode");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    }
 }
 
 void handleButtonPress(const byte newState, const unsigned long interval, const byte whichPin)
@@ -206,20 +279,31 @@ void handleButtonPress(const byte newState, const unsigned long interval, const 
     // newState: LOW or HIGH (current state)
     // interval: how many ms between the opposite state and this one
     // whichPin: which pin caused this change (so we can share the function across multiple switches)
-    if (newState == HIGH)
+    
+    if (newState == HIGH) 
     {
         if (whichPin == LEFT_BTTN_PIN)
         {
-            Serial.println("Crystal ON");
-            digitalWrite(ENABLE_PIN, HIGH);
+            // Decrement run_mode
+            if (current_run_mode == 0)
+                current_run_mode = MODES_COUNT - 1; // Roll over to the last run_mode
+            else
+                current_run_mode--;
+            changeRunMode(current_run_mode);
         }
         else if (whichPin == RIGHT_BTTN_PIN)
         {
-            Serial.println("Crystal OFF");
-            digitalWrite(ENABLE_PIN, LOW);
+            // Increment run_mode
+            if (current_run_mode == MODES_COUNT - 1)
+                current_run_mode = 0; // Roll over to the first run_mode
+            else
+                current_run_mode++;
+            changeRunMode(current_run_mode);
         }
     }
 }
+
+
 // uint8_t checkButtons()
 // {
 //     if (digitalRead(LEFT_BTTN_PIN) == LOW)
@@ -522,7 +606,7 @@ ISR(TIMER1_COMPA_vect)
 }
 
 void stopTimer1()
-{ // Stops Timer1, for when we are not in craystal running mode
+{ // Stops Timer1, for when we are not in craystal running run_mode
     // TCCR1B &= ~(1 << CS11);
     noInterrupts();
     TIMSK1 &= ~(1 << OCIE1A);
