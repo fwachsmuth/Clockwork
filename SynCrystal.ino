@@ -51,9 +51,13 @@ Irgendwann
 const byte SHAFT_PULSE_PIN = 2;
 const byte LED_GREEN_PIN = 7;
 const byte ENABLE_PIN = 9;
+
 const byte LEFT_BTTN_PIN = 10;
-const byte RIGHT_BTTN_PIN = A3;
-//const byte redLedPin = 9;
+const byte RIGHT_BTTN_PIN = 13;
+const byte FRAME_DN_BTTN_PIN = 11;
+const byte FRAME_UP_BTTN_PIN = 12;
+
+// const byte redLedPin = 9;
 
 const byte ledSlowerRed = 5;    //  --
 const byte ledSlowerYellow = 6; //  -
@@ -123,7 +127,7 @@ PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERS
 Adafruit_MCP4725 dac;
 
 // Instantiate the Buttons
-Button2 leftButton, rightButton;
+Button2 leftButton, rightButton, frameDnButton, frameUpButton;
 
 // State Machine!
 
@@ -185,7 +189,7 @@ calculateMedian(volatile unsigned long *buffer, size_t size)
 
 bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long tolerance)
 {
-    // Stebility check
+    // Stability check
     unsigned long minVal = buffer[0];
     unsigned long maxVal = buffer[0];
     for (size_t i = 1; i < size; i++)
@@ -201,21 +205,30 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 void setup()
 {
     leftButton.begin(LEFT_BTTN_PIN);
-    leftButton.setTapHandler(handleButtonTap); // react immediately when projector is stopped
-    leftButton.setClickHandler(handleButtonClick); // needed when we need to recognize long presses in running mode
-    leftButton.setLongClickDetectedHandler(handleButtonLongClick);
-    leftButton.setLongClickTime(1000);
+    leftButton.setTapHandler(handleButtonTap); // react immediately when no longtap is needed
+    // leftButton.setClickHandler(handleButtonClick); // needed when we need to recognize long presses in running mode
+    // leftButton.setLongClickDetectedHandler(handleButtonLongClick);
+    // leftButton.setLongClickTime(1000);
     leftButton.setDoubleClickTime(0); // disable double clicks
     leftButton.setDebounceTime(10);
 
     rightButton.begin(RIGHT_BTTN_PIN);
     rightButton.setTapHandler(handleButtonTap);
-    rightButton.setClickHandler(handleButtonClick);
-    rightButton.setLongClickDetectedHandler(handleButtonLongClick);
-    rightButton.setLongClickTime(1000);
+    // rightButton.setClickHandler(handleButtonClick);
+    // rightButton.setLongClickDetectedHandler(handleButtonLongClick);
+    // rightButton.setLongClickTime(1000);
     rightButton.setDoubleClickTime(0); // disable double clicks
     rightButton.setDebounceTime(10);
 
+    frameDnButton.begin(FRAME_DN_BTTN_PIN);
+    frameDnButton.setTapHandler(handleButtonTap);
+    frameDnButton.setDoubleClickTime(0); // disable double clicks
+    frameDnButton.setDebounceTime(10);
+
+    frameUpButton.begin(FRAME_UP_BTTN_PIN);
+    frameUpButton.setTapHandler(handleButtonTap);
+    frameUpButton.setDoubleClickTime(0); // disable double clicks
+    frameUpButton.setDebounceTime(10);
 
     Serial.begin(115200);
 
@@ -230,7 +243,9 @@ void setup()
     pinMode(ENABLE_PIN, OUTPUT);
     pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
     pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
-    // pinMode(redLedPin, OUTPUT);
+    pinMode(FRAME_DN_BTTN_PIN, INPUT_PULLUP);
+    pinMode(FRAME_UP_BTTN_PIN, INPUT_PULLUP);
+
     attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
@@ -290,32 +305,28 @@ void changeRunMode(byte run_mode)
 void handleButtonTap(Button2 &btn)
 {
     // Handle taps only if the projector is stopped
-    if (projector_running)
-        return;
-    selectNextMode(btn);
-}
-
-void handleButtonClick(Button2 &btn)
-{
-    // handle clicks only if the projector is running
-    if (!projector_running)
-        return;
     if (btn == leftButton)
     {
-        Serial.println("Left Button Clicked. Decrease Framecount.");
+        Serial.println("Left Button Tapped. Decrease Framecount.");
     }
     else if (btn == rightButton)
     {
-        Serial.println("Right Button Clicked. Increase Framecount.");
+        Serial.println("Right Button Tapped. Increase Framecount.");
     }
-}
+    // Frame up/down is only allowed while the projector is running
 
-void handleButtonLongClick(Button2 &btn)
-{
-    // handle long-clicks only if the projector is running
     if (!projector_running)
         return;
-    selectNextMode(btn);
+
+    if (btn == frameDnButton)
+    {
+        Serial.println("Frame Down Button Tapped.");
+    }
+    else if (btn == frameUpButton)
+    {
+        Serial.println("Frame Up Button Tapped.");
+    }
+    // selectNextMode(btn);
 }
 
 void selectNextMode(Button2 &btn)
@@ -328,6 +339,30 @@ void selectNextMode(Button2 &btn)
     changeRunMode(current_run_mode);
 }
 
+// void handleButtonClick(Button2 &btn)
+// {
+//     // handle clicks only if the projector is running
+//     if (!projector_running)
+//         return;
+//     if (btn == leftButton)
+//     {
+//         Serial.println("Left Button Clicked. Decrease Framecount.");
+//     }
+//     else if (btn == rightButton)
+//     {
+//         Serial.println("Right Button Clicked. Increase Framecount.");
+//     }
+// }
+
+// void handleButtonLongClick(Button2 &btn)
+// {
+//     // handle long-clicks only if the projector is running
+//     if (!projector_running)
+//         return;
+//     selectNextMode(btn);
+// }
+
+
 void loop()
 {
     static long local_timer_frames = 0; // for atomic reads
@@ -339,8 +374,11 @@ void loop()
     static long last_pid_update_millis;
     static long current_pid_update_millis;
 
+    // Poll the buttons
     leftButton.loop();
     rightButton.loop();
+    frameDnButton.loop();
+    frameUpButton.loop();
 
     // only read a pulse difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
     if (shaft_frame_count_updated && timer_frame_count_updated)
