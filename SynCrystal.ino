@@ -1,11 +1,7 @@
 /* Todo
 
 Hardware
-- add a selector switch
-- add +/- button tactile switches support
 - add i2c display
-- debonce with the schmitt triggers (https://electronics.stackexchange.com/questions/531167/suitable-rc-debouncing-circuit)
-https://hackaday.com/2015/12/09/embed-with-elliot-debounce-your-noisy-buttons-part-i/
 
 Code
 - consider an adaptive PID
@@ -27,8 +23,6 @@ Speeds:
 - (23.'976023 = 24 * 1000 / 1001)
 - 24
 - 25
-- (29.97'002997' = 30 * 1000 / 1001)
-- (30)
 
 
 Irgendwann
@@ -159,48 +153,6 @@ enum SyncStates
     SYNC_PROJ_TOO_SLOW
 };
 
-unsigned long
-calculateMedian(volatile unsigned long *buffer, size_t size)
-{
-    // Calculates the median. A rolling average might be cehaper and good enough, esp with filtering outliers.
-    unsigned long temp[size];
-    // We need a copy of the array to not get interference with the ISR. Intereference doesnt seem likely, so maybe 100B could be saved here
-    for (size_t i = 0; i < size; i++)
-    {
-        temp[i] = buffer[i];
-    }
-
-    // Simple Insertion Sort
-    for (size_t i = 1; i < size; i++)
-    {
-        unsigned long key = temp[i];
-        size_t j = i;
-        while (j > 0 && temp[j - 1] > key)
-        {
-            temp[j] = temp[j - 1];
-            j--;
-        }
-        temp[j] = key;
-    }
-
-    // Determine Median 
-    return (size % 2 == 0) ? (temp[size / 2 - 1] + temp[size / 2]) / 2 : temp[size / 2];
-}
-
-bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long tolerance)
-{
-    // Stability check
-    unsigned long minVal = buffer[0];
-    unsigned long maxVal = buffer[0];
-    for (size_t i = 1; i < size; i++)
-    {
-        if (buffer[i] < minVal)
-            minVal = buffer[i];
-        if (buffer[i] > maxVal)
-            maxVal = buffer[i];
-    }
-    return (maxVal - minVal) <= tolerance;
-}
 
 void setup()
 {
@@ -214,9 +166,6 @@ void setup()
 
     rightButton.begin(RIGHT_BTTN_PIN);
     rightButton.setTapHandler(handleButtonTap);
-    // rightButton.setClickHandler(handleButtonClick);
-    // rightButton.setLongClickDetectedHandler(handleButtonLongClick);
-    // rightButton.setLongClickTime(1000);
     rightButton.setDoubleClickTime(0); // disable double clicks
     rightButton.setDebounceTime(10);
 
@@ -232,7 +181,7 @@ void setup()
 
     Serial.begin(115200);
 
-    // Configre Timer2 (replaces micros() in the ISR, since it is cehaper)
+    // Configure Timer2 (replaces micros() in the ISR, since it is cheaper)
     TCCR2A = 0;            // Normal Mode
     TCCR2B = (1 << CS22);  // Prescaler = 64 (1 Tick = 4 µs at 16 MHz)
     TCNT2 = 0;             // Timer2 Reset
@@ -262,106 +211,6 @@ void setup()
 
     changeRunMode(current_run_mode);
 }
-
-void changeRunMode(byte run_mode)
-{
-    switch (run_mode)
-    {
-    case XTAL_NONE:
-        Serial.println("XTAL_NONE");
-        digitalWrite(ENABLE_PIN, LOW);
-        break;
-    case XTAL_AUTO:
-        Serial.println("XTAL_AUTO");
-        digitalWrite(ENABLE_PIN, HIGH);
-        break;
-    case XTAL_16_2_3:
-        Serial.println("XTAL_16_2_3");
-        digitalWrite(ENABLE_PIN, HIGH);
-        break;
-    case XTAL_18:
-        Serial.println("XTAL_18");
-        digitalWrite(ENABLE_PIN, HIGH);
-        break;
-    case XTAL_23_976:
-        Serial.println("XTAL_23_976");
-        digitalWrite(ENABLE_PIN, HIGH);
-        break;
-    case XTAL_24:
-        Serial.println("XTAL_24");
-        digitalWrite(ENABLE_PIN, HIGH);
-        break;
-    case XTAL_25:
-        Serial.println("XTAL_25");
-        digitalWrite(ENABLE_PIN, HIGH);
-        break;
-    default:
-        Serial.println("Unknown Mode");
-        digitalWrite(ENABLE_PIN, HIGH);
-        break;
-    }
-}
-
-void handleButtonTap(Button2 &btn)
-{
-    // Handle taps only if the projector is stopped
-    if (btn == leftButton)
-    {
-        Serial.println("Left Button Tapped. Decrease Framecount.");
-    }
-    else if (btn == rightButton)
-    {
-        Serial.println("Right Button Tapped. Increase Framecount.");
-    }
-    // Frame up/down is only allowed while the projector is running
-
-    if (!projector_running)
-        return;
-
-    if (btn == frameDnButton)
-    {
-        Serial.println("Frame Down Button Tapped.");
-    }
-    else if (btn == frameUpButton)
-    {
-        Serial.println("Frame Up Button Tapped.");
-    }
-    // selectNextMode(btn);
-}
-
-void selectNextMode(Button2 &btn)
-{
-    // Determine the change based on which button was pressed
-    int8_t change = (btn == leftButton) ? -1 : 1;
-
-    // Update the run mode
-    current_run_mode = (current_run_mode + change + MODES_COUNT) % MODES_COUNT;
-    changeRunMode(current_run_mode);
-}
-
-// void handleButtonClick(Button2 &btn)
-// {
-//     // handle clicks only if the projector is running
-//     if (!projector_running)
-//         return;
-//     if (btn == leftButton)
-//     {
-//         Serial.println("Left Button Clicked. Decrease Framecount.");
-//     }
-//     else if (btn == rightButton)
-//     {
-//         Serial.println("Right Button Clicked. Increase Framecount.");
-//     }
-// }
-
-// void handleButtonLongClick(Button2 &btn)
-// {
-//     // handle long-clicks only if the projector is running
-//     if (!projector_running)
-//         return;
-//     selectNextMode(btn);
-// }
-
 
 void loop()
 {
@@ -479,6 +328,125 @@ void loop()
         }
     }
 }
+
+unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
+{
+    // Calculates the median. A rolling average might be cehaper and good enough, esp with filtering outliers.
+    unsigned long temp[size];
+    // We need a copy of the array to not get interference with the ISR. Intereference doesnt seem likely, so maybe 100B could be saved here
+    for (size_t i = 0; i < size; i++)
+    {
+        temp[i] = buffer[i];
+    }
+
+    // Simple Insertion Sort
+    for (size_t i = 1; i < size; i++)
+    {
+        unsigned long key = temp[i];
+        size_t j = i;
+        while (j > 0 && temp[j - 1] > key)
+        {
+            temp[j] = temp[j - 1];
+            j--;
+        }
+        temp[j] = key;
+    }
+
+    // Determine Median 
+    return (size % 2 == 0) ? (temp[size / 2 - 1] + temp[size / 2]) / 2 : temp[size / 2];
+}
+
+bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long tolerance)
+{
+    // Stability check
+    unsigned long minVal = buffer[0];
+    unsigned long maxVal = buffer[0];
+    for (size_t i = 1; i < size; i++)
+    {
+        if (buffer[i] < minVal)
+            minVal = buffer[i];
+        if (buffer[i] > maxVal)
+            maxVal = buffer[i];
+    }
+    return (maxVal - minVal) <= tolerance;
+}
+
+void changeRunMode(byte run_mode)
+{
+    switch (run_mode)
+    {
+    case XTAL_NONE:
+        Serial.println("XTAL_NONE");
+        digitalWrite(ENABLE_PIN, LOW);
+        break;
+    case XTAL_AUTO:
+        Serial.println("XTAL_AUTO");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_16_2_3:
+        Serial.println("XTAL_16_2_3");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_18:
+        Serial.println("XTAL_18");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_23_976:
+        Serial.println("XTAL_23_976");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_24:
+        Serial.println("XTAL_24");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    case XTAL_25:
+        Serial.println("XTAL_25");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    default:
+        Serial.println("Unknown Mode");
+        digitalWrite(ENABLE_PIN, HIGH);
+        break;
+    }
+}
+
+void handleButtonTap(Button2 &btn)
+{
+    if (btn == leftButton)
+    {
+        Serial.println("Left Button Tapped. Decrease Framecount.");
+        selectNextMode(btn);
+    }
+    else if (btn == rightButton)
+    {
+        Serial.println("Right Button Tapped. Increase Framecount.");
+        selectNextMode(btn);
+    }
+    // Frame up/down is only allowed while the projector is running
+    if (projector_running)
+    {
+        if (btn == frameDnButton)
+        {
+            Serial.println("Frame Down Button Tapped.");
+        }
+        else if (btn == frameUpButton)
+        {
+            Serial.println("Frame Up Button Tapped.");
+        }
+    }
+}
+
+void selectNextMode(Button2 &btn)
+{
+    // Determine the change based on which button was pressed
+    int8_t change = (btn == leftButton) ? -1 : 1;
+
+    // Update the run mode
+    current_run_mode = (current_run_mode + change + MODES_COUNT) % MODES_COUNT;
+    changeRunMode(current_run_mode);
+}
+
+
 
 
 
