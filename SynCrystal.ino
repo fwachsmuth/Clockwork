@@ -44,8 +44,8 @@ Irgendwann
 #include <Adafruit_MCP4725.h> // Fancy DAC for voltage control
 #include <Wire.h>             // i2c to talk to the DAC
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
-#include <SwitchManager.h>    // http://gammon.com.au/Arduino/SwitchManager.zip
 #include <FreqMeasure.h>
+#include <Button2.h>
 
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
@@ -123,8 +123,7 @@ PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERS
 Adafruit_MCP4725 dac;
 
 // Instantiate the Buttons
-SwitchManager leftButton;
-SwitchManager rightButton;
+Button2 leftButton, rightButton;
 
 // State Machine!
 
@@ -201,8 +200,22 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 
 void setup()
 {
-    leftButton.begin(LEFT_BTTN_PIN, handleButtonPress);
-    rightButton.begin(RIGHT_BTTN_PIN, handleButtonPress);
+    leftButton.begin(LEFT_BTTN_PIN);
+    leftButton.setTapHandler(handleButtonTap); // react immediately when projector is stopped
+    leftButton.setClickHandler(handleButtonClick); // needed when we need to recognize long presses in running mode
+    leftButton.setLongClickDetectedHandler(handleButtonLongClick);
+    leftButton.setLongClickTime(1000);
+    leftButton.setDoubleClickTime(0); // disable double clicks
+    leftButton.setDebounceTime(10);
+
+    rightButton.begin(RIGHT_BTTN_PIN);
+    rightButton.setTapHandler(handleButtonTap);
+    rightButton.setClickHandler(handleButtonClick);
+    rightButton.setLongClickDetectedHandler(handleButtonLongClick);
+    rightButton.setLongClickTime(1000);
+    rightButton.setDoubleClickTime(0); // disable double clicks
+    rightButton.setDebounceTime(10);
+
 
     Serial.begin(115200);
 
@@ -274,42 +287,87 @@ void changeRunMode(byte run_mode)
     }
 }
 
-void handleButtonPress(const byte newState, const unsigned long interval, const byte whichPin)
+void handleButtonTap(Button2 &btn)
 {
-    // newState: LOW or HIGH (current state)
-    // interval: how many ms between the opposite state and this one
-    // whichPin: which pin caused this change (so we can share the function across multiple switches)
-
-    if (newState == HIGH) // on button release
+    // Handle taps only if the projector is stopped
+    if (projector_running)
+        return;
+    if (btn == leftButton)
     {
-        if (!projector_running || interval > 1500) // Change mode if not running or long press detected
-        {
-            if (whichPin == LEFT_BTTN_PIN)
-            {
-                // Decrement run_mode
-                if (current_run_mode == 0)
-                    current_run_mode = MODES_COUNT - 1; // Roll over to the last run_mode
-                else
-                    current_run_mode--;
-                changeRunMode(current_run_mode);
-            }
-            else if (whichPin == RIGHT_BTTN_PIN)
-            {
-                // Increment run_mode
-                if (current_run_mode == MODES_COUNT - 1)
-                    current_run_mode = 0; // Roll over to the first run_mode
-                else
-                    current_run_mode++;
-                changeRunMode(current_run_mode);
-            }
-        }
-        else
-        {
-            // Optionally, provide feedback for ignored button press
-            Serial.println("Short press ignored while projector is running.");
-        }
+        Serial.println("Left Button Tapped. Change to previous Mode");
+    }
+    else if (btn == rightButton)
+    {
+        Serial.println("Right Button Tapped. Change to next Mode");
     }
 }
+
+void handleButtonClick(Button2 &btn)
+{
+    // handle clicks only if the projector is running
+    if (!projector_running)
+        return;
+    if (btn == leftButton)
+    {
+        Serial.println("Left Button Clicked. Decrease Framecount.");
+    }
+    else if (btn == rightButton)
+    {
+        Serial.println("Right Button Clicked. Increase Framecount.");
+    }
+}
+
+void handleButtonLongClick(Button2 &btn)
+{
+    // handle long-clicks only if the projector is running
+    if (!projector_running)
+        return;
+    if (btn == leftButton)
+    {
+        Serial.println("Left Button long pressed. Change to previous Mode.");
+    }
+    else if (btn == rightButton)
+    {
+        Serial.println("Right Button long pressed. Change to next Mode.");
+    }
+}
+
+// void handleButtonPress(const byte newState, const unsigned long interval, const byte whichPin)
+// {
+//     // newState: LOW or HIGH (current state)
+//     // interval: how many ms between the opposite state and this one
+//     // whichPin: which pin caused this change (so we can share the function across multiple switches)
+
+//     if (newState == HIGH) // on button release
+//     {
+//         if (!projector_running || interval > 1500) // Change mode if not running or long press detected
+//         {
+//             if (whichPin == LEFT_BTTN_PIN)
+//             {
+//                 // Decrement run_mode
+//                 if (current_run_mode == 0)
+//                     current_run_mode = MODES_COUNT - 1; // Roll over to the last run_mode
+//                 else
+//                     current_run_mode--;
+//                 changeRunMode(current_run_mode);
+//             }
+//             else if (whichPin == RIGHT_BTTN_PIN)
+//             {
+//                 // Increment run_mode
+//                 if (current_run_mode == MODES_COUNT - 1)
+//                     current_run_mode = 0; // Roll over to the first run_mode
+//                 else
+//                     current_run_mode++;
+//                 changeRunMode(current_run_mode);
+//             }
+//         }
+//         else
+//         {
+//             // Optionally, provide feedback for ignored button press
+//             Serial.println("Short press ignored while projector is running.");
+//         }
+//     }
+// }
 
 // uint8_t checkButtons()
 // {
@@ -337,26 +395,8 @@ void loop()
     static long last_pid_update_millis;
     static long current_pid_update_millis;
 
-    leftButton.check();
-    rightButton.check();
-
-    // button = checkButtons();
-    // if (button != last_button)
-    // {
-    //     last_button = button;
-    //     if (button != BTTN_NONE)
-    //     {
-    //         if (button == 1) {
-    //             Serial.println("Button 1");
-    //             digitalWrite(ENABLE_PIN, HIGH);
-    //         }
-    //         else if (button == 2)
-    //         {
-    //             Serial.println("Button 2");
-    //             digitalWrite(ENABLE_PIN, LOW);
-    //         }
-    //     }
-    // }
+    leftButton.loop();
+    rightButton.loop();
 
     // only read a pulse difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
     if (shaft_frame_count_updated && timer_frame_count_updated)
@@ -381,10 +421,10 @@ void loop()
     // Print only if the difference has changed AND the projector is actually running
     if ((current_pulse_difference != last_pulse_difference) && projector_speed_switch_pos != 0)
     {
-        current_pid_update_millis = millis();
-        Serial.print(", which was stable for ");
-        Serial.print(current_pid_update_millis - last_pid_update_millis);
-        Serial.println(" ms");
+        // current_pid_update_millis = millis();
+        // Serial.print(", which was stable for ");
+        // Serial.print(current_pid_update_millis - last_pid_update_millis);
+        // Serial.println(" ms");
 
         Serial.print("Target FPS: ");
         Serial.print(projector_speed_switch_pos);
@@ -393,7 +433,7 @@ void loop()
         Serial.print(", PID-Output: ");
         Serial.print(pid_output);
         Serial.print(", new DAC value: ");
-        Serial.print(new_dac_value);
+        Serial.println(new_dac_value);
 
         if ((current_pulse_difference == 0) && ((current_pid_update_millis - last_pid_update_millis) > SAVE_THRESHOLD))
         {
