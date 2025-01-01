@@ -48,8 +48,8 @@ const byte ENABLE_PIN = 9;
 
 const byte LEFT_BTTN_PIN = 10;
 const byte RIGHT_BTTN_PIN = 13;
-const byte FRAME_DN_BTTN_PIN = 11;
-const byte FRAME_UP_BTTN_PIN = 12;
+const byte DROP_BACK_BTTN_PIN = 11;
+const byte CATCH_UP_BTTN_PIN = 12;
 
 // const byte redLedPin = 9;
 
@@ -121,7 +121,7 @@ PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERS
 Adafruit_MCP4725 dac;
 
 // Instantiate the Buttons
-Button2 leftButton, rightButton, frameDnButton, frameUpButton;
+Button2 leftButton, rightButton, dropBackButton, catchUpButton;
 
 // State Machine!
 
@@ -137,14 +137,6 @@ enum RunModes
     MODES_COUNT // Automatically equals the number of entries in the enum
 };
 byte current_run_mode = XTAL_AUTO;
-
-// enum ProjectorStates
-// {
-//     PROJ_IDLE,
-//     PROJ_RUNNING_FREE,
-//     PROJ_RUNNING_XTAL,
-// };
-// byte current_projector_state = 0;
 
 enum SyncStates
 {
@@ -169,15 +161,15 @@ void setup()
     rightButton.setDoubleClickTime(0); // disable double clicks
     rightButton.setDebounceTime(10);
 
-    frameDnButton.begin(FRAME_DN_BTTN_PIN);
-    frameDnButton.setTapHandler(handleButtonTap);
-    frameDnButton.setDoubleClickTime(0); // disable double clicks
-    frameDnButton.setDebounceTime(10);
+    dropBackButton.begin(DROP_BACK_BTTN_PIN);
+    dropBackButton.setTapHandler(handleButtonTap);
+    dropBackButton.setDoubleClickTime(0); // disable double clicks
+    dropBackButton.setDebounceTime(10);
 
-    frameUpButton.begin(FRAME_UP_BTTN_PIN);
-    frameUpButton.setTapHandler(handleButtonTap);
-    frameUpButton.setDoubleClickTime(0); // disable double clicks
-    frameUpButton.setDebounceTime(10);
+    catchUpButton.begin(CATCH_UP_BTTN_PIN);
+    catchUpButton.setTapHandler(handleButtonTap);
+    catchUpButton.setDoubleClickTime(0); // disable double clicks
+    catchUpButton.setDebounceTime(10);
 
     Serial.begin(115200);
 
@@ -192,8 +184,8 @@ void setup()
     pinMode(ENABLE_PIN, OUTPUT);
     pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
     pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
-    pinMode(FRAME_DN_BTTN_PIN, INPUT_PULLUP);
-    pinMode(FRAME_UP_BTTN_PIN, INPUT_PULLUP);
+    pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
+    pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
 
     attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
@@ -226,8 +218,8 @@ void loop()
     // Poll the buttons
     leftButton.loop();
     rightButton.loop();
-    frameDnButton.loop();
-    frameUpButton.loop();
+    dropBackButton.loop();
+    catchUpButton.loop();
 
     // only read a pulse difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
     if (shaft_frame_count_updated && timer_frame_count_updated)
@@ -274,17 +266,6 @@ void loop()
 
         last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
         last_pid_update_millis = current_pid_update_millis;
-
-
-        /* Todo:
-        Check if the error was 0. If so and the lifetime was >20s, store 
-        it in the eeprom, unless a similar value (<=100 pooints) is already saved there. Also, avoid saving a vlaue taht is > x off
-
-        Also, init the based DAC values with values from EEPROM.
-
-        Also, check if the EEPROM already contains base configs. If not, write 1500 to the DAC's eeprom 
-        and init the EEPROM with calculated init values for each freq.
-        */
     }
 
     if (!new_shaft_impulse_available)
@@ -313,11 +294,11 @@ void loop()
             Serial.print(" fps after ");
             Serial.print(shaft_impulse_count);
             last_pid_update_millis = millis(); // this is needed to calculate the lifetime of the first pid output
+
             if (detected_frequency <= 21)
             {
                 projector_speed_switch_pos = 18;
-                setupTimer1forFps(FPS_18);
-                digitalWrite(ENABLE_PIN, HIGH);
+                changeRunMode(XTAL_18);
             }
             else if (detected_frequency > 21)
             {
@@ -373,39 +354,36 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 
 void changeRunMode(byte run_mode)
 {
+    // set the crystal LED
+    digitalWrite(ENABLE_PIN, (run_mode == XTAL_NONE) ? LOW : HIGH);
+        
     switch (run_mode)
     {
     case XTAL_NONE:
         Serial.println("XTAL_NONE");
-        digitalWrite(ENABLE_PIN, LOW);
         break;
     case XTAL_AUTO:
         Serial.println("XTAL_AUTO");
-        digitalWrite(ENABLE_PIN, HIGH);
         break;
     case XTAL_16_2_3:
         Serial.println("XTAL_16_2_3");
-        digitalWrite(ENABLE_PIN, HIGH);
         break;
     case XTAL_18:
         Serial.println("XTAL_18");
-        digitalWrite(ENABLE_PIN, HIGH);
+        setupTimer1forFps(FPS_18);
         break;
     case XTAL_23_976:
         Serial.println("XTAL_23_976");
-        digitalWrite(ENABLE_PIN, HIGH);
         break;
     case XTAL_24:
         Serial.println("XTAL_24");
-        digitalWrite(ENABLE_PIN, HIGH);
+        setupTimer1forFps(FPS_24);
         break;
     case XTAL_25:
         Serial.println("XTAL_25");
-        digitalWrite(ENABLE_PIN, HIGH);
         break;
     default:
         Serial.println("Unknown Mode");
-        digitalWrite(ENABLE_PIN, HIGH);
         break;
     }
 }
@@ -425,13 +403,15 @@ void handleButtonTap(Button2 &btn)
     // Frame up/down is only allowed while the projector is running
     if (projector_running)
     {
-        if (btn == frameDnButton)
+        if (btn == dropBackButton)
         {
-            Serial.println("Frame Down Button Tapped.");
+            Serial.println("Drop Back Button Tapped.");
+            shaft_frames ++;
         }
-        else if (btn == frameUpButton)
+        else if (btn == catchUpButton)
         {
-            Serial.println("Frame Up Button Tapped.");
+            Serial.println("Catch Up Button Tapped.");
+            shaft_frames--;
         }
     }
 }
@@ -445,9 +425,6 @@ void selectNextMode(Button2 &btn)
     current_run_mode = (current_run_mode + change + MODES_COUNT) % MODES_COUNT;
     changeRunMode(current_run_mode);
 }
-
-
-
 
 
 bool setupTimer1forFps(byte sollFpsState)
@@ -528,10 +505,6 @@ bool setupTimer1forFps(byte sollFpsState)
     }
 }
 
-int calculateValue(float x, float a, float b, float c)
-{
-    return a * x * x + b * x + c; // calculates DAC value for any needed frequency. Probably not needed anymore
-}
 
 ISR(TIMER2_OVF_vect)
 {
