@@ -292,14 +292,7 @@ void handleButtonTap(Button2 &btn)
     // Handle taps only if the projector is stopped
     if (projector_running)
         return;
-    if (btn == leftButton)
-    {
-        Serial.println("Left Button Tapped. Change to previous Mode");
-    }
-    else if (btn == rightButton)
-    {
-        Serial.println("Right Button Tapped. Change to next Mode");
-    }
+    selectNextMode(btn);
 }
 
 void handleButtonClick(Button2 &btn)
@@ -322,67 +315,18 @@ void handleButtonLongClick(Button2 &btn)
     // handle long-clicks only if the projector is running
     if (!projector_running)
         return;
-    if (btn == leftButton)
-    {
-        Serial.println("Left Button long pressed. Change to previous Mode.");
-    }
-    else if (btn == rightButton)
-    {
-        Serial.println("Right Button long pressed. Change to next Mode.");
-    }
+    selectNextMode(btn);
 }
 
-// void handleButtonPress(const byte newState, const unsigned long interval, const byte whichPin)
-// {
-//     // newState: LOW or HIGH (current state)
-//     // interval: how many ms between the opposite state and this one
-//     // whichPin: which pin caused this change (so we can share the function across multiple switches)
+void selectNextMode(Button2 &btn)
+{
+    // Determine the change based on which button was pressed
+    int8_t change = (btn == leftButton) ? -1 : 1;
 
-//     if (newState == HIGH) // on button release
-//     {
-//         if (!projector_running || interval > 1500) // Change mode if not running or long press detected
-//         {
-//             if (whichPin == LEFT_BTTN_PIN)
-//             {
-//                 // Decrement run_mode
-//                 if (current_run_mode == 0)
-//                     current_run_mode = MODES_COUNT - 1; // Roll over to the last run_mode
-//                 else
-//                     current_run_mode--;
-//                 changeRunMode(current_run_mode);
-//             }
-//             else if (whichPin == RIGHT_BTTN_PIN)
-//             {
-//                 // Increment run_mode
-//                 if (current_run_mode == MODES_COUNT - 1)
-//                     current_run_mode = 0; // Roll over to the first run_mode
-//                 else
-//                     current_run_mode++;
-//                 changeRunMode(current_run_mode);
-//             }
-//         }
-//         else
-//         {
-//             // Optionally, provide feedback for ignored button press
-//             Serial.println("Short press ignored while projector is running.");
-//         }
-//     }
-// }
-
-// uint8_t checkButtons()
-// {
-//     if (digitalRead(LEFT_BTTN_PIN) == LOW)
-//     {
-//         return BTTN_LEFT;        
-//     } 
-//     else if (digitalRead(RIGHT_BTTN_PIN) == LOW)
-//     {
-//         return BTTN_RIGHT;
-//     }
-//     else {
-//         return BTTN_NONE;
-//     }
-// }
+    // Update the run mode
+    current_run_mode = (current_run_mode + change + MODES_COUNT) % MODES_COUNT;
+    changeRunMode(current_run_mode);
+}
 
 void loop()
 {
