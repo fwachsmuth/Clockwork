@@ -2,19 +2,22 @@
 
 Hardware
 - add i2c display
+- add IR emitter
+- 74LVC2G14
 
 Code
 - consider an adaptive PID
 - Add FreqMeasure
 - support the buttons:
-    - +/- one frame
     - chose target speed
 - test prescaler 1 or dither to 216 Hz (and other freqs, where necessary)
 - update stop detection to a timeout (instead of period length)
 - support more speeds
 - move the Serial.print out of the ISR
 - Allow changing speed in manual mode at runtime (longpress)
-
+- Reset Couters? (long press both buttons?)
+- Rangieren (langsam)
+- "start the audio" IR
 
 Speeds:
 - Auto
@@ -71,11 +74,6 @@ const float a = 0.6126;
 const float b = 155.44;
 const float c = -1459.34;
 
-#define FPS_9 1
-#define FPS_16_2_3 2
-#define FPS_18 3
-#define FPS_24 4
-#define FPS_25 5
 
 #define BTTN_NONE 0
 #define BTTN_LEFT 1
@@ -145,6 +143,16 @@ enum SyncStates
     SYNC_PROJ_TOO_SLOW
 };
 
+enum FpsSpeeds
+{
+    FPS_9,
+    FPS_16_2_3,
+    FPS_18,
+    FPS_23_976,
+    FPS_24,
+    FPS_25,
+    SPEEDS_COUNT // Automatically equals the number of entries in the enum
+};
 
 void setup()
 {
@@ -298,13 +306,14 @@ void loop()
             if (detected_frequency <= 21)
             {
                 projector_speed_switch_pos = 18;
-                changeRunMode(XTAL_18);
+                digitalWrite(ENABLE_PIN, HIGH);
+                setupTimer1forFps(FPS_18);
             }
             else if (detected_frequency > 21)
             {
                 projector_speed_switch_pos = 24;
-                setupTimer1forFps(FPS_24);
                 digitalWrite(ENABLE_PIN, HIGH);
+                setupTimer1forFps(FPS_24);
             }       
         }
     }
@@ -392,12 +401,10 @@ void handleButtonTap(Button2 &btn)
 {
     if (btn == leftButton)
     {
-        Serial.println("Left Button Tapped. Decrease Framecount.");
         selectNextMode(btn);
     }
     else if (btn == rightButton)
     {
-        Serial.println("Right Button Tapped. Increase Framecount.");
         selectNextMode(btn);
     }
     // Frame up/down is only allowed while the projector is running
@@ -405,12 +412,10 @@ void handleButtonTap(Button2 &btn)
     {
         if (btn == dropBackButton)
         {
-            Serial.println("Drop Back Button Tapped.");
             shaft_frames ++;
         }
         else if (btn == catchUpButton)
         {
-            Serial.println("Catch Up Button Tapped.");
             shaft_frames--;
         }
     }
@@ -427,17 +432,17 @@ void selectNextMode(Button2 &btn)
 }
 
 
-bool setupTimer1forFps(byte sollFpsState)
+bool setupTimer1forFps(byte desiredFps)
 {
     // start with a new sync point, no need to catch up differences from before.
     timer_frames = 0;
     shaft_frames = 0;
     timer_modulus = 0;
 
-    if (sollFpsState >= 1 && sollFpsState <= 5)
+    if (desiredFps < SPEEDS_COUNT)
     {
         Serial.print(F("New Timer FPS State: "));
-        Serial.println(sollFpsState);
+        Serial.println(desiredFps);
 
         noInterrupts();
         // Clear registers
@@ -447,24 +452,28 @@ bool setupTimer1forFps(byte sollFpsState)
         // CTC
         TCCR1B |= (1 << WGM12);
 
-        switch (sollFpsState)
+        switch (desiredFps)
         {
         case FPS_9:
-            OCR1A = 10100; // 198.000198000198 Hz (16000000/((10100+1)*8)),
-            //              divided by 22 is 9,000009.. Hz
-            //
-            TCCR1B |= (1 << CS11); // Prescaler 8
-            timer_factor = 22;
+        // Goal: (9 * 12 =) 108 Hz
+        // OCR1A = 2314
+        // timer_factor = 8;
+        // 3 ppm?
 
             break;
         case FPS_16_2_3:
-            OCR1A = 14999;                       // 16 2/3 Hz (16000000/((14999+1)*64))
-            TCCR1B |= (1 << CS11) | (1 << CS10); // Prescaler 64
+            // Goal: (16 2/3 * 12 =) 200 Hz
+            // This should be preciseley 200 Hz 
+            // (AI: but it is not. It is 200.00000000000006 Hz, so ~0.00000000000003 ppm off)
+            TIMSK1 = (1 << OCIE1A); // Compare A Match Interrupt Enable
+            TCCR1A = 0;             // WGM10=0, WGM11=0
+            TCCR1B = (1 << WGM12) | (1 << CS11);
+            OCR1A = 9999;
             timer_factor = 1;
 
-            break;
+        break;
         case FPS_18:
-            // Goal: (18*12=) 216 Hz
+            // Goal: (18 * 12 =) 216 Hz
             // this config gives approx 216,00605 Hz, so ~28 ppm off
             // Prescaoer 1 oder Dithering würden helfen
             TIMSK1 = (1 << OCIE1A); // Compare A Match Interrupt Enable
@@ -472,7 +481,13 @@ bool setupTimer1forFps(byte sollFpsState)
             TCCR1B = (1 << WGM12) | (1 << CS11);
             OCR1A = 9258;
             timer_factor = 1;
+            // OCR1A = 2314
+            // timer_factor = 4;
+            // 3 ppm?
 
+            break;
+        case FPS_23_976:
+            // Goal: ((24000 /1001) * 12 = 288000 / 1001) 287.712'287712 Hz
             break;
         case FPS_24:
             // Goal: (24*12=) 288 Hz
@@ -482,12 +497,13 @@ bool setupTimer1forFps(byte sollFpsState)
             TCCR1B = (1 << WGM12) | (1 << CS11);
             OCR1A = 2314;
             timer_factor = 3;
+            // OCR1A = 2314
+            // timer_factor = 3;
+            // 3 ppm?
 
             break;
         case FPS_25:
-            OCR1A = 624;                         // 25 Hz (16000000/((624+1)*1024))
-            TCCR1B |= (1 << CS12) | (1 << CS10); // Prescaler 1024
-            timer_factor = 1;
+            // Goal: (25 * 12 =) 300 Hz
 
             break;
         default:
