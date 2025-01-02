@@ -187,15 +187,22 @@ static const DitherConfig PROGMEM s_ditherTable[] = {
     // 2) FPS_16_2_3 => 200 Hz => idealDiv=10000 => fraction=0 => no dithering
     //    => base=9999, frac32=0
     //    => Endfreq=200 => 0 ppm
-    {9999, 0x00000000, 1},
+    {10000, 0x00000000, 1},
 
     // 3) FPS_18 => 216 Hz = 864 Hz ISR / 4
     //    => same as 108 Hz example but factor=4 => 0 ppm
     {2314, 0xD0BE9C00, 4},
 
-    // 4) FPS_23_976 => ~287.712287712 => idealDiv ~6950.7060006953
-    //    => fraction=~0.7060006953, frac32=0xB2284B17 => 0.03 ppm
-    {6950, 0xB4C236F7, 1},
+    // 4) FPS_23_976
+    /*  => fraction = 288000/1001 ~ 287.712287712288 Hz
+    timer_factor= 1
+    best base   = 6951
+    best frac32 = 0x638E38E4  (decimal 1670265060)
+    freqActual  = 2147483648000000/7463996984889 ~ 287.712287712283 Hz
+    error Hz    = -0.000000000004
+    ppm error   = -0.000000
+    */
+    {6951, 0x638E38E4, 1},
 
     // 5) FPS_24 => 288 Hz = 864 Hz ISR / 3
     //    => same base/fraction as 108 Hz, factor=3 => 0 ppm
@@ -534,81 +541,6 @@ bool setupTimer1forFps(byte desiredFps)
     Serial.print(F(", timerFactor="));
     Serial.println(timer_factor);
 
-    /*    if (desiredFps >= SPEEDS_COUNT)
-        {
-            Serial.print(F("New Timer FPS State: "));
-            Serial.println(desiredFps);
-
-            noInterrupts();
-            // Clear registers
-            TCCR1A = 0;
-            TCCR1B = 0;
-            TCNT1 = 0;
-            // CTC
-            TCCR1B |= (1 << WGM12);
-
-            switch (desiredFps)
-            {
-            case FPS_9:
-            // Goal: (9 * 12 =) 108 Hz
-            // OCR1A = 2314
-            // timer_factor = 8;
-            // 3 ppm?
-
-                break;
-            case FPS_16_2_3:
-                // Goal: (16 2/3 * 12 =) 200 Hz
-                // This should be preciseley 200 Hz
-                // (AI: but it is not. It is 200.00000000000006 Hz, so ~0.00000000000003 ppm off)
-                TIMSK1 = (1 << OCIE1A); // Compare A Match Interrupt Enable
-                TCCR1A = 0;             // WGM10=0, WGM11=0
-                TCCR1B = (1 << WGM12) | (1 << CS11);
-                OCR1A = 9999;
-                timer_factor = 1;
-
-            break;
-            case FPS_18:
-                // Goal: (18 * 12 =) 216 Hz
-                // this config gives approx 216,00605 Hz, so ~28 ppm off
-                // Prescaoer 1 oder Dithering würden helfen
-                TIMSK1 = (1 << OCIE1A); // Compare A Match Interrupt Enable
-                TCCR1A = 0;            // WGM10=0, WGM11=0
-                TCCR1B = (1 << WGM12) | (1 << CS11);
-                OCR1A = 9258;
-                timer_factor = 1;
-                // OCR1A = 2314
-                // timer_factor = 4;
-                // 3 ppm?
-
-                break;
-            case FPS_23_976:
-                // Goal: ((24000 /1001) * 12 = 288000 / 1001) 287.712'287712 Hz
-                break;
-            case FPS_24:
-                // Goal: (24*12=) 288 Hz
-                // this config gives approx (3x288) 864.02 Hz, so ~23 ppm off
-                TIMSK1 = (1 << OCIE1A);
-                TCCR1A = 0;
-                TCCR1B = (1 << WGM12) | (1 << CS11);
-                OCR1A = 2314;
-                timer_factor = 3;
-                // OCR1A = 2314
-                // timer_factor = 3;
-                // 3 ppm?
-
-                break;
-            case FPS_25:
-                // Goal: (25 * 12 =) 300 Hz
-
-                break;
-            default:
-                break;
-            }
-            // Output Compare Match A Interrupt Enable
-            TIMSK1 |= (1 << OCIE1A);
-            interrupts();
-
-        } */
     return true;
 }
 
