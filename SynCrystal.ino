@@ -8,25 +8,12 @@ Hardware
 Code
 - consider an adaptive PID
 - Add FreqMeasure
-- support the buttons:
-    - chose target speed
-- test prescaler 1 or dither to 216 Hz (and other freqs, where necessary)
 - update stop detection to a timeout (instead of period length)
-- support more speeds
 - move the Serial.print out of the ISR
-- Allow changing speed in manual mode at runtime (longpress)
-- Reset Couters? (long press both buttons?)
+- Allow changing speed in manual mode at runtime
+- Reset Counters? (long press both buttons?)
 - Rangieren (langsam)
 - "start the audio" IR
-
-Speeds:
-- Auto
-- 16 2/3
-- 18
-- (23.'976023 = 24 * 1000 / 1001)
-- 24
-- 25
-
 
 Irgendwann
 - Fernstart/stop support
@@ -167,42 +154,51 @@ volatile uint16_t ditherBase = 0;   // Grundwert für OCR1A
 volatile uint32_t ditherFrac32 = 0; // Fraction in UQ0.32
 volatile uint32_t ditherAccu32 = 0; // Akkumulator
 
-// ---------------------------------------------------------------------------
-// 3) Tabelle mit Base-/Frac-/Factor-Werten für jede Zielfrequenz
-//    Prescaler=8 => Timer-Frequenz = 2 MHz
-//    Die Werte sind exemplarisch für "fps*12" = Endfrequenz.
-//
-//    Erklärung:
-//      - base = floor( (2,000,000 / (ZielFreq)) ) bzw. floor( (2,000,000 / (Vielfaches)) )
-//      - frac32 = (Nachkomma * 2^32)  (UQ0.32-Festkomma)
-//      - timerFactor => Software-Teiler in der ISR
-//
-//    Beispiele:
-//      * FPS_9 => 108 Hz = 864 / 8 => Timer-ISR=864 Hz => base=2314.8 => 2314 + frac~0.8148 => frac32~0xD0E14710
-//      * FPS_16_2_3 => 200 Hz => exakter Teiler=10,000 => OCR1A=9999 => fraction=0 => kein Dither
-//      * usw.
-//
-//  Hinweis: Alle frac32-Werte hier auf ~ <5 ppm gerundet.
-// ---------------------------------------------------------------------------
+/*
+---------------------------------------------------------------------------
+ Table with Base/Frac/Factor values for each target frequency
+   Prescaler=8 => Timer frequency = 2 MHz
+   The values are tailored for “fps * 12” = final frequency.
 
-static const DitherConfig PROGMEM s_ditherTable[SPEEDS_COUNT] = {
-    // FPS_9 (108 Hz)  => Timer-ISR=864 Hz => timerFactor=8
-    // base=2314, frac32=0xD0E14710 ~ 0.8148
-    {2314, 0xD0E14710, 8},
+   Explanation:
+     - base = floor( (2,000,000 / (target freq)) ) or floor( (2,000,000 / (a multiple)) )
+     - frac32 = (decimal point * 2^32) (UQ0.32 fixed decimal point)
+     - timerFactor => Software divider in the ISR
 
-    // FPS_16_2_3 (200 Hz) => exakter Teiler=10,000 => fraction=0 => timerFactor=1
+   Examples:
+     * FPS_9 => 108 Hz = 864 / 8 => Timer-ISR=864 Hz => base=2314.8 => 2314 + frac~0.8148 => frac32~0xD0E14710
+     * FPS_16_2_3 => 200 Hz => exact divider=10,000 => OCR1A=9999 => fraction=0 => no dither
+     * etc.
+
+ Note: All frac32 values here rounded to ~ <5 ppm.
+---------------------------------------------------------------------------
+*/
+
+static const DitherConfig PROGMEM s_ditherTable[] = {
+    // 1) FPS_9 => 108 Hz = 864 Hz ISR / 8
+    //    => idealDiv = 2314.8148148..., base=2314, fraction=~0.8148148
+    //    => frac32 = round(0.8148148 * 2^32) = 0xD0BE9C00
+    //    => Endfreq ~ 108.000000 => 0 ppm
+    {2314, 0xD0BE9C00, 8},
+
+    // 2) FPS_16_2_3 => 200 Hz => idealDiv=10000 => fraction=0 => no dithering
+    //    => base=9999, frac32=0
+    //    => Endfreq=200 => 0 ppm
     {9999, 0x00000000, 1},
 
-    // FPS_18 (216 Hz) => Timer=864 => base=2314+0.8148 => timerFactor=4
-    {2314, 0xD0E14710, 4},
+    // 3) FPS_18 => 216 Hz = 864 Hz ISR / 4
+    //    => same as 108 Hz example but factor=4 => 0 ppm
+    {2314, 0xD0BE9C00, 4},
 
-    // FPS_23_976 (~287.712 Hz) => direkter Teiler ~6950.695 => base=6950, frac~0.695 => ~0xB1E33080 => tF=1
-    {6950, 0xB1E33080, 1},
+    // 4) FPS_23_976 => ~287.712 => idealDiv ~6950.695953
+    //    => fraction=0.695953..., frac32=0xB2284B17 => 0.03 ppm
+    {6950, 0xB4C236F7, 1},
 
-    // FPS_24 (288 Hz) => Timer=864 => base=2314+0.8148 => timerFactor=3
-    {2314, 0xD0E14710, 3},
+    // 5) FPS_24 => 288 Hz = 864 Hz ISR / 3
+    //    => same base/fraction as 108 Hz, factor=3 => 0 ppm
+    {2314, 0xD0BE9C00, 3},
 
-    // FPS_25 (300 Hz) => direkter Teiler=6666.666 => base=6666+0.666..., ~0xAAAAAAAB => tF=1
+    // 6) FPS_25 => 300 Hz => idealDiv=6666.666..., fraction=0.666..., frac32=0xAAAAAAAB => 0 ppm
     {6666, 0xAAAAAAAB, 1},
 };
 
