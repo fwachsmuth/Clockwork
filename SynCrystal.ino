@@ -7,6 +7,8 @@ Hardware
 - Strobe
 
 Code
+- clean up "this woudl be a winner" code
+- create function for "projector stopped" to move it ouf of the shaft ISR and not have two copies around
 - consider an adaptive PID
 - add a speed lock LED
 - Add FreqMeasure
@@ -82,7 +84,7 @@ volatile long shaft_frames = 0; // This is the actually advanced frames (pulses 
 volatile bool shaft_frame_count_updated;
 volatile bool timer_frame_count_updated;
 
-volatile unsigned long last_shaft_pulse_time = 0;
+volatile unsigned long last_shaft_pulse_distance = 0;
 
 // These consts are used in the median approach, which finds stable freq detection after ~ 48 impulses (4 frames). 
 constexpr size_t STABILITY_WINDOW_SIZE = 12;        // Size of the Median Window. We use 12 to capture one entire shaft revolution
@@ -97,8 +99,7 @@ volatile size_t freq_buffer_index = 0;
 volatile unsigned long last_stable_freq_value = 0; // Zuletzt erkannter stabiler Wert
 volatile unsigned long shaft_impulse_count = 0;
 volatile bool new_shaft_impulse_available = false;
-volatile bool projector_running = false; // true = Running, false = Stopped
-volatile byte projector_speed_switch_pos = 0; // holds the (guessed) current speed switch position (18 or 24)
+volatile byte projector_speed_auto_guess = 0; // holds the (guessed) current speed switch position (18 or 24)
 volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
 
 // PID stuff
@@ -115,7 +116,7 @@ Button2 leftButton, rightButton, dropBackButton, catchUpButton;
 // Instantiate the Display
 U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 
-enum RunModes
+enum SyncModes
 {
     XTAL_NONE,
     XTAL_AUTO,
@@ -126,15 +127,14 @@ enum RunModes
     XTAL_25,
     MODES_COUNT // Automatically equals the number of entries in the enum
 };
-byte current_run_mode = XTAL_AUTO;
+byte sync_mode = XTAL_AUTO;
 
-// we probably don't need those
-enum SyncStates
+enum ProjectorStates
 {
-    SYNC_LOCKED,
-    SYNC_PROJ_TOO_FAST,
-    SYNC_PROJ_TOO_SLOW
+    PROJ_IDLE,
+    PROJ_RUNNING
 };
+byte projector_state = PROJ_IDLE;
 
 enum FpsSpeeds
 {
@@ -219,10 +219,7 @@ static const DitherConfig PROGMEM s_ditherTable[] = {
 void setup()
 {
     leftButton.begin(LEFT_BTTN_PIN);
-    leftButton.setTapHandler(handleButtonTap); // react immediately when no longtap is needed
-    // leftButton.setClickHandler(handleButtonClick); // needed when we need to recognize long presses in running mode
-    // leftButton.setLongClickDetectedHandler(handleButtonLongClick);
-    // leftButton.setLongClickTime(1000);
+    leftButton.setTapHandler(handleButtonTap); 
     leftButton.setDoubleClickTime(0); // disable double clicks
     leftButton.setDebounceTime(10);
 
@@ -271,17 +268,16 @@ void setup()
     pid_output = DAC_INITIAL_VALUE; // This avoids starting with a 0-Output signal
     myPID.SetMode(AUTOMATIC);
 
-    changeRunMode(current_run_mode);
+    changeRunMode(sync_mode); 
 
     u8x8.begin();
     u8x8.setFont(u8x8_font_profont29_2x3_n);
 }
 
-void loop()
-{
-    static long local_timer_frames = 0; // for atomic reads
-    static long local_shaft_frames = 0; // for atomic reads
-    static long last_pulse_difference = 0; // Stores the last output difference
+void loop() {
+    static long local_timer_frames = 0;    // for atomic reads
+    static long local_shaft_frames = 0;    // for atomic reads
+    static long last_pulse_difference = 0; // Stores the last output difference. )Just used to limit the printf output)
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
     static uint8_t button, last_button = BTTN_NONE;
@@ -294,93 +290,227 @@ void loop()
     dropBackButton.loop();
     catchUpButton.loop();
 
-    // only read a pulse difference if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
-    if (shaft_frame_count_updated && timer_frame_count_updated)
+    if (projector_state == PROJ_IDLE)
     {
-        noInterrupts();
-        local_timer_frames = timer_frames;
-        local_shaft_frames = shaft_frames;
-        interrupts();
-
-        current_pulse_difference = local_timer_frames - local_shaft_frames;
-
-        // mark these counts as read
-        shaft_frame_count_updated = false;
-        timer_frame_count_updated = false;
-
-        pid_input = current_pulse_difference;
-        myPID.Compute();
-        new_dac_value = pid_output;
-        dac.setVoltage(new_dac_value, false);
+        checkProjectorRunning();
     }
-
-    // Print only if the difference has changed AND the projector is actually running
-    if ((current_pulse_difference != last_pulse_difference) && projector_speed_switch_pos != 0)
+    else if (projector_state == PROJ_RUNNING)
     {
-        // current_pid_update_millis = millis();
-        // Serial.print(", which was stable for ");
-        // Serial.print(current_pid_update_millis - last_pid_update_millis);
-        // Serial.println(" ms");
-
-        Serial.print("Mode: ");
-        Serial.print(runModeToString(current_run_mode));
-        Serial.print(", Error: ");
-        Serial.print(current_pulse_difference);
-        Serial.print(", DAC: ");
-        Serial.println(new_dac_value);
-
-        if ((current_pulse_difference == 0) && ((current_pid_update_millis - last_pid_update_millis) > SAVE_THRESHOLD))
+        // Compute Error and feed PID and DAC
+        // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
+        if (shaft_frame_count_updated && timer_frame_count_updated)
         {
-            Serial.print(" This would be a winner: ");
-            Serial.println((current_pid_update_millis - last_pid_update_millis) / 1000);
+            noInterrupts();
+            local_timer_frames = timer_frames; // To Do: Could directly use current_pulse_difference here?
+            local_shaft_frames = shaft_frames;
+            interrupts();
+
+            current_pulse_difference = local_timer_frames - local_shaft_frames;
+            // mark these counts as read
+
+            shaft_frame_count_updated = false;
+            timer_frame_count_updated = false;
+        
+            // should this be further down outside this if block?
+            pid_input = current_pulse_difference;
+            myPID.Compute();
+            new_dac_value = pid_output;
+            dac.setVoltage(new_dac_value, false);
         }
 
-        last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
-        last_pid_update_millis = current_pid_update_millis;
-    }
+        // Debug output
+        if (current_pulse_difference != last_pulse_difference)
+        {
+            Serial.print("Mode: ");
+            Serial.print(runModeToString(sync_mode));
+            Serial.print(", Error: ");
+            Serial.print(current_pulse_difference);
+            Serial.print(", DAC: ");
+            Serial.println(new_dac_value);
 
+            last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
+        }
+    }
+}
+
+void checkProjectorRunning()
+{
     if (!new_shaft_impulse_available)
         return; // Skip processing if no new data
+    
+    new_shaft_impulse_available = false; // Reset the ISR's "new data available" flag
 
-    new_shaft_impulse_available = false; // Reset the ISR flag
-
-    // Calculate median and store it in the stability buffer
-    unsigned long median = calculateMedian(freq_median_buffer, STABILITY_WINDOW_SIZE);
-    stability_buffer[freq_buffer_index] = median;
-    freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
-
-    // Perform running frequency stability check if the buffer is full AND we don't know the fps-switch pos yet
-    if (projector_speed_switch_pos == 0 && freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
+    if (sync_mode == XTAL_AUTO)
     {
-        unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
-
-        // Handle projector restart or stability change
-        if (!projector_running || abs((long)new_stable_value - (long)last_stable_freq_value) > MIN_CHANGE)
+        // Calculate median and store it in the stability buffer
+        unsigned long median = calculateMedian(freq_median_buffer, STABILITY_WINDOW_SIZE);
+        stability_buffer[freq_buffer_index] = median;
+        freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
+        
+        // If the buffer is full, perform running frequency stability check
+        if (freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
         {
+            // ??? Handle projector restart (?) or stability change (?)
+            unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
             last_stable_freq_value = new_stable_value;
             float detected_frequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
-            projector_running = true; // Projector is running again
-            Serial.print("[DEBUG] Projector running stable with ~");
+            // ????? projector_running = true; // Projector is running again
+            
+            Serial.print("[AUTO:] Projector running stable with ~");
             Serial.print(detected_frequency, 1); // FPS
             Serial.print(" fps after ");
             Serial.print(shaft_impulse_count);
-            Serial.println(" impulses.");
-
-            last_pid_update_millis = millis(); // this is needed to calculate the lifetime of the first pid output
+            Serial.print(" impulses, aka ~");
+            Serial.print(shaft_impulse_count / STABILITY_WINDOW_SIZE);
+            Serial.println(" frames.");
 
             if (detected_frequency <= 21)
             {
-                projector_speed_switch_pos = 18;
+                projector_speed_auto_guess = 18;
                 changeRunMode(XTAL_18);
             }
             else if (detected_frequency > 21)
             {
-                projector_speed_switch_pos = 24;
+                projector_speed_auto_guess = 24;
                 changeRunMode(XTAL_24);
-            }       
+            }
+
+            projector_state = PROJ_RUNNING;
+        }
+    }
+    // for all non-auto speeds
+    else if (sync_mode != XTAL_AUTO)
+    {
+        if (shaft_impulse_count > STABILITY_WINDOW_SIZE)
+        {
+            Serial.println("Projector detected as running.");
+
+            // start the correct timer
+            changeRunMode(sync_mode);
+            
+            // init the PID
+            myPID.SetMode(MANUAL);
+            pid_output = DAC_INITIAL_VALUE;
+            myPID.Compute();
+            myPID.SetMode(AUTOMATIC);
+
+            // set DAC to initial value
+            dac.setVoltage(DAC_INITIAL_VALUE, false);
+
+            // change projector state to running for the FSM
+            projector_state = PROJ_RUNNING;
         }
     }
 }
+
+
+
+// Old loop ---------------------------------------------------------------------
+
+// void loopy()
+// {
+//     static long local_timer_frames = 0; // for atomic reads
+//     static long local_shaft_frames = 0; // for atomic reads
+//     static long last_pulse_difference = 0; // Stores the last output difference. )Just used to limit the printf output)
+//     static long current_pulse_difference = 0;
+//     uint16_t new_dac_value = 0;
+//     static uint8_t button, last_button = BTTN_NONE;
+//     static long last_pid_update_millis;
+//     static long current_pid_update_millis;
+
+    
+//     // Poll the buttons
+//     leftButton.loop();
+//     rightButton.loop();
+//     dropBackButton.loop();
+//     catchUpButton.loop();
+
+   
+
+//     // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
+//     if (shaft_frame_count_updated && timer_frame_count_updated)
+//     {
+//         currentPulseDifference();
+
+//         // Compute PID and feed to DAC
+//         pid_input = current_pulse_difference;
+//         myPID.Compute();
+//         new_dac_value = pid_output;
+//         dac.setVoltage(new_dac_value, false);
+//     }
+
+//     // Print only if the difference has changed AND the projector is actually running
+//     if ((current_pulse_difference != last_pulse_difference) && (projector_speed_auto_guess != 0))
+//     {
+//         // 
+//         // current_pid_update_millis = millis();
+//         // Serial.print(", which was stable for ");
+//         // Serial.print(current_pid_update_millis - last_pid_update_millis);
+//         // Serial.println(" ms");
+
+//         Serial.print("Mode: ");
+//         Serial.print(runModeToString(sync_mode));
+//         Serial.print(", Error: ");
+//         Serial.print(current_pulse_difference);
+//         Serial.print(", DAC: ");
+//         Serial.println(new_dac_value);
+
+//         // 
+//         // if ((current_pulse_difference == 0) && ((current_pid_update_millis - last_pid_update_millis) > SAVE_THRESHOLD))
+//         // {
+//         //     Serial.print(" This would be a winner: ");
+//         //     Serial.println((current_pid_update_millis - last_pid_update_millis) / 1000);
+//         // }
+
+//         last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
+//         // last_pid_update_millis = current_pid_update_millis;
+//     }
+
+//     if (!new_shaft_impulse_available)
+//         return; // Skip processing if no new data
+
+//     new_shaft_impulse_available = false; // Reset the ISR's "new data available" flag
+
+//     // Only auto-detect a speed when in AUTO mode
+//     // Calculate median and store it in the stability buffer
+//     unsigned long median = calculateMedian(freq_median_buffer, STABILITY_WINDOW_SIZE);
+//     stability_buffer[freq_buffer_index] = median;
+//     freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
+
+//     // Perform running frequency stability check if the buffer is full AND we don't know the fps-switch pos yet
+//     if (projector_speed_auto_guess == 0 && freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
+//     {
+//         unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
+
+//         // Handle projector restart or stability change
+//         if (!projector_running || abs((long)new_stable_value - (long)last_stable_freq_value) > MIN_CHANGE)
+//         {
+//             last_stable_freq_value = new_stable_value;
+//             float detected_frequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
+//             projector_running = true; // Projector is running again
+
+//             Serial.print("[AUTO:] Projector running stable with ~");
+//             Serial.print(detected_frequency, 1); // FPS
+//             Serial.print(" fps after ");
+//             Serial.print(shaft_impulse_count);
+//             Serial.print(" impulses, aka ~");
+//             Serial.print(shaft_impulse_count / STABILITY_WINDOW_SIZE);
+//             Serial.println(" frames.");
+
+//             if (detected_frequency <= 21)
+//             {
+//                 projector_speed_auto_guess = 18;
+//                 changeRunMode(XTAL_18);
+//             }
+//             else if (detected_frequency > 21)
+//             {
+//                 projector_speed_auto_guess = 24;
+//                 changeRunMode(XTAL_24);
+//             }       
+//         }
+//     }
+// }
+
 
 unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
 {
@@ -435,21 +565,20 @@ void changeRunMode(byte run_mode)
         Serial.println("XTAL_NONE");
         break;
     case XTAL_AUTO:
+        // Disconnect the DAC
         digitalWrite(ENABLE_PIN, LOW);
-        projector_speed_switch_pos = 0; // forget the previously determined switch pos, it might be changed
+        projector_speed_auto_guess = 0; // forget the previously determined switch pos, it might be changed
         // reset the frequency detection vars
         memset(freq_median_buffer, 0, sizeof(freq_median_buffer));
         memset(stability_buffer, 0, sizeof(stability_buffer));
         freq_median_index = 0;
         freq_buffer_index = 0;
         last_stable_freq_value = 0;
-        //reset the PID
+        //reset the PID Output
         myPID.SetMode(MANUAL);
         pid_output = DAC_INITIAL_VALUE;
         myPID.Compute();
         myPID.SetMode(AUTOMATIC);
-
-
         // set DAC to initial value
         dac.setVoltage(DAC_INITIAL_VALUE, false);
         Serial.println("XTAL_AUTO");
@@ -491,7 +620,7 @@ void handleButtonTap(Button2 &btn)
         selectNextMode(btn);
     }
     // Frame up/down is only allowed while the projector is running
-    if (projector_running)
+    if (projector_state == PROJ_RUNNING)
     {
         if (btn == dropBackButton)
         {
@@ -510,8 +639,8 @@ void selectNextMode(Button2 &btn)
     int8_t change = (btn == leftButton) ? -1 : 1;
 
     // Update the run mode
-    current_run_mode = (current_run_mode + change + MODES_COUNT) % MODES_COUNT;
-    changeRunMode(current_run_mode);
+    sync_mode = (sync_mode + change + MODES_COUNT) % MODES_COUNT;
+    changeRunMode(sync_mode);
 }
 
 
@@ -575,7 +704,7 @@ void onShaftImpulseISR()
 
     // convert to microseonds
     unsigned long interval_micros = elapsed_ticks * 4; // 4 µs per tick with prescaler 64
-    last_shaft_pulse_time += interval_micros;            // update last pulse timestamp
+    last_shaft_pulse_distance += interval_micros;            // update last pulse timestamp
 
     // update the frequencies buffer
     freq_median_buffer[freq_median_index] = interval_micros;
@@ -583,11 +712,11 @@ void onShaftImpulseISR()
 
     // Check if the interval length qualifies to recognize a stopped projector
     // Todo: This should probably better use a timeout
-    if (interval_micros > STOP_THRESHOLD && projector_running)
+    if ((interval_micros > STOP_THRESHOLD) && projector_state == PROJ_RUNNING)
     {
-        projector_running = false; // Projector stopped
+        projector_state = PROJ_IDLE; // Projector is stopped
         Serial.println("[DEBUG] Projector stopped.");
-        projector_speed_switch_pos = 0; // forget the previously determined switch pos, it might be changed
+        projector_speed_auto_guess = 0; // forget the previously determined switch pos, it might be changed
         stopTimer1();
         timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
         shaft_impulse_count = 0;
@@ -661,3 +790,4 @@ const char* runModeToString(byte run_mode)
         return "25";
     }
 }
+
