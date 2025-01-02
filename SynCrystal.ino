@@ -4,9 +4,11 @@ Hardware
 - add i2c display
 - add IR emitter
 - 74LVC2G14
+- Strobe
 
 Code
 - consider an adaptive PID
+- add a speed lock LED
 - Add FreqMeasure
 - update stop detection to a timeout (instead of period length)
 - move the Serial.print out of the ISR
@@ -56,11 +58,12 @@ const unsigned long STOP_THRESHOLD = 15000;
 
 const unsigned long SAVE_THRESHOLD = 10000; // ms until a stable DAC value will be considered as new EPROM default
 
+/*
 // to get the approx. DAC value for any desired fps per a * x * x + b * x + c
 const float a = 0.6126;
 const float b = 155.44;
 const float c = -1459.34;
-
+*/
 
 #define BTTN_NONE 0
 #define BTTN_LEFT 1
@@ -108,8 +111,6 @@ Adafruit_MCP4725 dac;
 // Instantiate the Buttons
 Button2 leftButton, rightButton, dropBackButton, catchUpButton;
 
-// State Machine!
-
 enum RunModes
 {
     XTAL_NONE,
@@ -123,6 +124,7 @@ enum RunModes
 };
 byte current_run_mode = XTAL_AUTO;
 
+// we probably don't need those
 enum SyncStates
 {
     SYNC_LOCKED,
@@ -141,40 +143,41 @@ enum FpsSpeeds
     SPEEDS_COUNT // Anzahl
 };
 
-// Struktur mit allen Infos, die wir für Dithering & Postscaler brauchen:
+// Global dithering variables for the ISR:
+volatile uint16_t ditherBase = 0;   // base for OCR1A
+volatile uint32_t ditherFrac32 = 0; // fraction in UQ0.32
+volatile uint32_t ditherAccu32 = 0; // Accumulator
+
+// Struct with all the information we need for dithering & postscaler:
 struct DitherConfig
 {
     uint16_t base;   // Grundwert für OCR1A
     uint32_t frac32; // fractional part (UQ0.32), 0..(2^32-1)
     uint8_t timerFactor;
 };
-// Globale Dithering Variablen für die ISR:
-
-volatile uint16_t ditherBase = 0;   // Grundwert für OCR1A
-volatile uint32_t ditherFrac32 = 0; // Fraction in UQ0.32
-volatile uint32_t ditherAccu32 = 0; // Akkumulator
-
-/*
----------------------------------------------------------------------------
- Table with Base/Frac/Factor values for each target frequency
-   Prescaler=8 => Timer frequency = 2 MHz
-   The values are tailored for “fps * 12” = final frequency.
-
-   Explanation:
-     - base = floor( (2,000,000 / (target freq)) ) or floor( (2,000,000 / (a multiple)) )
-     - frac32 = (decimal point * 2^32) (UQ0.32 fixed decimal point)
-     - timerFactor => Software divider in the ISR
-
-   Examples:
-     * FPS_9 => 108 Hz = 864 / 8 => Timer-ISR=864 Hz => base=2314.8 => 2314 + frac~0.8148 => frac32~0xD0E14710
-     * FPS_16_2_3 => 200 Hz => exact divider=10,000 => OCR1A=9999 => fraction=0 => no dither
-     * etc.
-
- Note: All frac32 values here rounded to ~ <5 ppm.
----------------------------------------------------------------------------
-*/
 
 static const DitherConfig PROGMEM s_ditherTable[] = {
+
+    /*
+    ---------------------------------------------------------------------------
+     Table with Base/Frac/Factor values for each target frequency
+       Prescaler=8 => Timer frequency = 2 MHz
+       The values are tailored for “fps * 12” = final frequency.
+
+       Explanation:
+         - base = floor( (2000000 / (target freq)) ) or floor( (2000000 / (a multiple)) )
+         - frac32 = (decimal point * 2^32) (UQ0.32 fixed decimal point)
+         - timerFactor => Software divider in the ISR
+
+       Examples:
+         * FPS_9 => 108 Hz = 864 / 8 => Timer-ISR=864 Hz => base=2314.8 => 2314 + frac~0.8148 => frac32~0xD0E14710
+         * FPS_16_2_3 => 200 Hz => exact divider=10,000 => OCR1A=9999 => fraction=0 => no dither
+         * etc.
+
+     Note: All frac32 values here rounded to ~ <5 ppm.
+    ---------------------------------------------------------------------------
+    */
+
     // 1) FPS_9 => 108 Hz = 864 Hz ISR / 8
     //    => idealDiv = 2314.8148148..., base=2314, fraction=~0.8148148
     //    => frac32 = round(0.8148148 * 2^32) = 0xD0BE9C00
@@ -190,8 +193,8 @@ static const DitherConfig PROGMEM s_ditherTable[] = {
     //    => same as 108 Hz example but factor=4 => 0 ppm
     {2314, 0xD0BE9C00, 4},
 
-    // 4) FPS_23_976 => ~287.712 => idealDiv ~6950.695953
-    //    => fraction=0.695953..., frac32=0xB2284B17 => 0.03 ppm
+    // 4) FPS_23_976 => ~287.712287712 => idealDiv ~6950.7060006953
+    //    => fraction=~0.7060006953, frac32=0xB2284B17 => 0.03 ppm
     {6950, 0xB4C236F7, 1},
 
     // 5) FPS_24 => 288 Hz = 864 Hz ISR / 3
@@ -513,20 +516,13 @@ bool setupTimer1forFps(byte desiredFps)
     ditherFrac32 = cfg.frac32;
     ditherAccu32 = 0;
 
-    // Deinen timerFactor & -Divider init
     timer_factor = cfg.timerFactor;
     timer_modulus = 0;
     timer_frames = 0;
 
-    // 3) OCR1A Startwert
-    OCR1A = ditherBase;
-
-    // 4) CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
-    TCCR1B |= (1 << WGM12) | (1 << CS11);
-
-    // Compare-A-Interrupt an
-    TIMSK1 |= (1 << OCIE1A);
-
+    OCR1A = ditherBase; // OCR1A start value
+    TCCR1B |= (1 << WGM12) | (1 << CS11); // CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
+    TIMSK1 |= (1 << OCIE1A); // enable Compare-A-Interrupt
     interrupts();
 
     Serial.print(F("Timer1 configured for Fps index="));
@@ -685,17 +681,11 @@ ISR(TIMER1_COMPA_vect)
     timer_modulus++;
     timer_modulus %= timer_factor;
 
-    // 2) Dither-Logik (Festkomma-Akkumulator)
+    // Dither logic (fixed-point accumulator)
     ditherAccu32 += ditherFrac32;
-    // Wenn Überlauf => ditherAccu32 < ditherFrac32
-    if (ditherAccu32 < ditherFrac32)
-    {
-        OCR1A = ditherBase + 1;
-    }
-    else
-    {
-        OCR1A = ditherBase;
-    }
+
+    // If overflow => ditherAccu32 < ditherFrac32
+    OCR1A = (ditherAccu32 < ditherFrac32) ? (ditherBase + 1) : ditherBase;
 }
 
 void stopTimer1()
