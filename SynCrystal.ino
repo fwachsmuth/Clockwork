@@ -32,6 +32,7 @@ Irgendwann
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
 #include <FreqMeasure.h>
 #include <Button2.h>
+#include <U8x8lib.h>          // Display Driver
 
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
@@ -110,6 +111,9 @@ Adafruit_MCP4725 dac;
 
 // Instantiate the Buttons
 Button2 leftButton, rightButton, dropBackButton, catchUpButton;
+
+// Instantiate the Display
+U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 
 enum RunModes
 {
@@ -268,6 +272,9 @@ void setup()
     myPID.SetMode(AUTOMATIC);
 
     changeRunMode(current_run_mode);
+
+    u8x8.begin();
+    u8x8.setFont(u8x8_font_profont29_2x3_n);
 }
 
 void loop()
@@ -315,13 +322,11 @@ void loop()
         // Serial.print(current_pid_update_millis - last_pid_update_millis);
         // Serial.println(" ms");
 
-        Serial.print("Target FPS: ");
-        Serial.print(projector_speed_switch_pos);
+        Serial.print("Mode: ");
+        Serial.print(runModeToString(current_run_mode));
         Serial.print(", Error: ");
         Serial.print(current_pulse_difference);
-        Serial.print(", PID-Output: ");
-        Serial.print(pid_output);
-        Serial.print(", new DAC value: ");
+        Serial.print(", DAC: ");
         Serial.println(new_dac_value);
 
         if ((current_pulse_difference == 0) && ((current_pid_update_millis - last_pid_update_millis) > SAVE_THRESHOLD))
@@ -359,19 +364,19 @@ void loop()
             Serial.print(detected_frequency, 1); // FPS
             Serial.print(" fps after ");
             Serial.print(shaft_impulse_count);
+            Serial.println(" impulses.");
+
             last_pid_update_millis = millis(); // this is needed to calculate the lifetime of the first pid output
 
             if (detected_frequency <= 21)
             {
                 projector_speed_switch_pos = 18;
-                digitalWrite(ENABLE_PIN, HIGH);
-                setupTimer1forFps(FPS_18);
+                changeRunMode(XTAL_18);
             }
             else if (detected_frequency > 21)
             {
                 projector_speed_switch_pos = 24;
-                digitalWrite(ENABLE_PIN, HIGH);
-                setupTimer1forFps(FPS_24);
+                changeRunMode(XTAL_24);
             }       
         }
     }
@@ -430,6 +435,23 @@ void changeRunMode(byte run_mode)
         Serial.println("XTAL_NONE");
         break;
     case XTAL_AUTO:
+        digitalWrite(ENABLE_PIN, LOW);
+        projector_speed_switch_pos = 0; // forget the previously determined switch pos, it might be changed
+        // reset the frequency detection vars
+        memset(freq_median_buffer, 0, sizeof(freq_median_buffer));
+        memset(stability_buffer, 0, sizeof(stability_buffer));
+        freq_median_index = 0;
+        freq_buffer_index = 0;
+        last_stable_freq_value = 0;
+        //reset the PID
+        myPID.SetMode(MANUAL);
+        pid_output = DAC_INITIAL_VALUE;
+        myPID.Compute();
+        myPID.SetMode(AUTOMATIC);
+
+
+        // set DAC to initial value
+        dac.setVoltage(DAC_INITIAL_VALUE, false);
         Serial.println("XTAL_AUTO");
         break;
     case XTAL_16_2_3:
@@ -532,15 +554,6 @@ bool setupTimer1forFps(byte desiredFps)
     TIMSK1 |= (1 << OCIE1A); // enable Compare-A-Interrupt
     interrupts();
 
-    Serial.print(F("Timer1 configured for Fps index="));
-    Serial.print(desiredFps);
-    Serial.print(F("; base="));
-    Serial.print(ditherBase);
-    Serial.print(F(", frac32=0x"));
-    Serial.print(ditherFrac32, HEX);
-    Serial.print(F(", timerFactor="));
-    Serial.println(timer_factor);
-
     return true;
 }
 
@@ -626,4 +639,25 @@ void stopTimer1()
     noInterrupts();
     TIMSK1 &= ~(1 << OCIE1A);
     interrupts();
+}
+
+const char* runModeToString(byte run_mode)
+{
+    switch (run_mode)
+    {
+    case XTAL_NONE:
+        return "NONE";
+    case XTAL_AUTO:
+        return "AUTO";
+    case XTAL_16_2_3:
+        return "16 2/3";
+    case XTAL_18:
+        return "18";
+    case XTAL_23_976:
+        return "23.976";
+    case XTAL_24:
+        return "24";
+    case XTAL_25:
+        return "25";
+    }
 }
