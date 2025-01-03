@@ -11,8 +11,6 @@ Code
 - Reset Counters? (long press both buttons?)
 - consider an adaptive PID
 - Add FreqMeasure
-- Allow changing speed in manual mode at runtime
-- Reset Counters? (long press both buttons?)
 - Rangieren (langsam)
 - "start the audio" IR
 
