@@ -338,6 +338,10 @@ void loop()
             Serial.print(current_pulse_difference);
             Serial.print(", DAC: ");
             Serial.println(new_dac_value);
+            // Serial.print(" Timer-Frames: ");
+            // Serial.print(timer_frames);
+            // Serial.print(", Shaft-Frames: ");
+            // Serial.println(shaft_frames);
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
         }
@@ -398,8 +402,7 @@ void checkProjectorRunning()
             Serial.print(" fps after ");
             Serial.print(shaft_impulse_count);
             Serial.print(" impulses, aka ~");
-            Serial.print(shaft_impulse_count / SHAFT_SEGMENT_COUNT);
-            Serial.println(" frames.");
+            Serial.println(shaft_impulse_count / SHAFT_SEGMENT_COUNT);
 
             if (detected_frequency <= 21)
             {
@@ -569,9 +572,15 @@ void selectNextMode(Button2 &btn)
 bool setupTimer1forFps(byte desiredFps)
 {
     // start with a new sync point, no need to catch up differences from before.
-    timer_frames = 0;
-    shaft_frames = 0;
-    timer_modulus = 0;
+    if (projector_state == PROJ_IDLE)
+    {
+        noInterrupts();
+        timer_frames = 0;
+        shaft_frames = 0;
+        timer_modulus = 0;
+        shaft_modulus = 0; 
+        interrupts();
+    }
 
     if (desiredFps >= SPEEDS_COUNT)
     {
@@ -597,8 +606,6 @@ bool setupTimer1forFps(byte desiredFps)
     ditherAccu32 = 0;
 
     timer_factor = cfg.timerFactor;
-    timer_modulus = 0;
-    timer_frames = 0;
 
     OCR1A = ditherBase;                   // OCR1A start value
     TCCR1B |= (1 << WGM12) | (1 << CS11); // CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
