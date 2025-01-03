@@ -95,7 +95,6 @@ volatile size_t freq_buffer_index = 0;
 volatile unsigned long last_stable_freq_value = 0; // Zuletzt erkannter stabiler Wert
 volatile unsigned long shaft_impulse_count = 0;
 volatile bool new_shaft_impulse_available = false;
-volatile byte projector_speed_auto_guess = 0;     // holds the (guessed) current speed switch position (18 or 24)
 volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
 volatile unsigned long last_pulse_timestamp;      // Timestamp of the last pulse, used to detect a stop
 
@@ -313,7 +312,7 @@ void loop()
             shaft_frame_count_updated = false;
             timer_frame_count_updated = false;
 
-            // should this be further down outside this if block?
+            // should this be further down in the if block? Doesn't seem so
             pid_input = current_pulse_difference;
             myPID.Compute();
             new_dac_value = pid_output;
@@ -348,7 +347,6 @@ void loop()
         {
             projector_state = PROJ_IDLE; // Projector is stopped
             Serial.println("[DEBUG] Projector stopped.");
-            projector_speed_auto_guess = 0; // forget the previously determined switch pos, it might be changed
             stopTimer1();
             timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
             shaft_impulse_count = 0;
@@ -405,12 +403,10 @@ void checkProjectorRunning()
 
             if (detected_frequency <= 21)
             {
-                projector_speed_auto_guess = 18;
                 changeRunMode(XTAL_18);
             }
             else if (detected_frequency > 21)
             {
-                projector_speed_auto_guess = 24;
                 changeRunMode(XTAL_24);
             }
 
@@ -486,7 +482,7 @@ bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long t
 
 void changeRunMode(byte run_mode)
 {
-    // set the crystal LED
+    // connect or disconnect the DAC
     digitalWrite(ENABLE_PIN, (run_mode == XTAL_NONE) ? LOW : HIGH);
 
     switch (run_mode)
@@ -495,9 +491,6 @@ void changeRunMode(byte run_mode)
         Serial.println("XTAL_NONE");
         break;
     case XTAL_AUTO:
-        // Disconnect the DAC
-        digitalWrite(ENABLE_PIN, LOW);
-        projector_speed_auto_guess = 0; // forget the previously determined switch pos, it might be changed
         // reset the frequency detection vars
         memset(freq_median_buffer, 0, sizeof(freq_median_buffer));
         memset(stability_buffer, 0, sizeof(stability_buffer));
