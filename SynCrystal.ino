@@ -8,12 +8,8 @@ Hardware
 
 Code
 - clean up "this woudl be a winner" code
-- create function for "projector stopped" to move it ouf of the shaft ISR and not have two copies around
 - consider an adaptive PID
-- add a speed lock LED
 - Add FreqMeasure
-- update stop detection to a timeout (instead of period length)
-- move the Serial.print out of the ISR
 - Allow changing speed in manual mode at runtime
 - Reset Counters? (long press both buttons?)
 - Rangieren (langsam)
@@ -58,7 +54,7 @@ const byte ledFasterYellow = 8; //  +
 const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
 
 // Threshold in microseconds to detect a stop. (This is between shaft pulses, so too big vlaues might never happen!)
-const unsigned long STOP_THRESHOLD = 15000; 
+const unsigned long STOP_THRESHOLD = 15000; // microseconds until a stop will be detected
 
 const unsigned long SAVE_THRESHOLD = 10000; // ms until a stable DAC value will be considered as new EPROM default
 
@@ -81,19 +77,17 @@ const byte shaft_segment_disc_divider = 1; // Increase this if we only want to u
 volatile int shaft_modulus = 0; // For Modulo in the ISR, to compensate the multiple pulses per revolution
 volatile long shaft_frames = 0; // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
 
-// flags to assure reading only once both ISRs have done theri duty
+// flags to assure reading only once both ISRs have done their duty
 volatile bool shaft_frame_count_updated;
 volatile bool timer_frame_count_updated;
 
-volatile unsigned long last_shaft_pulse_distance = 0;
-
 // These consts are used in the median approach, which finds stable freq detection after ~ 48 impulses (4 frames). 
-constexpr size_t STABILITY_WINDOW_SIZE = 12;        // Size of the Median Window. We use 12 to capture one entire shaft revolution
+constexpr size_t SHAFT_SEGMENT_COUNT = 12;        // Size of the Median Window. We use 12 to capture one entire shaft revolution
 constexpr size_t STABILITY_CHECKS = 36;             // Window size to determine stability
 constexpr unsigned long SPEED_DETECT_TOLERANCE = 1600; // allowed tolerance between pulses in microseconds
 constexpr unsigned long MIN_CHANGE = 800;           // minimum deviation to determine a new stability
 
-volatile unsigned long freq_median_buffer[STABILITY_WINDOW_SIZE];
+volatile unsigned long freq_median_buffer[SHAFT_SEGMENT_COUNT];
 volatile size_t freq_median_index = 0;
 volatile unsigned long stability_buffer[STABILITY_CHECKS];
 volatile size_t freq_buffer_index = 0;
@@ -102,9 +96,11 @@ volatile unsigned long shaft_impulse_count = 0;
 volatile bool new_shaft_impulse_available = false;
 volatile byte projector_speed_auto_guess = 0; // holds the (guessed) current speed switch position (18 or 24)
 volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
+volatile unsigned long last_pulse_timestamp; // Timestamp of the last pulse, used to detect a stop
 
 // PID stuff
-double pid_setpoint, pid_input, pid_output;
+double pid_setpoint,
+    pid_input, pid_output;
 double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0;
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
@@ -302,14 +298,16 @@ void loop() {
         // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
         if (shaft_frame_count_updated && timer_frame_count_updated)
         {
+            // read the counters atomically
             noInterrupts();
             local_timer_frames = timer_frames; // To Do: Could directly use current_pulse_difference here?
             local_shaft_frames = shaft_frames;
             interrupts();
 
             current_pulse_difference = local_timer_frames - local_shaft_frames;
-            // mark these counts as read
+            last_pulse_timestamp = micros();
 
+            // mark these counts as read
             shaft_frame_count_updated = false;
             timer_frame_count_updated = false;
         
@@ -342,7 +340,35 @@ void loop() {
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
         }
+
+        // Stop detection
+        if (hasStoppedSince(last_pulse_timestamp, STOP_THRESHOLD))
+        {
+            projector_state = PROJ_IDLE; // Projector is stopped
+            Serial.println("[DEBUG] Projector stopped.");
+            projector_speed_auto_guess = 0; // forget the previously determined switch pos, it might be changed
+            stopTimer1();
+            timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
+            shaft_impulse_count = 0;
+            // Reset DAC and PID
+            dac.setVoltage(DAC_INITIAL_VALUE, false); // reset the DAc to compensate for wound-up break corrections
+            myPID.SetMode(MANUAL);
+            pid_output = DAC_INITIAL_VALUE;
+            pid_input = 0;
+            myPID.Compute();
+            Serial.print("PID Reset to initial DAC value: ");
+            Serial.println(pid_output);
+            myPID.SetMode(AUTOMATIC);
+            digitalWrite(ENABLE_PIN, LOW);
+            digitalWrite(LED_RED_PIN, LOW);
+        }
+
     }
+}
+
+bool hasStoppedSince(unsigned long start, unsigned long duration)
+{
+    return (micros() - start) > duration;
 }
 
 void checkProjectorRunning()
@@ -355,7 +381,7 @@ void checkProjectorRunning()
     if (sync_mode == XTAL_AUTO)
     {
         // Calculate median and store it in the stability buffer
-        unsigned long median = calculateMedian(freq_median_buffer, STABILITY_WINDOW_SIZE);
+        unsigned long median = calculateMedian(freq_median_buffer, SHAFT_SEGMENT_COUNT);
         stability_buffer[freq_buffer_index] = median;
         freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
         
@@ -373,7 +399,7 @@ void checkProjectorRunning()
             Serial.print(" fps after ");
             Serial.print(shaft_impulse_count);
             Serial.print(" impulses, aka ~");
-            Serial.print(shaft_impulse_count / STABILITY_WINDOW_SIZE);
+            Serial.print(shaft_impulse_count / SHAFT_SEGMENT_COUNT);
             Serial.println(" frames.");
 
             if (detected_frequency <= 21)
@@ -393,7 +419,7 @@ void checkProjectorRunning()
     // for all non-auto speeds
     else if (sync_mode != XTAL_AUTO)
     {
-        if (shaft_impulse_count > STABILITY_WINDOW_SIZE)
+        if (shaft_impulse_count > SHAFT_SEGMENT_COUNT)
         {
             Serial.println("Projector detected as running.");
 
@@ -528,11 +554,11 @@ void handleButtonTap(Button2 &btn)
     {
         if (btn == dropBackButton)
         {
-            shaft_frames ++;
+            shaft_frames += SHAFT_SEGMENT_COUNT;
         }
         else if (btn == catchUpButton)
         {
-            shaft_frames--;
+            shaft_frames -= SHAFT_SEGMENT_COUNT;
         }
     }
 }
@@ -608,34 +634,10 @@ void onShaftImpulseISR()
 
     // convert to microseonds
     unsigned long interval_micros = elapsed_ticks * 4; // 4 µs per tick with prescaler 64
-    last_shaft_pulse_distance += interval_micros;            // update last pulse timestamp
 
     // update the frequencies buffer
     freq_median_buffer[freq_median_index] = interval_micros;
-    freq_median_index = (freq_median_index + 1) % STABILITY_WINDOW_SIZE;
-
-    // Check if the interval length qualifies to recognize a stopped projector
-    // Todo: This should probably better use a timeout
-    if ((interval_micros > STOP_THRESHOLD) && projector_state == PROJ_RUNNING)
-    {
-        projector_state = PROJ_IDLE; // Projector is stopped
-        Serial.println("[DEBUG] Projector stopped.");
-        projector_speed_auto_guess = 0; // forget the previously determined switch pos, it might be changed
-        stopTimer1();
-        timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
-        shaft_impulse_count = 0;
-        // Reset DAC and PID
-        dac.setVoltage(DAC_INITIAL_VALUE, false); // reset the DAc to compensate for wound-up break corrections
-        myPID.SetMode(MANUAL);
-        pid_output = DAC_INITIAL_VALUE;
-        pid_input = 0;
-        myPID.Compute();
-        Serial.print("PID Reset to initial DAC value: ");
-        Serial.println(pid_output);
-        myPID.SetMode(AUTOMATIC);
-        digitalWrite(ENABLE_PIN, LOW);
-        digitalWrite(LED_RED_PIN, LOW);
-    }
+    freq_median_index = (freq_median_index + 1) % SHAFT_SEGMENT_COUNT;
 
     // Expose the news
     shaft_impulse_count++;
