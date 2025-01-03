@@ -377,11 +377,9 @@ void checkProjectorRunning()
         // If the buffer is full, perform running frequency stability check
         if (freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
         {
-            // ??? Handle projector restart (?) or stability change (?)
             unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
             last_stable_freq_value = new_stable_value;
             float detected_frequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
-            // ????? projector_running = true; // Projector is running again
             
             Serial.print("[AUTO:] Projector running stable with ~");
             Serial.print(detected_frequency, 1); // FPS
@@ -549,16 +547,13 @@ void selectNextMode(Button2 &btn)
 
 bool setupTimer1forFps(byte desiredFps)
 {
-    // start with a new sync point, no need to catch up differences from before.
+    // start with a new sync point once the projector was stopped
     timer_frames = 0;
     shaft_frames = 0;
     timer_modulus = 0;
 
     if (desiredFps >= SPEEDS_COUNT)
-    {
-        Serial.println(F("Invalid FPS index!"));
         return false;
-    }
 
     // --- Tabellenwerte aus PROGMEM lesen
     DitherConfig cfg;
