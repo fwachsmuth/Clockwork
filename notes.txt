@@ -1,0 +1,26 @@
+
+loop
+    if state idle
+        runCheck
+    if state running
+        if error != prevError
+            debug output
+            pid.compute
+            dac(pidoutput(pulse_diff))
+
+
+runCheck
+    if mode auto
+        build a series of buffers and medians
+        if stable
+            speed = 18/24
+            state = running
+
+
+    if mode manual
+        if 12 frames in
+            start timer
+            init dac
+            init pid
+            state = running
+

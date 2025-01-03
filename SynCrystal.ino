@@ -7,11 +7,12 @@ Hardware
 - Strobe
 
 Code
+- Bug: SPeed changes resets Timer!
+- Reset Counters? (long press both buttons?)
+- move dithering structs to consts
 - clean up "this woudl be a winner" code
 - consider an adaptive PID
 - Add FreqMeasure
-- Allow changing speed in manual mode at runtime
-- Reset Counters? (long press both buttons?)
 - Rangieren (langsam)
 - "start the audio" IR
 
@@ -30,7 +31,7 @@ Irgendwann
 #include <PID_v1.h>           // using 1.2.0 from https://github.com/br3ttb/Arduino-PID-Library
 #include <FreqMeasure.h>
 #include <Button2.h>
-#include <U8x8lib.h>          // Display Driver
+// #include <U8x8lib.h>          // Display Driver
 
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
@@ -69,13 +70,12 @@ const float c = -1459.34;
 #define BTTN_LEFT 1
 #define BTTN_RIGHT 2
 
-int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
-volatile int timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
-volatile long timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
+uint8_t timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
+volatile uint8_t timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
+volatile uint32_t timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
 
-const byte shaft_segment_disc_divider = 1; // Increase this if we only want to use every nth pulse
-volatile int shaft_modulus = 0; // For Modulo in the ISR, to compensate the multiple pulses per revolution
-volatile long shaft_frames = 0; // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
+volatile uint8_t shaft_modulus = 0; // For Modulo in the ISR, to compensate the multiple pulses per revolution
+volatile uint32_t shaft_frames = 0; // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
 
 // flags to assure reading only once both ISRs have done their duty
 volatile bool shaft_frame_count_updated;
@@ -87,16 +87,16 @@ constexpr size_t STABILITY_CHECKS = 36;             // Window size to determine 
 constexpr unsigned long SPEED_DETECT_TOLERANCE = 1600; // allowed tolerance between pulses in microseconds
 constexpr unsigned long MIN_CHANGE = 800;           // minimum deviation to determine a new stability
 
-volatile unsigned long freq_median_buffer[SHAFT_SEGMENT_COUNT];
+volatile uint32_t freq_median_buffer[SHAFT_SEGMENT_COUNT];
 volatile size_t freq_median_index = 0;
-volatile unsigned long stability_buffer[STABILITY_CHECKS];
+volatile uint32_t stability_buffer[STABILITY_CHECKS];
 volatile size_t freq_buffer_index = 0;
-volatile unsigned long last_stable_freq_value = 0; // Zuletzt erkannter stabiler Wert
-volatile unsigned long shaft_impulse_count = 0;
+volatile uint32_t last_stable_freq_value = 0; // Zuletzt erkannter stabiler Wert
+volatile uint32_t shaft_impulse_count = 0;
 volatile bool new_shaft_impulse_available = false;
-volatile byte projector_speed_auto_guess = 0; // holds the (guessed) current speed switch position (18 or 24)
-volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
-volatile unsigned long last_pulse_timestamp; // Timestamp of the last pulse, used to detect a stop
+volatile uint8_t projector_speed_auto_guess = 0; // holds the (guessed) current speed switch position (18 or 24)
+volatile uint32_t timer2_overflow_count = 0;  // Globale Zähler-Variable für Timer2-Überläufe
+volatile uint32_t last_pulse_timestamp;       // Timestamp of the last pulse, used to detect a stop
 
 // PID stuff
 double pid_setpoint,
@@ -111,7 +111,7 @@ Adafruit_MCP4725 dac;
 Button2 leftButton, rightButton, dropBackButton, catchUpButton;
 
 // Instantiate the Display
-U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
+// U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 
 enum SyncModes
 {
@@ -268,8 +268,8 @@ void setup()
 
     changeRunMode(sync_mode); 
 
-    u8x8.begin();
-    u8x8.setFont(u8x8_font_profont29_2x3_n);
+    // u8x8.begin();
+    // u8x8.setFont(u8x8_font_profont29_2x3_n);
 }
 
 void loop() {
@@ -279,8 +279,6 @@ void loop() {
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
     static uint8_t button, last_button = BTTN_NONE;
-    static long last_pid_update_millis;
-    static long current_pid_update_millis;
 
     // Poll the buttons
     leftButton.loop();
@@ -648,8 +646,6 @@ void onShaftImpulseISR()
         shaft_frames++;
         shaft_frame_count_updated = true;
     }
-    shaft_modulus++;
-    shaft_modulus %= (shaft_segment_disc_divider); 
 }
 
 ISR(TIMER1_COMPA_vect)
