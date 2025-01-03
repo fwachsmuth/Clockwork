@@ -57,13 +57,6 @@ const unsigned long STOP_THRESHOLD = 15000; // microseconds until a stop will be
 
 const unsigned long SAVE_THRESHOLD = 10000; // ms until a stable DAC value will be considered as new EPROM default
 
-/*
-// to get the approx. DAC value for any desired fps per a * x * x + b * x + c
-const float a = 0.6126;
-const float b = 155.44;
-const float c = -1459.34;
-*/
-
 #define BTTN_NONE 0
 #define BTTN_LEFT 1
 #define BTTN_RIGHT 2
@@ -268,10 +261,14 @@ void setup()
 
     u8x8.begin();
     u8x8.setFont(u8x8_font_profont29_2x3_n);
+
+    // FreqMeasure.begin();
 }
 
 void loop()
 {
+    // measureFrequency();
+
     static long local_timer_frames = 0;    // for atomic reads
     static long local_shaft_frames = 0;    // for atomic reads
     static long last_pulse_difference = 0; // Stores the last output difference. )Just used to limit the printf output)
@@ -365,6 +362,34 @@ void loop()
             digitalWrite(LED_RED_PIN, LOW);
         }
     }
+}
+
+void measureFrequency()
+{
+    static double sum = 0;
+    static int count = 48;
+    
+    if (FreqMeasure.available())
+    {
+        // average several reading together
+        sum += FreqMeasure.read();
+        count++;
+        if (count > 48) // 48 impulses = 4 frames
+        {
+            float frequency = FreqMeasure.countToFrequency(sum / count);
+
+            // Buffer to hold the formatted string
+            char buffer[20];
+            // Convert float to string with 5 decimal places
+            dtostrf(frequency / 12, 8, 5, buffer); // (value, width, precision, buffer)
+
+            Serial.println(buffer);
+            u8x8.drawString(0, 1, buffer);
+            sum = 0;
+            count = 0;
+        }
+    }
+    FreqMeasure.end();
 }
 
 bool hasStoppedSince(unsigned long start, unsigned long duration)
