@@ -38,6 +38,7 @@ Irgendwann
 
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
+const byte LED_RED_PIN = 5;
 const byte LED_GREEN_PIN = 7;
 const byte ENABLE_PIN = 9;
 
@@ -48,9 +49,9 @@ const byte CATCH_UP_BTTN_PIN = 12;
 
 // const byte redLedPin = 9;
 
-const byte ledSlowerRed = 5;    //  --
+const byte ledRed = 5;    //  Out of Sync
+const byte ledGreen = 7;        //  Crystal enabled
 const byte ledSlowerYellow = 6; //  -
-const byte ledGreen = 7;        //  o
 const byte ledFasterYellow = 8; //  +
 //const byte ledFasterRed = 9;    //  ++
 
@@ -248,6 +249,7 @@ void setup()
     
     pinMode(SHAFT_PULSE_PIN, INPUT);
     pinMode(LED_GREEN_PIN, OUTPUT);
+    pinMode(LED_RED_PIN, OUTPUT);
     pinMode(ENABLE_PIN, OUTPUT);
     pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
     pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
@@ -316,6 +318,16 @@ void loop() {
             myPID.Compute();
             new_dac_value = pid_output;
             dac.setVoltage(new_dac_value, false);
+        }
+        
+        // Detect if we have are > half a frame off and light the red LED
+        if (current_pulse_difference < -6 || current_pulse_difference > 6)
+        {
+            digitalWrite(LED_RED_PIN, HIGH);
+        }
+        else
+        {
+            digitalWrite(LED_RED_PIN, LOW);
         }
 
         // Debug output
@@ -402,114 +414,6 @@ void checkProjectorRunning()
         }
     }
 }
-
-
-
-// Old loop ---------------------------------------------------------------------
-
-// void loopy()
-// {
-//     static long local_timer_frames = 0; // for atomic reads
-//     static long local_shaft_frames = 0; // for atomic reads
-//     static long last_pulse_difference = 0; // Stores the last output difference. )Just used to limit the printf output)
-//     static long current_pulse_difference = 0;
-//     uint16_t new_dac_value = 0;
-//     static uint8_t button, last_button = BTTN_NONE;
-//     static long last_pid_update_millis;
-//     static long current_pid_update_millis;
-
-    
-//     // Poll the buttons
-//     leftButton.loop();
-//     rightButton.loop();
-//     dropBackButton.loop();
-//     catchUpButton.loop();
-
-   
-
-//     // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs/errors
-//     if (shaft_frame_count_updated && timer_frame_count_updated)
-//     {
-//         currentPulseDifference();
-
-//         // Compute PID and feed to DAC
-//         pid_input = current_pulse_difference;
-//         myPID.Compute();
-//         new_dac_value = pid_output;
-//         dac.setVoltage(new_dac_value, false);
-//     }
-
-//     // Print only if the difference has changed AND the projector is actually running
-//     if ((current_pulse_difference != last_pulse_difference) && (projector_speed_auto_guess != 0))
-//     {
-//         // 
-//         // current_pid_update_millis = millis();
-//         // Serial.print(", which was stable for ");
-//         // Serial.print(current_pid_update_millis - last_pid_update_millis);
-//         // Serial.println(" ms");
-
-//         Serial.print("Mode: ");
-//         Serial.print(runModeToString(sync_mode));
-//         Serial.print(", Error: ");
-//         Serial.print(current_pulse_difference);
-//         Serial.print(", DAC: ");
-//         Serial.println(new_dac_value);
-
-//         // 
-//         // if ((current_pulse_difference == 0) && ((current_pid_update_millis - last_pid_update_millis) > SAVE_THRESHOLD))
-//         // {
-//         //     Serial.print(" This would be a winner: ");
-//         //     Serial.println((current_pid_update_millis - last_pid_update_millis) / 1000);
-//         // }
-
-//         last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
-//         // last_pid_update_millis = current_pid_update_millis;
-//     }
-
-//     if (!new_shaft_impulse_available)
-//         return; // Skip processing if no new data
-
-//     new_shaft_impulse_available = false; // Reset the ISR's "new data available" flag
-
-//     // Only auto-detect a speed when in AUTO mode
-//     // Calculate median and store it in the stability buffer
-//     unsigned long median = calculateMedian(freq_median_buffer, STABILITY_WINDOW_SIZE);
-//     stability_buffer[freq_buffer_index] = median;
-//     freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
-
-//     // Perform running frequency stability check if the buffer is full AND we don't know the fps-switch pos yet
-//     if (projector_speed_auto_guess == 0 && freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
-//     {
-//         unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
-
-//         // Handle projector restart or stability change
-//         if (!projector_running || abs((long)new_stable_value - (long)last_stable_freq_value) > MIN_CHANGE)
-//         {
-//             last_stable_freq_value = new_stable_value;
-//             float detected_frequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
-//             projector_running = true; // Projector is running again
-
-//             Serial.print("[AUTO:] Projector running stable with ~");
-//             Serial.print(detected_frequency, 1); // FPS
-//             Serial.print(" fps after ");
-//             Serial.print(shaft_impulse_count);
-//             Serial.print(" impulses, aka ~");
-//             Serial.print(shaft_impulse_count / STABILITY_WINDOW_SIZE);
-//             Serial.println(" frames.");
-
-//             if (detected_frequency <= 21)
-//             {
-//                 projector_speed_auto_guess = 18;
-//                 changeRunMode(XTAL_18);
-//             }
-//             else if (detected_frequency > 21)
-//             {
-//                 projector_speed_auto_guess = 24;
-//                 changeRunMode(XTAL_24);
-//             }       
-//         }
-//     }
-// }
 
 
 unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
@@ -730,6 +634,7 @@ void onShaftImpulseISR()
         Serial.println(pid_output);
         myPID.SetMode(AUTOMATIC);
         digitalWrite(ENABLE_PIN, LOW);
+        digitalWrite(LED_RED_PIN, LOW);
     }
 
     // Expose the news
