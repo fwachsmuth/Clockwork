@@ -7,7 +7,8 @@ Hardware
 - Strobe
 
 Code
-- Bug: SPeed changes resets Timer!
+- Bug: Speed changes resets Timer!
+- Review volatile vars (only for variables modified inside ISRs and used outside)
 - Reset Counters? (long press both buttons?)
 - move dithering structs to consts
 - clean up "this woudl be a winner" code
@@ -94,7 +95,6 @@ volatile size_t freq_buffer_index = 0;
 volatile uint32_t last_stable_freq_value = 0; // Zuletzt erkannter stabiler Wert
 volatile uint32_t shaft_impulse_count = 0;
 volatile bool new_shaft_impulse_available = false;
-volatile uint8_t projector_speed_auto_guess = 0; // holds the (guessed) current speed switch position (18 or 24)
 volatile uint32_t timer2_overflow_count = 0;  // Globale Zähler-Variable für Timer2-Überläufe
 volatile uint32_t last_pulse_timestamp;       // Timestamp of the last pulse, used to detect a stop
 
@@ -215,25 +215,11 @@ static const DitherConfig PROGMEM s_ditherTable[] = {
 
 void setup()
 {
-    leftButton.begin(LEFT_BTTN_PIN);
-    leftButton.setTapHandler(handleButtonTap); 
-    leftButton.setDoubleClickTime(0); // disable double clicks
-    leftButton.setDebounceTime(10);
-
-    rightButton.begin(RIGHT_BTTN_PIN);
-    rightButton.setTapHandler(handleButtonTap);
-    rightButton.setDoubleClickTime(0); // disable double clicks
-    rightButton.setDebounceTime(10);
-
-    dropBackButton.begin(DROP_BACK_BTTN_PIN);
-    dropBackButton.setTapHandler(handleButtonTap);
-    dropBackButton.setDoubleClickTime(0); // disable double clicks
-    dropBackButton.setDebounceTime(10);
-
-    catchUpButton.begin(CATCH_UP_BTTN_PIN);
-    catchUpButton.setTapHandler(handleButtonTap);
-    catchUpButton.setDoubleClickTime(0); // disable double clicks
-    catchUpButton.setDebounceTime(10);
+    // Initialize buttons using the helper function
+    initializeButton(leftButton, LEFT_BTTN_PIN);
+    initializeButton(rightButton, RIGHT_BTTN_PIN);
+    initializeButton(dropBackButton, DROP_BACK_BTTN_PIN);
+    initializeButton(catchUpButton, CATCH_UP_BTTN_PIN);
 
     Serial.begin(115200);
 
@@ -344,7 +330,6 @@ void loop() {
         {
             projector_state = PROJ_IDLE; // Projector is stopped
             Serial.println("[DEBUG] Projector stopped.");
-            projector_speed_auto_guess = 0; // forget the previously determined switch pos, it might be changed
             stopTimer1();
             timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
             shaft_impulse_count = 0;
@@ -354,14 +339,20 @@ void loop() {
             pid_output = DAC_INITIAL_VALUE;
             pid_input = 0;
             myPID.Compute();
-            Serial.print("PID Reset to initial DAC value: ");
-            Serial.println(pid_output);
             myPID.SetMode(AUTOMATIC);
             digitalWrite(ENABLE_PIN, LOW);
             digitalWrite(LED_RED_PIN, LOW);
         }
 
     }
+}
+
+void initializeButton(Button2 &button, byte pin)
+{
+    button.begin(pin);
+    button.setTapHandler(handleButtonTap);
+    button.setDoubleClickTime(0); // disable double clicks
+    button.setDebounceTime(10);
 }
 
 bool hasStoppedSince(unsigned long start, unsigned long duration)
@@ -400,16 +391,7 @@ void checkProjectorRunning()
             Serial.print(shaft_impulse_count / SHAFT_SEGMENT_COUNT);
             Serial.println(" frames.");
 
-            if (detected_frequency <= 21)
-            {
-                projector_speed_auto_guess = 18;
-                changeRunMode(XTAL_18);
-            }
-            else if (detected_frequency > 21)
-            {
-                projector_speed_auto_guess = 24;
-                changeRunMode(XTAL_24);
-            }
+            changeRunMode((detected_frequency <= 21) ? XTAL_18 : XTAL_24);
 
             projector_state = PROJ_RUNNING;
         }
@@ -495,7 +477,6 @@ void changeRunMode(byte run_mode)
     case XTAL_AUTO:
         // Disconnect the DAC
         digitalWrite(ENABLE_PIN, LOW);
-        projector_speed_auto_guess = 0; // forget the previously determined switch pos, it might be changed
         // reset the frequency detection vars
         memset(freq_median_buffer, 0, sizeof(freq_median_buffer));
         memset(stability_buffer, 0, sizeof(stability_buffer));
@@ -550,14 +531,8 @@ void handleButtonTap(Button2 &btn)
     // Frame up/down is only allowed while the projector is running
     if (projector_state == PROJ_RUNNING)
     {
-        if (btn == dropBackButton)
-        {
-            shaft_frames += SHAFT_SEGMENT_COUNT;
-        }
-        else if (btn == catchUpButton)
-        {
-            shaft_frames -= SHAFT_SEGMENT_COUNT;
-        }
+        // add or subtract 12 impulses depending on the button pressed
+        shaft_frames += (btn == dropBackButton) ? SHAFT_SEGMENT_COUNT : -SHAFT_SEGMENT_COUNT;
     }
 }
 
