@@ -11,6 +11,8 @@ Code
 - Reset Counters? (long press both buttons?)
 - consider an adaptive PID
 - Add FreqMeasure
+- Allow changing speed in manual mode at runtime
+- Reset Counters? (long press both buttons?)
 - Rangieren (langsam)
 - "start the audio" IR
 
@@ -68,13 +70,13 @@ const float c = -1459.34;
 #define BTTN_LEFT 1
 #define BTTN_RIGHT 2
 
-uint8_t timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
-volatile uint8_t timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
-volatile uint32_t timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
+int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
+volatile int timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
+volatile long timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
 
 const byte shaft_segment_disc_divider = 1; // Increase this if we only want to use every nth pulse
-volatile uint8_t shaft_modulus = 0;            // For Modulo in the ISR, to compensate the multiple pulses per revolution
-volatile uint32_t shaft_frames = 0;            // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
+volatile int shaft_modulus = 0;            // For Modulo in the ISR, to compensate the multiple pulses per revolution
+volatile long shaft_frames = 0;            // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
 
 // flags to assure reading only once both ISRs have done their duty
 volatile bool shaft_frame_count_updated;
