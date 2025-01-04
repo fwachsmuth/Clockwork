@@ -7,10 +7,32 @@ Hardware
 - Reconfigure OpAmp offset to allow tha DAC to halt the motor
 
 Code
+- Implement 3 catch-up modes for speed changes while running:
+    - A:  Convert timer_pulses to new speed: Projector will catch up until sync is reach again.
+          Stopping the projector resets the counters.
+        + allows speed corrections without finding the start mark again
+        + good for sepmag 
+        - projector might "run" of "crawl" for quite some time
+
+    - B:  Forget any previous errors and start fresh
+        + allws for quick speed changes
+        + ideal mode for use as "Peaceman's Box" (ESS out mode)
+        + good for telecine (which could also just restartm though)
+        - loses sync with any sepmag audio
+
+    - C: keep old errors around and correct them too
+         Shaft and Pulse totals will always be in sync, speed changes cause no pulse loss
+        • currently implemented already
+        • not very meaningful though?
+
+Bug: 
+- Changing form 25 fpd back to Auto does not retain a previous 18fps-Auto
+- Decrement Shaft Impulses after detected shaft noise!
+
+- Use the display
 - Review volatile vars (only for variables modified inside ISRs and used outside)
 - Reset Counters? (long press both buttons?)
 - consider an adaptive PID
-- Add FreqMeasure
 - Rangieren (langsam)
 - "start the audio" IR
 - Clamp the PID output to avoid halting the motor
@@ -200,25 +222,11 @@ static const DitherConfig PROGMEM s_ditherTable[] = {
 
 void setup()
 {
-    leftButton.begin(LEFT_BTTN_PIN);
-    leftButton.setTapHandler(handleButtonTap);
-    leftButton.setDoubleClickTime(0); // disable double clicks
-    leftButton.setDebounceTime(10);
-
-    rightButton.begin(RIGHT_BTTN_PIN);
-    rightButton.setTapHandler(handleButtonTap);
-    rightButton.setDoubleClickTime(0); // disable double clicks
-    rightButton.setDebounceTime(10);
-
-    dropBackButton.begin(DROP_BACK_BTTN_PIN);
-    dropBackButton.setTapHandler(handleButtonTap);
-    dropBackButton.setDoubleClickTime(0); // disable double clicks
-    dropBackButton.setDebounceTime(10);
-
-    catchUpButton.begin(CATCH_UP_BTTN_PIN);
-    catchUpButton.setTapHandler(handleButtonTap);
-    catchUpButton.setDoubleClickTime(0); // disable double clicks
-    catchUpButton.setDebounceTime(10);
+    // Initialize buttons using the helper function
+    initializeButton(leftButton, LEFT_BTTN_PIN);
+    initializeButton(rightButton, RIGHT_BTTN_PIN);
+    initializeButton(dropBackButton, DROP_BACK_BTTN_PIN);
+    initializeButton(catchUpButton, CATCH_UP_BTTN_PIN);
 
     Serial.begin(115200);
 
@@ -386,6 +394,14 @@ void measureFrequency()
         }
     }
     // FreqMeasure.end();
+}
+
+void initializeButton(Button2 &button, byte pin)
+{
+    button.begin(pin);
+    button.setTapHandler(handleButtonTap);
+    button.setDoubleClickTime(0); // disable double clicks
+    button.setDebounceTime(10);
 }
 
 bool hasStoppedSince(unsigned long start, unsigned long duration)
