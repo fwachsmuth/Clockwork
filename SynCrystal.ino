@@ -1,10 +1,10 @@
 /* Todo
 
 Hardware
-- add i2c display
 - add IR emitter
 - 74LVC2G14
-- Strobe
+- Strobe Output
+- Reconfigure OpAmp offset to allow tha DAC to halt the motor
 
 Code
 - Review volatile vars (only for variables modified inside ISRs and used outside)
@@ -13,6 +13,7 @@ Code
 - Add FreqMeasure
 - Rangieren (langsam)
 - "start the audio" IR
+- Clamp the PID output to avoid halting the motor
 
 Irgendwann
 - Fernstart/stop support
@@ -62,12 +63,12 @@ const unsigned long SAVE_THRESHOLD = 10000; // ms until a stable DAC value will 
 #define BTTN_RIGHT 2
 
 int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
-volatile int timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
-volatile long timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
+volatile uint8_t timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
+volatile uint32_t timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
 
 const byte shaft_segment_disc_divider = 1; // Increase this if we only want to use every nth pulse
-volatile int shaft_modulus = 0;            // For Modulo in the ISR, to compensate the multiple pulses per revolution
-volatile long shaft_frames = 0;            // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
+uint8_t shaft_modulus = 0;            // For Modulo in the ISR, to compensate the multiple pulses per revolution
+volatile uint32_t shaft_frames = 0;            // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
 
 // flags to assure reading only once both ISRs have done their duty
 volatile bool shaft_frame_count_updated;
@@ -76,17 +77,15 @@ volatile bool timer_frame_count_updated;
 // These consts are used in the median approach, which finds stable freq detection after ~ 48 impulses (4 frames).
 constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Window. We use 12 to capture one entire shaft revolution
 constexpr size_t STABILITY_CHECKS = 36;                // Window size to determine stability
-constexpr unsigned long SPEED_DETECT_TOLERANCE = 1600; // allowed tolerance between pulses in microseconds
-constexpr unsigned long MIN_CHANGE = 800;              // minimum deviation to determine a new stability
+constexpr uint16_t SPEED_DETECT_TOLERANCE = 1600; // allowed tolerance between pulses in microseconds
+constexpr uint16_t MIN_CHANGE = 800;              // minimum deviation to determine a new stability
 
-volatile unsigned long shaft_impulse_count = 0;
+volatile uint32_t shaft_impulse_count = 0;
 volatile bool new_shaft_impulse_available = false;
-volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
-volatile unsigned long last_pulse_timestamp;      // Timestamp of the last pulse, used to detect a stop
+volatile uint32_t last_pulse_timestamp;      // Timestamp of the last pulse, used to detect a stop
 
 // PID stuff
-double pid_setpoint,
-    pid_input, pid_output;
+double pid_setpoint, pid_input, pid_output;
 double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0;
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
@@ -121,7 +120,7 @@ byte projector_state = PROJ_IDLE;
 
 enum FpsSpeeds
 {
-    FPS_9,       // => 108 Hz
+    /* FPS_9,       // => 108 Hz */
     FPS_16_2_3,  // => 200 Hz
     FPS_18,      // => 216 Hz
     FPS_23_976,  // => ~287.712 Hz
@@ -169,7 +168,7 @@ static const DitherConfig PROGMEM s_ditherTable[] = {
     //    => idealDiv = 2314.8148148..., base=2314, fraction=~0.8148148
     //    => frac32 = round(0.8148148 * 2^32) = 0xD0BE9C00
     //    => Endfreq ~ 108.000000 => 0 ppm
-    {2314, 0xD0BE9C00, 8},
+    // {2314, 0xD0BE9C00, 8},
 
     // 2) FPS_16_2_3 => 200 Hz => idealDiv=10000 => fraction=0 => no dithering
     //    => base=9999, frac32=0
