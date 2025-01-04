@@ -15,6 +15,11 @@ Code
         - projector might "run" of "crawl" for quite some time
     Timecode conversion is possible.
 
+    Todo:
+    √ Keep prevvious speed_mode around
+    - capture millis when projector started running (for Auto -> Fixed transition)
+
+
     - B:  Forget any previous errors and start fresh
         + allws for quick speed changes
         + ideal mode for use as "Peaceman's Box" (ESS out mode)
@@ -31,6 +36,8 @@ Code
 Bug: 
 - Changing form 25 fpd back to Auto does not retain a previous 18fps-Auto
 - Decrement Shaft Impulses after detected shaft noise!
+- Cannot start in a manual selected mode
+- Clamp the error to not switch sign
 
 - Use the display
 - Review volatile vars (only for variables modified inside ISRs and used outside)
@@ -135,6 +142,7 @@ enum SpeedModes
     MODES_COUNT // Automatically equals the number of entries in the enum
 };
 byte speed_mode = XTAL_AUTO;
+byte previous_speed_mode = XTAL_AUTO; // to allow recalculation of timer_frames and timecode
 
 enum ProjectorStates
 {
@@ -172,7 +180,8 @@ struct DitherConfig
 {
     uint16_t base;   // Grundwert für OCR1A
     uint32_t frac32; // fractional part (UQ0.32), 0..(2^32-1)
-    uint8_t timerFactor;
+    uint8_t timerFactor; // a frequency multiplier for each timer config (some multiples give better accuracy)
+    float endFreq; // the actual frequency we get with this config
 };
 
 static const DitherConfig PROGMEM s_ditherTable[] = {
@@ -201,16 +210,16 @@ static const DitherConfig PROGMEM s_ditherTable[] = {
     //    => idealDiv = 2314.8148148..., base=2314, fraction=~0.8148148
     //    => frac32 = round(0.8148148 * 2^32) = 0xD0BE9C00
     //    => Endfreq ~ 108.000000 => 0 ppm
-    // {2314, 0xD0BE9C00, 8},
+    // {2314, 0xD0BE9C00, 8, 9.000000},
 
     // 2) FPS_16_2_3 => 200 Hz => idealDiv=10000 => fraction=0 => no dithering
     //    => base=9999, frac32=0
     //    => Endfreq=200 => 0 ppm
-    {10000, 0x00000000, 1},
+    {10000, 0x00000000, 1, 16.666666},
 
     // 3) FPS_18 => 216 Hz = 864 Hz ISR / 4
     //    => same as 108 Hz example but factor=4 => 0 ppm
-    {2314, 0xD0BE9C00, 4},
+    {2314, 0xD0BE9C00, 4, 18.000000},
 
     // 4) FPS_23_976
     /*  => fraction = 288000/1001 ~ 287.712287712288 Hz
@@ -221,14 +230,14 @@ static const DitherConfig PROGMEM s_ditherTable[] = {
     error Hz    = -0.000000000004
     ppm error   = -0.000000
     */
-    {6951, 0x638E38E4, 1},
+    {6951, 0x638E38E4, 1, 23.976024},
 
     // 5) FPS_24 => 288 Hz = 864 Hz ISR / 3
     //    => same base/fraction as 108 Hz, factor=3 => 0 ppm
-    {2314, 0xD0BE9C00, 3},
+    {2314, 0xD0BE9C00, 3, 24.000000},
 
     // 6) FPS_25 => 300 Hz => idealDiv=6666.666..., fraction=0.666..., frac32=0xAAAAAAAB => 0 ppm
-    {6666, 0xAAAAAAAB, 1},
+    {6666, 0xAAAAAAAB, 1, 25.000000},
 };
 
 void setup()
@@ -335,7 +344,7 @@ void loop()
         if (current_pulse_difference != last_pulse_difference)
         {
             Serial.print(F("Mode: "));
-            Serial.print(runModeToString(speed_mode));
+            Serial.print(speedModeToString(speed_mode));
             Serial.print(F(", Error: "));
             Serial.print(current_pulse_difference);
             Serial.print(F(", DAC: "));
@@ -543,11 +552,11 @@ void handleButtonTap(Button2 &btn)
     {
         if (btn == dropBackButton)
         {
-            shaft_frames += SHAFT_SEGMENT_COUNT;
+            shaft_frames++;
         }
         else if (btn == catchUpButton)
         {
-            shaft_frames -= SHAFT_SEGMENT_COUNT;
+            shaft_frames--;
         }
     }
 }
@@ -558,7 +567,23 @@ void selectNextMode(Button2 &btn)
     int8_t change = (btn == leftButton) ? -1 : 1;
 
     // Update the run mode
+    previous_speed_mode = speed_mode;
     speed_mode = (speed_mode + change + MODES_COUNT) % MODES_COUNT;
+
+    // Serial.print(speedModeToString(previous_speed_mode));
+    // Serial.print(F(" -> "));
+    // Serial.println(speedModeToString(speed_mode));
+
+    // Serial.print(timer_frames);
+    // Serial.print(" / ");
+
+    if (speed_mode != XTAL_AUTO && speed_mode != XTAL_NONE)
+    {
+        // noInterrupts();
+        // timer_frames = (timer_frames / 18) * 24;
+        // interrupts();        
+    }
+
     changeSpeedMode(speed_mode);
 }
 
@@ -642,7 +667,7 @@ void stopTimer1()
     interrupts();
 }
 
-const char *runModeToString(byte run_mode)
+const char *speedModeToString(byte run_mode)
 {
     switch (run_mode)
     {
