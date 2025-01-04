@@ -8,22 +8,25 @@ Hardware
 
 Code
 - Implement 3 catch-up modes for speed changes while running:
-    - A:  Convert timer_pulses to new speed: Projector will catch up until sync is reach again.
+    - A:  Convert timer_pulses to new speed: Projector will catch up until sync is reached again.
           Stopping the projector resets the counters.
         + allows speed corrections without finding the start mark again
         + good for sepmag 
         - projector might "run" of "crawl" for quite some time
+    Timecode conversion is possible.
 
     - B:  Forget any previous errors and start fresh
         + allws for quick speed changes
         + ideal mode for use as "Peaceman's Box" (ESS out mode)
         + good for telecine (which could also just restartm though)
         - loses sync with any sepmag audio
+    Timecode would restart at 0:00:00.00
 
     - C: keep old errors around and correct them too
          Shaft and Pulse totals will always be in sync, speed changes cause no pulse loss
         • currently implemented already
         • not very meaningful though?
+    Timecode conversion is possible, but pointless (since not in sync with virtual sepmag time)
 
 Bug: 
 - Changing form 25 fpd back to Auto does not retain a previous 18fps-Auto
@@ -120,7 +123,7 @@ Button2 leftButton, rightButton, dropBackButton, catchUpButton;
 // Instantiate the Display
 U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 
-enum SyncModes
+enum SpeedModes
 {
     XTAL_NONE,
     XTAL_AUTO,
@@ -131,7 +134,7 @@ enum SyncModes
     XTAL_25,
     MODES_COUNT // Automatically equals the number of entries in the enum
 };
-byte sync_mode = XTAL_AUTO;
+byte speed_mode = XTAL_AUTO;
 
 enum ProjectorStates
 {
@@ -148,8 +151,16 @@ enum FpsSpeeds
     FPS_23_976,  // => ~287.712 Hz
     FPS_24,      // => 288 Hz
     FPS_25,      // => 300 Hz
-    SPEEDS_COUNT // Anzahl
+    SPEEDS_COUNT // Total Count of speeds supported
 };
+
+enum BlendModes
+{
+    BLEND_SEPMAG,  // Option A: Convert timer_pulses to new speed: Projector will catch up until sync is reached again.
+    BLEND_RESET,   // Option B: Forget any previous pulses and start fresh
+    BLEND_EQUAL    // Option C: keep old errors around and correct them too
+};
+byte blend_mode = BLEND_SEPMAG;
 
 // Global dithering variables for the ISR:
 volatile uint16_t ditherBase = 0;   // base for OCR1A
@@ -253,10 +264,10 @@ void setup()
     pid_output = DAC_INITIAL_VALUE; // This avoids starting with a 0-Output signal
     myPID.SetMode(AUTOMATIC);
 
-    changeRunMode(sync_mode);
+    changeSpeedMode(speed_mode);
 
     u8x8.begin();
-    u8x8.setFont(u8x8_font_profont29_2x3_n);
+    u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
 
     // FreqMeasure.begin();
 }
@@ -324,7 +335,7 @@ void loop()
         if (current_pulse_difference != last_pulse_difference)
         {
             Serial.print(F("Mode: "));
-            Serial.print(runModeToString(sync_mode));
+            Serial.print(runModeToString(speed_mode));
             Serial.print(F(", Error: "));
             Serial.print(current_pulse_difference);
             Serial.print(F(", DAC: "));
@@ -416,7 +427,7 @@ void checkProjectorRunning()
 
     new_shaft_impulse_available = false; // Reset the ISR's "new data available" flag
 
-    if (sync_mode == XTAL_AUTO)
+    if (speed_mode == XTAL_AUTO)
     {
         double freq_sum = 0;
         int freq_count = 0;
@@ -458,7 +469,7 @@ void checkProjectorRunning()
             Serial.println(detected_frequency / SHAFT_SEGMENT_COUNT);
 
             // Determine the mode based on the detected frequency
-            changeRunMode(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? XTAL_18 : XTAL_24);
+            changeSpeedMode(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? XTAL_18 : XTAL_24);
 
             // Update projector state
             projector_state = PROJ_RUNNING;
@@ -471,7 +482,7 @@ void checkProjectorRunning()
 }
 
 
-void changeRunMode(byte run_mode)
+void changeSpeedMode(byte run_mode)
 {
     // connect or disconnect the DAC
     digitalWrite(ENABLE_PIN, (run_mode == XTAL_NONE) ? LOW : HIGH);
@@ -547,8 +558,8 @@ void selectNextMode(Button2 &btn)
     int8_t change = (btn == leftButton) ? -1 : 1;
 
     // Update the run mode
-    sync_mode = (sync_mode + change + MODES_COUNT) % MODES_COUNT;
-    changeRunMode(sync_mode);
+    speed_mode = (speed_mode + change + MODES_COUNT) % MODES_COUNT;
+    changeSpeedMode(speed_mode);
 }
 
 bool setupTimer1forFps(byte desiredFps)
