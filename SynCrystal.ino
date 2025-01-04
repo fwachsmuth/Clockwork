@@ -315,11 +315,11 @@ void loop()
         // Debug output
         if (current_pulse_difference != last_pulse_difference)
         {
-            Serial.print("Mode: ");
+            Serial.print(F("Mode: "));
             Serial.print(runModeToString(sync_mode));
-            Serial.print(", Error: ");
+            Serial.print(F(", Error: "));
             Serial.print(current_pulse_difference);
-            Serial.print(", DAC: ");
+            Serial.print(F(", DAC: "));
             Serial.println(new_dac_value);
             // Serial.print(" Timer-Frames: ");
             // Serial.print(timer_frames);
@@ -333,7 +333,7 @@ void loop()
         if (hasStoppedSince(last_pulse_timestamp, STOP_THRESHOLD))
         {
             projector_state = PROJ_IDLE; // Projector is stopped
-            Serial.println("[DEBUG] Projector stopped.");
+            Serial.println(F("[DEBUG] Projector stopped."));
             stopTimer1();
             timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
             shaft_impulse_count = 0;
@@ -343,7 +343,7 @@ void loop()
             pid_output = DAC_INITIAL_VALUE;
             pid_input = 0;
             myPID.Compute();
-            Serial.print("PID Reset to initial DAC value: ");
+            Serial.print(F("PID Reset to initial DAC value: "));
             Serial.println(pid_output);
             myPID.SetMode(AUTOMATIC);
             digitalWrite(ENABLE_PIN, LOW);
@@ -427,7 +427,7 @@ void checkProjectorRunning()
             // Check for timeout
             if (micros() - last_available_freqMeasure_time > STOP_THRESHOLD)
             {
-                Serial.println("Shaft Noise ignored.");
+                Serial.println(F("Shaft Noise ignored."));
                 break; // Exit the loop
             }
         }
@@ -438,7 +438,7 @@ void checkProjectorRunning()
         if (freq_count >= 48)
         {
             float detected_frequency = FreqMeasure.countToFrequency(freq_sum / freq_count);
-            Serial.print("Detected frequency: ");
+            Serial.print(F("Detected frequency: "));
             Serial.println(detected_frequency / SHAFT_SEGMENT_COUNT);
 
             // Determine the mode based on the detected frequency
@@ -463,7 +463,7 @@ void changeRunMode(byte run_mode)
     switch (run_mode)
     {
     case XTAL_NONE:
-        Serial.println("XTAL_NONE");
+        Serial.println(F("XTAL_NONE"));
         break;
     case XTAL_AUTO:
         // reset the PID Output
@@ -473,30 +473,30 @@ void changeRunMode(byte run_mode)
         myPID.SetMode(AUTOMATIC);
         // set DAC to initial value
         dac.setVoltage(DAC_INITIAL_VALUE, false);
-        Serial.println("XTAL_AUTO");
+        Serial.println(F("XTAL_AUTO"));
         break;
     case XTAL_16_2_3:
-        Serial.println("XTAL_16_2_3");
+        Serial.println(F("XTAL_16_2_3"));
         setupTimer1forFps(FPS_16_2_3);
         break;
     case XTAL_18:
-        Serial.println("XTAL_18");
+        Serial.println(F("XTAL_18"));
         setupTimer1forFps(FPS_18);
         break;
     case XTAL_23_976:
-        Serial.println("XTAL_23_976");
+        Serial.println(F("XTAL_23_976"));
         setupTimer1forFps(FPS_23_976);
         break;
     case XTAL_24:
-        Serial.println("XTAL_24");
+        Serial.println(F("XTAL_24"));
         setupTimer1forFps(FPS_24);
         break;
     case XTAL_25:
-        Serial.println("XTAL_25");
+        Serial.println(F("XTAL_25"));
         setupTimer1forFps(FPS_25);
         break;
     default:
-        Serial.println("Unknown Mode");
+        Serial.println(F("Unknown Mode"));
         break;
     }
 }
@@ -546,12 +546,6 @@ bool setupTimer1forFps(byte desiredFps)
         timer_modulus = 0;
         shaft_modulus = 0; 
         interrupts();
-    }
-
-    if (desiredFps >= SPEEDS_COUNT)
-    {
-        Serial.println(F("Invalid FPS index!"));
-        return false;
     }
 
     // --- Tabellenwerte aus PROGMEM lesen
