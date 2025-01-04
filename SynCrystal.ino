@@ -142,7 +142,7 @@ enum SpeedModes
     MODES_COUNT // Automatically equals the number of entries in the enum
 };
 byte speed_mode = XTAL_AUTO;
-byte previous_speed_mode = XTAL_AUTO; // to allow recalculation of timer_frames and timecode
+float previous_freq = 1.00; // to allow recalculation of timer_frames and timecode
 
 enum ProjectorStates
 {
@@ -174,6 +174,7 @@ byte blend_mode = BLEND_SEPMAG;
 volatile uint16_t ditherBase = 0;   // base for OCR1A
 volatile uint32_t ditherFrac32 = 0; // fraction in UQ0.32
 volatile uint32_t ditherAccu32 = 0; // Accumulator
+volatile float ditherEndFreq = 0;   // Actual frequency of the dithered timer / SHAFT_SEGMENT_COUNT (proj. freq)
 
 // Struct with all the information we need for dithering & postscaler:
 struct DitherConfig
@@ -567,21 +568,36 @@ void selectNextMode(Button2 &btn)
     int8_t change = (btn == leftButton) ? -1 : 1;
 
     // Update the run mode
-    previous_speed_mode = speed_mode;
-    speed_mode = (speed_mode + change + MODES_COUNT) % MODES_COUNT;
+    previous_freq = ditherEndFreq;  // the struct's float with the actual fps. Could probably just use ditherEndFreq here.
 
-    // Serial.print(speedModeToString(previous_speed_mode));
-    // Serial.print(F(" -> "));
-    // Serial.println(speedModeToString(speed_mode));
+    // Change the speed mode to an adjacent enum value ("change")
+    speed_mode = (speed_mode + change + MODES_COUNT) % MODES_COUNT;
+    
+    float next_freq;
+    // copy the endFreq of the struct wuth index -2 
+    memcpy_P(&next_freq, &s_ditherTable[((speed_mode - 2))].endFreq, sizeof(float));
+
+    Serial.print(previous_freq, 4); // Print the float with 4 decimal places
+    Serial.print(F(" -> "));
+    Serial.println(next_freq, 4 );
 
     // Serial.print(timer_frames);
     // Serial.print(" / ");
 
     if (speed_mode != XTAL_AUTO && speed_mode != XTAL_NONE)
     {
-        // noInterrupts();
-        // timer_frames = (timer_frames / 18) * 24;
-        // interrupts();        
+        Serial.print(timer_frames);
+        Serial.print(F(" / "));
+        Serial.print(previous_freq);
+        Serial.print(F(" * "));
+        Serial.print(next_freq);
+        Serial.print(F(" = "));
+        Serial.println((timer_frames / previous_freq) * next_freq ,5);
+        Serial.println(static_cast<uint32_t>((timer_frames / previous_freq) * next_freq));
+
+        noInterrupts();
+        timer_frames = static_cast<uint32_t>((timer_frames / previous_freq) * next_freq)
+        interrupts();
     }
 
     changeSpeedMode(speed_mode);
@@ -600,7 +616,7 @@ bool setupTimer1forFps(byte desiredFps)
         interrupts();
     }
 
-    // --- Tabellenwerte aus PROGMEM lesen
+    // Read the required dither config from PROGMEM, this saves RAM
     DitherConfig cfg;
     memcpy_P(&cfg, &s_ditherTable[desiredFps], sizeof(DitherConfig));
 
@@ -618,6 +634,7 @@ bool setupTimer1forFps(byte desiredFps)
     ditherAccu32 = 0;
 
     timer_factor = cfg.timerFactor;
+    ditherEndFreq = cfg.endFreq;
 
     OCR1A = ditherBase;                   // OCR1A start value
     TCCR1B |= (1 << WGM12) | (1 << CS11); // CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
