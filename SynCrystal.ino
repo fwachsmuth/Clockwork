@@ -79,11 +79,6 @@ constexpr size_t STABILITY_CHECKS = 36;                // Window size to determi
 constexpr unsigned long SPEED_DETECT_TOLERANCE = 1600; // allowed tolerance between pulses in microseconds
 constexpr unsigned long MIN_CHANGE = 800;              // minimum deviation to determine a new stability
 
-volatile unsigned long freq_median_buffer[SHAFT_SEGMENT_COUNT];
-volatile size_t freq_median_index = 0;
-volatile unsigned long stability_buffer[STABILITY_CHECKS];
-volatile size_t freq_buffer_index = 0;
-volatile unsigned long last_stable_freq_value = 0; // Zuletzt erkannter stabiler Wert
 volatile unsigned long shaft_impulse_count = 0;
 volatile bool new_shaft_impulse_available = false;
 volatile unsigned long timer2_overflow_count = 0; // Globale Zähler-Variable für Timer2-Überläufe
@@ -227,12 +222,6 @@ void setup()
     catchUpButton.setDebounceTime(10);
 
     Serial.begin(115200);
-
-    // Configure Timer2 (replaces micros() in the ISR, since it is cheaper)
-    TCCR2A = 0;            // Normal Mode
-    TCCR2B = (1 << CS22);  // Prescaler = 64 (1 Tick = 4 µs at 16 MHz)
-    TCNT2 = 0;             // Timer2 Reset
-    TIMSK2 = (1 << TOIE2); // Activate Overflow Interrupt
 
     pinMode(SHAFT_PULSE_PIN, INPUT);
     pinMode(LED_GREEN_PIN, OUTPUT);
@@ -466,47 +455,6 @@ void checkProjectorRunning()
     }
 }
 
-unsigned long calculateMedian(volatile unsigned long *buffer, size_t size)
-{
-    // Calculates the median. A rolling average might be cehaper and good enough, esp with filtering outliers.
-    unsigned long temp[size];
-    // We need a copy of the array to not get interference with the ISR. Intereference doesnt seem likely, so maybe 100B could be saved here
-    for (size_t i = 0; i < size; i++)
-    {
-        temp[i] = buffer[i];
-    }
-
-    // Simple Insertion Sort
-    for (size_t i = 1; i < size; i++)
-    {
-        unsigned long key = temp[i];
-        size_t j = i;
-        while (j > 0 && temp[j - 1] > key)
-        {
-            temp[j] = temp[j - 1];
-            j--;
-        }
-        temp[j] = key;
-    }
-
-    // Determine Median
-    return (size % 2 == 0) ? (temp[size / 2 - 1] + temp[size / 2]) / 2 : temp[size / 2];
-}
-
-bool checkStability(volatile unsigned long *buffer, size_t size, unsigned long tolerance)
-{
-    // Stability check
-    unsigned long minVal = buffer[0];
-    unsigned long maxVal = buffer[0];
-    for (size_t i = 1; i < size; i++)
-    {
-        if (buffer[i] < minVal)
-            minVal = buffer[i];
-        if (buffer[i] > maxVal)
-            maxVal = buffer[i];
-    }
-    return (maxVal - minVal) <= tolerance;
-}
 
 void changeRunMode(byte run_mode)
 {
@@ -519,12 +467,6 @@ void changeRunMode(byte run_mode)
         Serial.println("XTAL_NONE");
         break;
     case XTAL_AUTO:
-        // reset the frequency detection vars
-        memset(freq_median_buffer, 0, sizeof(freq_median_buffer));
-        memset(stability_buffer, 0, sizeof(stability_buffer));
-        freq_median_index = 0;
-        freq_buffer_index = 0;
-        last_stable_freq_value = 0;
         // reset the PID Output
         myPID.SetMode(MANUAL);
         pid_output = DAC_INITIAL_VALUE;
@@ -640,28 +582,8 @@ bool setupTimer1forFps(byte desiredFps)
     return true;
 }
 
-ISR(TIMER2_OVF_vect)
-{
-    timer2_overflow_count++; // increment overflow counter
-}
-
 void onShaftImpulseISR()
 {
-    // For stability detection in free running mode, we use timer2 with overflow instead of micros() — it's cheaper.
-    static unsigned long last_timer2_value = 0;
-
-    // ombine overflow and timer counters
-    unsigned long current_timer2_value = (timer2_overflow_count << 8) | TCNT2; // 8-Bit Timer2 plus overflows
-    unsigned long elapsed_ticks = current_timer2_value - last_timer2_value;    // tick difference
-    last_timer2_value = current_timer2_value;
-
-    // convert to microseonds
-    unsigned long interval_micros = elapsed_ticks * 4; // 4 µs per tick with prescaler 64
-
-    // update the frequencies buffer
-    freq_median_buffer[freq_median_index] = interval_micros;
-    freq_median_index = (freq_median_index + 1) % SHAFT_SEGMENT_COUNT;
-
     // Expose the news
     shaft_impulse_count++;
     new_shaft_impulse_available = true;
