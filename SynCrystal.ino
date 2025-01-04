@@ -360,12 +360,20 @@ void loop()
             myPID.SetMode(AUTOMATIC);
             digitalWrite(ENABLE_PIN, LOW);
             digitalWrite(LED_RED_PIN, LOW);
+
+            FreqMeasure.end();
         }
     }
 }
 
 void measureFrequency()
 {
+    // ignore first revolution
+    // average 3 revolutions
+    // OR: 
+    // average 2 revolutions
+    // take 2nd result
+
     static double sum = 0;
     static int count = 48;
     
@@ -389,7 +397,7 @@ void measureFrequency()
             count = 0;
         }
     }
-    FreqMeasure.end();
+    // FreqMeasure.end();
 }
 
 bool hasStoppedSince(unsigned long start, unsigned long duration)
@@ -403,63 +411,93 @@ void checkProjectorRunning()
         return; // Skip processing if no new data
 
     new_shaft_impulse_available = false; // Reset the ISR's "new data available" flag
-
+    
     if (sync_mode == XTAL_AUTO)
     {
-        // Calculate median and store it in the stability buffer
-        unsigned long median = calculateMedian(freq_median_buffer, SHAFT_SEGMENT_COUNT);
-        stability_buffer[freq_buffer_index] = median;
-        freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
+        double freqSum = 0;
+        int freqCount = 0;
 
-        // If the buffer is full, perform running frequency stability check
-        if (freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
+        FreqMeasure.begin();
+        while (freqCount <= 47)
         {
-            // ??? Handle projector restart (?) or stability change (?)
-            unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
-            last_stable_freq_value = new_stable_value;
-            float detected_frequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
-            // ????? projector_running = true; // Projector is running again
-
-            Serial.print("[AUTO:] Projector running stable with ~");
-            Serial.print(detected_frequency, 1); // FPS
-            Serial.print(" fps after ");
-            Serial.print(shaft_impulse_count);
-            Serial.print(" impulses, aka ~");
-            Serial.println(shaft_impulse_count / SHAFT_SEGMENT_COUNT);
-
-            if (detected_frequency <= 21)
+            if (FreqMeasure.available())
             {
-                changeRunMode(XTAL_18);
+                // average several readings together
+                freqSum += FreqMeasure.read();
+                freqCount++;
+                Serial.print(freqCount);
+                Serial.print(": ");
+                Serial.println(freqSum);
             }
-            else if (detected_frequency > 21)
-            {
-                changeRunMode(XTAL_24);
-            }
-
-            projector_state = PROJ_RUNNING;
         }
-    }
-    // for all non-auto speeds
-    else if (sync_mode != XTAL_AUTO)
-    {
-        if (shaft_impulse_count > SHAFT_SEGMENT_COUNT)
+        FreqMeasure.end();
+
+        float detected_frequency = FreqMeasure.countToFrequency(freqSum / freqCount);
+
+        Serial.println(detected_frequency);
+        
+        changeRunMode(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? XTAL_18 : XTAL_24);
+        freqSum = 0;
+        freqCount = 0;
+        detected_frequency = 0;
+        projector_state = PROJ_RUNNING;
+        /*
+                // Calculate median and store it in the stability buffer
+                unsigned long median = calculateMedian(freq_median_buffer, SHAFT_SEGMENT_COUNT);
+                stability_buffer[freq_buffer_index] = median;
+                freq_buffer_index = (freq_buffer_index + 1) % STABILITY_CHECKS;
+
+                // If the buffer is full, perform running frequency stability check
+                if (freq_buffer_index == 0 && checkStability(stability_buffer, STABILITY_CHECKS, SPEED_DETECT_TOLERANCE))
+                {
+                    // ??? Handle projector restart (?) or stability change (?)
+                    unsigned long new_stable_value = calculateMedian(stability_buffer, STABILITY_CHECKS);
+                    last_stable_freq_value = new_stable_value;
+                    float detected_frequency = 1000000.0f / 12.0f / (float)last_stable_freq_value;
+                    // ????? projector_running = true; // Projector is running again
+
+                    Serial.print("[AUTO:] Projector running stable with ~");
+                    Serial.print(detected_frequency, 1); // FPS
+                    Serial.print(" fps after ");
+                    Serial.print(shaft_impulse_count);
+                    Serial.print(" impulses, aka ~");
+                    Serial.println(shaft_impulse_count / SHAFT_SEGMENT_COUNT);
+
+                    if (detected_frequency <= 21)
+                    {
+                        changeRunMode(XTAL_18);
+                    }
+                    else if (detected_frequency > 21)
+                    {
+                        changeRunMode(XTAL_24);
+                    }
+
+                    projector_state = PROJ_RUNNING;
+                }
+            }
+            // for all non-auto speeds
+            else */
+        if (sync_mode != XTAL_AUTO)
         {
-            Serial.println("Projector detected as running.");
+            if (shaft_impulse_count > SHAFT_SEGMENT_COUNT)
+            {
+                Serial.println("Projector detected as running.");
 
-            // start the correct timer
-            changeRunMode(sync_mode);
+                // start the correct timer
+                changeRunMode(sync_mode);
 
-            // init the PID
-            myPID.SetMode(MANUAL);
-            pid_output = DAC_INITIAL_VALUE;
-            myPID.Compute();
-            myPID.SetMode(AUTOMATIC);
+                // init the PID
+                myPID.SetMode(MANUAL);
+                pid_output = DAC_INITIAL_VALUE;
+                myPID.Compute();
+                myPID.SetMode(AUTOMATIC);
 
-            // set DAC to initial value
-            dac.setVoltage(DAC_INITIAL_VALUE, false);
+                // set DAC to initial value
+                dac.setVoltage(DAC_INITIAL_VALUE, false);
 
-            // change projector state to running for the FSM
-            projector_state = PROJ_RUNNING;
+                // change projector state to running for the FSM
+                projector_state = PROJ_RUNNING;
+            }
         }
     }
 }

@@ -3726,6 +3726,16 @@
 		)
 		(uuid "87683c02-ec0c-41fd-8bac-180c5b7c3847")
 	)
+	(text "D2 und D8 verbinden"
+		(exclude_from_sim no)
+		(at 48.514 33.274 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "8af50058-b1ac-4b43-af3b-bcfdc5dda42d")
+	)
 	(text "5V Square out"
 		(exclude_from_sim no)
 		(at 181.356 75.184 0)
