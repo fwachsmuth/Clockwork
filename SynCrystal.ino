@@ -102,12 +102,15 @@ const byte ledSlowerYellow = 6; //  -
 const byte ledFasterYellow = 8; //  +
 
 // Timer Variables
+volatile uint32_t timer_pulses = 0;
 volatile uint32_t timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
 volatile uint8_t timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
 int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
+volatile uint32_t last_pulse_timestamp; // Timestamp of the last pulse, used to detect a stop
+
 
 // Shaft Encoder Variables
-volatile uint32_t shaft_impulse_count = 0;
+volatile uint32_t shaft_pulses = 0;
 volatile uint32_t shaft_frames = 0;   // This is the actually advanced frames (pulses / shaft_segment_disc_divider)
 volatile uint8_t shaft_modulus = 0;            // For Modulo in the ISR, to compensate the multiple pulses per revolution
 volatile bool new_shaft_impulse_available = false;
@@ -293,7 +296,10 @@ void loop()
 {
     static long local_timer_frames = 0;    // for atomic reads
     static long local_shaft_frames = 0;    // for atomic reads
+    static long local_timer_pulses = 0;    // for atomic reads
+    static long local_shaft_pulses = 0;    // for atomic reads
     static long last_pulse_difference = 0; // Stores the last output difference. )Just used to limit the printf output)
+    static long current_frame_difference = 0;
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
     static uint8_t button, last_button = BTTN_NONE;
@@ -312,46 +318,68 @@ void loop()
     }
     else if (projector_state == PROJ_RUNNING)
     {
+        // leave out the if to check if both ISRs updated yet. Maybe it doesn't matter.
+    if (shaft_frame_count_updated && timer_frame_count_updated)
+    {
+
+        noInterrupts();
+        local_timer_pulses = timer_pulses;
+        local_shaft_pulses = shaft_pulses;
+        interrupts();
+
+        shaft_frame_count_updated = false;
+        timer_frame_count_updated = false;
+
+        current_pulse_difference = local_timer_pulses / timer_factor - local_shaft_pulses;
+
+        unsigned long current_time = millis(); // might make this micros()?
+        last_pulse_timestamp = current_time;
+
+        pid_input = current_pulse_difference;
+        myPID.Compute();
+        new_dac_value = pid_output;
+        dac.setVoltage(new_dac_value, false);
+    }
+
         // Compute Error and feed PID and DAC
         // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
 
-        if (shaft_frame_count_updated && timer_frame_count_updated)
-        {
-            // read the counters atomically
-            noInterrupts();
-            local_timer_frames = timer_frames; // To Do: Could directly use current_pulse_difference here?
-            local_shaft_frames = shaft_frames;
-            interrupts();
+        // if (shaft_frame_count_updated && timer_frame_count_updated)
+        // {
+        //     // read the counters atomically
+        //     noInterrupts();
+        //     local_timer_frames = timer_frames; // To Do: Could directly use current_frame_difference here?
+        //     local_shaft_frames = shaft_frames;
+        //     interrupts();
 
 
-            // mark these counts as read
-            shaft_frame_count_updated = false;
-            timer_frame_count_updated = false;
+        //     // mark these counts as read
+        //     shaft_frame_count_updated = false;
+        //     timer_frame_count_updated = false;
 
-            current_pulse_difference = local_timer_frames - local_shaft_frames;
-            // Serial.print(F("local_timer_frames: "));
-            // Serial.print(local_timer_frames);
-            // Serial.print(F(" - "));
-            // Serial.print(F("local_shaft_frames: "));
-            // Serial.println(local_shaft_frames);
+        //     current_frame_difference = local_timer_frames - local_shaft_frames;
+        //     // Serial.print(F("local_timer_frames: "));
+        //     // Serial.print(local_timer_frames);
+        //     // Serial.print(F(" - "));
+        //     // Serial.print(F("local_shaft_frames: "));
+        //     // Serial.println(local_shaft_frames);
 
-            //temp debug code
-            unsigned long current_time = millis();
-            // unsigned long time_since_last = current_time - last_frame_timestamp;
-            // Serial.print(F("Time since last frame (ms): "));
-            // Serial.println(time_since_last);
-            last_frame_timestamp = current_time;
+        //     //temp debug code
+        //     unsigned long current_time = millis();
+        //     // unsigned long time_since_last = current_time - last_frame_timestamp;
+        //     // Serial.print(F("Time since last frame (ms): "));
+        //     // Serial.println(time_since_last);
+        //     last_frame_timestamp = current_time;
 
-
-            // should this be further down in the if block? Doesn't seem so
-            pid_input = current_pulse_difference;
-            myPID.Compute();
-            new_dac_value = pid_output;
-            dac.setVoltage(new_dac_value, false);
-        }
+        //     // should this be further down in the if block? Doesn't seem so
+        //     pid_input = current_frame_difference;
+        //     myPID.Compute();
+        //     new_dac_value = pid_output;
+        //     dac.setVoltage(new_dac_value, false);
+        // }
 
         // Detect if we have are > half a frame off and light the red LED
-        if (current_pulse_difference < -6 || current_pulse_difference > 6)
+        if (current_frame_difference < -6 || current_frame_difference > 6)
         {
             digitalWrite(LED_RED_PIN, HIGH);
         }
@@ -363,31 +391,39 @@ void loop()
         // Debug output
         if (current_pulse_difference != last_pulse_difference)
         {
-            // if (millis() % 1000 < 10)
-            // {
+            if (millis() % 1000 < 10)
+            {
                 Serial.print(F("Mode: "));
                 Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Error: "));
                 Serial.print(current_pulse_difference);
                 Serial.print(F(", DAC: "));
                 Serial.println(new_dac_value);
-                // Serial.print(" Timer-Frames: ");
-                // Serial.print(timer_frames);
-                // Serial.print(", Shaft-Frames: ");
-                // Serial.println(shaft_frames);
-            // }
+
+                // Serial.print(F(" Current Pulse Difference: "));
+                // Serial.print(current_pulse_difference);
+                // Serial.print(F(" - Last Pulse Difference: "));
+                // Serial.println(last_pulse_difference);
+                }
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
+
+            Serial.print(" Timer-Pulses: ");
+            Serial.print(local_timer_pulses / timer_factor);
+            Serial.print(", Shaft-Pulses: ");
+            Serial.println(local_shaft_pulses);
         }
 
         // Stop detection
-        if (hasStoppedSince(last_frame_timestamp, 1000))
+        if (hasStoppedSince(last_pulse_timestamp, 1000))
         {
             projector_state = PROJ_IDLE; // Projector is stopped
             Serial.println(F("[DEBUG] Projector stopped."));
             stopTimer1();
             timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
-            shaft_impulse_count = 0;
+            // timer_pulse_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
+            shaft_pulses = 0;
+            timer_pulses = 0;
             // Reset DAC and PID
             dac.setVoltage(DAC_INITIAL_VALUE, false); // reset the DAc to compensate for wound-up break corrections
             myPID.SetMode(MANUAL);
@@ -585,13 +621,13 @@ void handleButtonTap(Button2 &btn)
         if (btn == dropBackButton)
         {
             noInterrupts();
-            shaft_impulse_count += SHAFT_SEGMENT_COUNT;
+            shaft_pulses += SHAFT_SEGMENT_COUNT;
             interrupts();
         }
         else if (btn == catchUpButton)
         {
             noInterrupts();
-            shaft_impulse_count -= SHAFT_SEGMENT_COUNT;
+            shaft_pulses -= SHAFT_SEGMENT_COUNT;
             interrupts();
         }
     }
@@ -612,7 +648,7 @@ void selectNextMode(Button2 &btn)
     float next_freq;
 
     noInterrupts();
-    long local_shaft_impulse_count = shaft_impulse_count;
+    long local_shaft_impulse_count = shaft_pulses;
     interrupts();
 
     Serial.print(F("Average fps since start: "));
@@ -716,7 +752,7 @@ bool setupTimer1forFps(byte desiredFps)
 void onShaftImpulseISR()
 {
     // Expose the news
-    shaft_impulse_count++;
+    shaft_pulses++;
     new_shaft_impulse_available = true;
 
     if (shaft_modulus == 0)
@@ -729,7 +765,9 @@ void onShaftImpulseISR()
 }
 
 ISR(TIMER1_COMPA_vect)
-{
+{   
+    timer_pulses++;
+
     if (timer_modulus == 0)
     {
         timer_frames++;
