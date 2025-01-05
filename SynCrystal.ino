@@ -1,7 +1,6 @@
 /* Todo
 
 Test controlling pulse count, not framecount!
-Fix projector stop detecttion to use micros again
 
 Move controller and stop detection from loop intofunctions
 
@@ -332,11 +331,12 @@ void loop()
             local_shaft_pulses = shaft_pulses;
             interrupts();
 
+            // Compute Error and feed PID and DAC
+            // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
             current_pulse_difference = local_timer_pulses - local_shaft_pulses;
 
             unsigned long current_time = micros(); // might make this micros()?
             last_pulse_timestamp = current_time;
-            // Serial.println(last_pulse_timestamp);
 
             pid_input = current_pulse_difference;
             myPID.Compute();
@@ -347,42 +347,6 @@ void loop()
             timer_pulse_count_updated = false;
         }
 
-        // Compute Error and feed PID and DAC
-        // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
-
-        // if (shaft_frame_count_updated && timer_frame_count_updated)
-        // {
-        //     // read the counters atomically
-        //     noInterrupts();
-        //     local_timer_frames = timer_frames; // To Do: Could directly use current_frame_difference here?
-        //     local_shaft_frames = shaft_frames;
-        //     interrupts();
-
-
-        //     // mark these counts as read
-        //     shaft_frame_count_updated = false;
-        //     timer_frame_count_updated = false;
-
-        //     current_frame_difference = local_timer_frames - local_shaft_frames;
-        //     // Serial.print(F("local_timer_frames: "));
-        //     // Serial.print(local_timer_frames);
-        //     // Serial.print(F(" - "));
-        //     // Serial.print(F("local_shaft_frames: "));
-        //     // Serial.println(local_shaft_frames);
-
-        //     //temp debug code
-        //     unsigned long current_time = millis();
-        //     // unsigned long time_since_last = current_time - last_frame_timestamp;
-        //     // Serial.print(F("Time since last frame (ms): "));
-        //     // Serial.println(time_since_last);
-        //     last_frame_timestamp = current_time;
-
-        //     // should this be further down in the if block? Doesn't seem so
-        //     pid_input = current_frame_difference;
-        //     myPID.Compute();
-        //     new_dac_value = pid_output;
-        //     dac.setVoltage(new_dac_value, false);
-        // }
 
         // Detect if we have are > half a frame off and light the red LED
         if (current_frame_difference < -6 || current_frame_difference > 6)
@@ -451,12 +415,6 @@ void loop()
 
 void measureFrequency()
 {
-    // ignore first revolution
-    // average 3 revolutions
-    // OR: 
-    // average 2 revolutions
-    // take 2nd result
-
     static double sum = 0;
     static int count = 48;
     
@@ -788,16 +746,6 @@ ISR(TIMER1_COMPA_vect)
         timer_modulus = 0; // Reset the counter
         timer_pulse_count_updated = true;
     }
-
-    // timer_pulses++;
-
-    // if (timer_modulus == 0)
-    // {
-    //     timer_frames++;
-    //     timer_frame_count_updated = true;
-    // }
-    // timer_modulus++;
-    // timer_modulus %= SHAFT_SEGMENT_COUNT * timer_factor;
 
     // Dither logic (fixed-point accumulator)
     ditherAccu32 += ditherFrac32;
