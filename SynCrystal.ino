@@ -322,32 +322,22 @@ void loop()
         // Serial.print(F(", Timer: "));
         // Serial.println(timer_pulse_count_updated);
 
-        // // leave out the if to check if both ISRs updated yet. Maybe it doesn't matter.
-        // if (shaft_pulse_count_updated && timer_pulse_count_updated)
-        // {
-            // Serial.println(F("I am in the if. Both pulses have been updated"));
-            noInterrupts();
-            local_timer_pulses = timer_pulses;
-            local_shaft_pulses = shaft_pulses;
-            interrupts();
+        // Serial.println(F("I am in the if. Both pulses have been updated"));
+        noInterrupts();
+        local_timer_pulses = timer_pulses;
+        local_shaft_pulses = shaft_pulses;
+        interrupts();
 
-            // Compute Error and feed PID and DAC
-            // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
-            current_pulse_difference = local_timer_pulses - local_shaft_pulses;
+        // Compute Error and feed PID and DAC
+        // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
+        current_pulse_difference = local_timer_pulses - local_shaft_pulses;
+        
+        // unsigned long current_time = micros(); 
 
-            unsigned long current_time = micros(); // might make this micros()?
-            last_pulse_timestamp = current_time;
-            // Serial.print(F("last pulse time: "));
-            // Serial.println(last_pulse_timestamp);
-
-            pid_input = current_pulse_difference;
-            myPID.Compute();
-            new_dac_value = pid_output;
-            dac.setVoltage(new_dac_value, false);
-
-            // shaft_pulse_count_updated = false;
-            // timer_pulse_count_updated = false;
-        // }
+        pid_input = current_pulse_difference;
+        myPID.Compute();
+        new_dac_value = pid_output;
+        dac.setVoltage(new_dac_value, false);
 
 
         // Detect if we have are > half a frame off and light the red LED
@@ -363,35 +353,27 @@ void loop()
         // Debug output
         if (current_pulse_difference != last_pulse_difference)
         {
-            // if (millis() % 1000 < 10)
-            // {
+            // Throttle the Console Output
+            if (millis() % 500 == 2)
+            {
                 Serial.print(F("Mode: "));
                 Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Error: "));
                 Serial.print(current_pulse_difference);
                 Serial.print(F(", DAC: "));
                 Serial.println(new_dac_value);
+            }
 
-                // Serial.print(F(" Current Pulse Difference: "));
-                // Serial.print(current_pulse_difference);
-                // Serial.print(F(" - Last Pulse Difference: "));
-                // Serial.println(last_pulse_difference);
-                // }
-
-            last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
-
-            // Serial.print(" Timer-Pulses: ");
-            // Serial.print(local_timer_pulses);
-            // Serial.print(", Shaft-Pulses: ");
-            // Serial.println(local_shaft_pulses);
+            last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
         }
 
         // Stop detection
-        if (hasStoppedSince(last_pulse_timestamp, STOP_THRESHOLD))
+        if (shaft_pulse_count_updated) // This is set in the shaft ISR
+            last_pulse_timestamp = micros();
+ 
+         if (hasStoppedSince(last_pulse_timestamp, STOP_THRESHOLD))
         {
-            // Serial.println(last_pulse_timestamp);
-
-            projector_state = PROJ_IDLE; // Projector is stopped
+             projector_state = PROJ_IDLE; // Projector is stopped
             Serial.println(F("[DEBUG] Projector stopped."));
             stopTimer1();
             timer_frame_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
@@ -412,8 +394,16 @@ void loop()
 
             FreqMeasure.end();
         }
+        else 
+        // reset the flag and be ready for another incoming pulse
+        {
+            shaft_pulse_count_updated = false;
+            // 
+        }
     }
 }
+
+
 
 void measureFrequency()
 {
@@ -724,6 +714,7 @@ void onShaftImpulseISR()
 {
     // Expose the news
     shaft_pulses++;
+    
     shaft_pulse_count_updated = true;
     new_shaft_impulse_available = true;
 
