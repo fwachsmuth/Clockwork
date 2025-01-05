@@ -122,9 +122,9 @@ uint8_t projector_speed_switch = 0;  // To track the detected position of the pr
 
 // flags to assure reading only once both ISRs have done their duty
 volatile bool shaft_frame_count_updated;
+volatile bool shaft_pulse_count_updated;
 volatile bool timer_frame_count_updated;
-
-
+volatile bool timer_pulse_count_updated;
 
 // PID stuff
 double pid_setpoint, pid_input, pid_output;
@@ -314,32 +314,38 @@ void loop()
 
     if (projector_state == PROJ_IDLE)
     {
-        checkProjectorRunning();
+        checkProjectorRunningYet();
     }
     else if (projector_state == PROJ_RUNNING)
     {
+        // Serial.print(F("Pulse: "));
+        // Serial.print(shaft_pulse_count_updated);
+        // Serial.print(F(", Timer: "));
+        // Serial.println(timer_pulse_count_updated);
+
         // leave out the if to check if both ISRs updated yet. Maybe it doesn't matter.
-    if (shaft_frame_count_updated && timer_frame_count_updated)
-    {
+        if (shaft_pulse_count_updated && timer_pulse_count_updated)
+        {
+            // Serial.println(F("I am in the if. Both pulses have been updated"));
+            noInterrupts();
+            local_timer_pulses = timer_pulses;
+            local_shaft_pulses = shaft_pulses;
+            interrupts();
 
-        noInterrupts();
-        local_timer_pulses = timer_pulses;
-        local_shaft_pulses = shaft_pulses;
-        interrupts();
+            current_pulse_difference = local_timer_pulses - local_shaft_pulses;
 
-        shaft_frame_count_updated = false;
-        timer_frame_count_updated = false;
+            unsigned long current_time = millis(); // might make this micros()?
+            last_pulse_timestamp = current_time;
+            // Serial.println(last_pulse_timestamp);
 
-        current_pulse_difference = local_timer_pulses / timer_factor - local_shaft_pulses;
+            pid_input = current_pulse_difference;
+            myPID.Compute();
+            new_dac_value = pid_output;
+            dac.setVoltage(new_dac_value, false);
 
-        unsigned long current_time = millis(); // might make this micros()?
-        last_pulse_timestamp = current_time;
-
-        pid_input = current_pulse_difference;
-        myPID.Compute();
-        new_dac_value = pid_output;
-        dac.setVoltage(new_dac_value, false);
-    }
+            shaft_pulse_count_updated = false;
+            timer_pulse_count_updated = false;
+        }
 
         // Compute Error and feed PID and DAC
         // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
@@ -408,20 +414,22 @@ void loop()
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
 
-            Serial.print(" Timer-Pulses: ");
-            Serial.print(local_timer_pulses / timer_factor);
-            Serial.print(", Shaft-Pulses: ");
-            Serial.println(local_shaft_pulses);
+            // Serial.print(" Timer-Pulses: ");
+            // Serial.print(local_timer_pulses);
+            // Serial.print(", Shaft-Pulses: ");
+            // Serial.println(local_shaft_pulses);
         }
 
         // Stop detection
         if (hasStoppedSince(last_pulse_timestamp, 1000))
         {
+            // Serial.println(last_pulse_timestamp);
+
             projector_state = PROJ_IDLE; // Projector is stopped
             Serial.println(F("[DEBUG] Projector stopped."));
             stopTimer1();
-            timer_frame_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
-            // timer_pulse_count_updated = 0; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
+            timer_frame_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
+            timer_pulse_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
             shaft_pulses = 0;
             timer_pulses = 0;
             // Reset DAC and PID
@@ -494,7 +502,7 @@ bool hasStoppedSince(unsigned long start, unsigned long duration)
     return (millis() - start) > duration;
 }
 
-void checkProjectorRunning()
+void checkProjectorRunningYet()
 {
     if (!new_shaft_impulse_available)
         return; // Skip processing if no new data
@@ -716,7 +724,7 @@ bool setupTimer1forFps(byte desiredFps)
         noInterrupts();
         timer_frames = 0;
         // shaft_frames = 0;
-        timer_modulus = 0;
+        // timer_modulus = 0; // This sees to clear the modulus inbetween ISR calls, whyever?
         shaft_modulus = 0; 
         interrupts();
     }
@@ -753,6 +761,7 @@ void onShaftImpulseISR()
 {
     // Expose the news
     shaft_pulses++;
+    shaft_pulse_count_updated = true;
     new_shaft_impulse_available = true;
 
     if (shaft_modulus == 0)
@@ -765,16 +774,30 @@ void onShaftImpulseISR()
 }
 
 ISR(TIMER1_COMPA_vect)
-{   
-    timer_pulses++;
-
-    if (timer_modulus == 0)
-    {
-        timer_frames++;
-        timer_frame_count_updated = true;
-    }
+{
+    // Increment the modulus counter
     timer_modulus++;
-    timer_modulus %= SHAFT_SEGMENT_COUNT * timer_factor;
+    // Serial.println(timer_factor);
+    // Serial.println(timer_modulus);
+
+    // Check if the counter has reached the desired factor
+    if (timer_modulus >= timer_factor)
+    {
+        // Serial.print(F("*** i the ISR if"));
+        timer_pulses++;    // Increment timer_pulses
+        timer_modulus = 0; // Reset the counter
+        timer_pulse_count_updated = true;
+    }
+
+    // timer_pulses++;
+
+    // if (timer_modulus == 0)
+    // {
+    //     timer_frames++;
+    //     timer_frame_count_updated = true;
+    // }
+    // timer_modulus++;
+    // timer_modulus %= SHAFT_SEGMENT_COUNT * timer_factor;
 
     // Dither logic (fixed-point accumulator)
     ditherAccu32 += ditherFrac32;
