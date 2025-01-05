@@ -334,7 +334,7 @@ void loop()
 
             current_pulse_difference = local_timer_pulses - local_shaft_pulses;
 
-            unsigned long current_time = millis(); // might make this micros()?
+            unsigned long current_time = micros(); // might make this micros()?
             last_pulse_timestamp = current_time;
             // Serial.println(last_pulse_timestamp);
 
@@ -397,8 +397,8 @@ void loop()
         // Debug output
         if (current_pulse_difference != last_pulse_difference)
         {
-            if (millis() % 1000 < 10)
-            {
+            // if (millis() % 1000 < 10)
+            // {
                 Serial.print(F("Mode: "));
                 Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Error: "));
@@ -410,7 +410,7 @@ void loop()
                 // Serial.print(current_pulse_difference);
                 // Serial.print(F(" - Last Pulse Difference: "));
                 // Serial.println(last_pulse_difference);
-                }
+                // }
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_difference
 
@@ -421,7 +421,7 @@ void loop()
         }
 
         // Stop detection
-        if (hasStoppedSince(last_pulse_timestamp, 1000))
+        if (hasStoppedSince(last_pulse_timestamp, STOP_THRESHOLD))
         {
             // Serial.println(last_pulse_timestamp);
 
@@ -499,7 +499,7 @@ bool hasStoppedSince(unsigned long start, unsigned long duration)
     // Serial.print(" = ");
     // Serial.println(millis() - start);
 
-    return (millis() - start) > duration;
+    return (micros() - start) > duration;
 }
 
 void checkProjectorRunningYet()
