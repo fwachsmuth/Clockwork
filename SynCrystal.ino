@@ -322,9 +322,9 @@ void loop()
         // Serial.print(F(", Timer: "));
         // Serial.println(timer_pulse_count_updated);
 
-        // leave out the if to check if both ISRs updated yet. Maybe it doesn't matter.
-        if (shaft_pulse_count_updated && timer_pulse_count_updated)
-        {
+        // // leave out the if to check if both ISRs updated yet. Maybe it doesn't matter.
+        // if (shaft_pulse_count_updated && timer_pulse_count_updated)
+        // {
             // Serial.println(F("I am in the if. Both pulses have been updated"));
             noInterrupts();
             local_timer_pulses = timer_pulses;
@@ -337,15 +337,17 @@ void loop()
 
             unsigned long current_time = micros(); // might make this micros()?
             last_pulse_timestamp = current_time;
+            // Serial.print(F("last pulse time: "));
+            // Serial.println(last_pulse_timestamp);
 
             pid_input = current_pulse_difference;
             myPID.Compute();
             new_dac_value = pid_output;
             dac.setVoltage(new_dac_value, false);
 
-            shaft_pulse_count_updated = false;
-            timer_pulse_count_updated = false;
-        }
+            // shaft_pulse_count_updated = false;
+            // timer_pulse_count_updated = false;
+        // }
 
 
         // Detect if we have are > half a frame off and light the red LED
@@ -451,11 +453,11 @@ void initializeButton(Button2 &button, byte pin)
 
 bool hasStoppedSince(unsigned long start, unsigned long duration)
 {
-    // Serial.print(millis());
+    // Serial.print(micros());
     // Serial.print(" - ");
     // Serial.print(start);
     // Serial.print(" = ");
-    // Serial.println(millis() - start);
+    // Serial.println(micros() - start);
 
     return (micros() - start) > duration;
 }
@@ -513,6 +515,9 @@ void checkProjectorRunningYet()
             // Determine the mode based on the detected frequency
             changeSpeedMode(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? XTAL_18 : XTAL_24);
             projector_speed_switch = (detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? 18 : 24);
+
+            // Init the pulse timer to not lose those first frames
+            timer_pulses = freq_count;
 
             // Update projector state
             projector_state = PROJ_RUNNING;
@@ -735,13 +740,10 @@ ISR(TIMER1_COMPA_vect)
 {
     // Increment the modulus counter
     timer_modulus++;
-    // Serial.println(timer_factor);
-    // Serial.println(timer_modulus);
 
     // Check if the counter has reached the desired factor
     if (timer_modulus >= timer_factor)
     {
-        // Serial.print(F("*** i the ISR if"));
         timer_pulses++;    // Increment timer_pulses
         timer_modulus = 0; // Reset the counter
         timer_pulse_count_updated = true;
