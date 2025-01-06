@@ -1,12 +1,11 @@
 /* Todo
 
 - New Bugs: 
-- Cannot restart after a detected stop
+- Cannot start correctly in a manual selected mode
 - updated_time_pulses not written back yet since they cause a "stop" deetcted !?
 - Not sure if entering Auto/None works correctly... pretzel brain
 - Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
 - Decrement Shaft Impulses after detected shaft noise!
-- Cannot start in a manual selected mode
 
 
 Pending Bugs for Sepmag Sync:
@@ -510,63 +509,62 @@ void checkProjectorRunningYet()
 
     projector_start_millis = millis(); // Track the start time of the projector running
 
-    if (speed_mode == XTAL_AUTO)
+    double freq_sum = 0;
+    int freq_count = 0;
+    unsigned long last_available_freqMeasure_time = micros(); // Track the last time data was available
+
+    FreqMeasure.begin();
+
+    while (freq_count <= 47)    // collect 48 samples (4 frames)
     {
-        double freq_sum = 0;
-        int freq_count = 0;
-        unsigned long last_available_freqMeasure_time = micros(); // Track the last time data was available
-
-        FreqMeasure.begin();
-
-        while (freq_count <= 47)    // collect 48 samples
+        if (FreqMeasure.available())
         {
-            if (FreqMeasure.available())
-            {
-                // Average several readings together
-                freq_sum += FreqMeasure.read();
-                freq_count++;
-                /*
-                Serial.print(freq_count);
-                Serial.print(": ");
-                Serial.println(freq_sum);
-                */
+            // Average several readings together
+            freq_sum += FreqMeasure.read();
+            freq_count++;
+            /* Debug Code
+            Serial.print(freq_count);
+            Serial.print(": ");
+            Serial.println(freq_sum);
+            */
 
-                last_available_freqMeasure_time = micros(); // Update the last available time
-            }
-
-            // Check for timeout
-            if (micros() - last_available_freqMeasure_time > STOP_THRESHOLD)
-            {
-                Serial.println(F("Shaft Noise ignored."));
-                break; // Exit the loop
-            }
+            last_available_freqMeasure_time = micros(); // Update the last available time
         }
 
-        FreqMeasure.end();
-
-        // Only process if a full set of data was collected
-        if (freq_count >= 48)
+        // Check for timeout
+        if (micros() - last_available_freqMeasure_time > STOP_THRESHOLD)
         {
-            float detected_frequency = FreqMeasure.countToFrequency(freq_sum / freq_count);
-            Serial.print(F("Detected frequency: "));
-            Serial.println(detected_frequency / SHAFT_SEGMENT_COUNT);
+            Serial.println(F("Shaft Noise ignored."));
+            break; // Exit the loop
+        }
+    }
 
-            // Determine the mode based on the detected frequency
+    FreqMeasure.end();
+
+    // Only process if a full set of data was collected
+    if (freq_count >= 48)
+    {
+        float detected_frequency = FreqMeasure.countToFrequency(freq_sum / freq_count);
+        Serial.print(F("Detected frequency: "));
+        Serial.println(detected_frequency / SHAFT_SEGMENT_COUNT);
+
+        if (speed_mode == XTAL_AUTO)
+        { // Determine the mode based on the detected frequency
             changeSpeedMode(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? XTAL_18 : XTAL_24);
             projector_speed_switch = (detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? 18 : 24);
-
-            // Init the pulse timer to not lose those first frames
-            timer_pulses = freq_count;
-
-            // Update projector state
-            projector_state = PROJ_RUNNING;
         }
+        // Init the pulse timer to not lose those first frames
+        timer_pulses = freq_count;
 
-        // Reset variables
-        freq_sum = 0;
-        freq_count = 0;
+        // Update projector state
+        projector_state = PROJ_RUNNING;
     }
+
+    // Reset variables
+    freq_sum = 0;
+    freq_count = 0;
 }
+
 
 void selectNextMode(Button2 &btn)
 {
@@ -601,7 +599,7 @@ void selectNextMode(Button2 &btn)
         case XTAL_AUTO:
             // Since
             Serial.print(F("Estimated fps so far (for previous_freq):"));
-            Serial.println((millis() - projector_start_millis) / local_shaft_pulses / SHAFT_SEGMENT_COUNT, 2);
+            Serial.println((float)(millis() - projector_start_millis) / local_shaft_pulses / SHAFT_SEGMENT_COUNT, 2);
             Serial.print(F("Proj. Speed Switch (to): "));
             Serial.println(projector_speed_switch);
             break;
