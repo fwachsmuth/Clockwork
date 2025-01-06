@@ -1,7 +1,18 @@
 /* Todo
 
-- New Bugs: 
-- Cannot start correctly in a manual selected mode
+- New Bugs:
+- Remaining pid-Errors seem to add up on speed changes?
+- Cannot start correctly in a manual selected mode: somehow the DAC is pulled to 0
+
+
+    Mode: AUTO, Error: 1, DAC: 1415
+    [DEBUG] Projector stopped.
+    PID Reset to initial DAC value: 1500.00
+    Shaft Noise ignored.
+    timer_pulses * next_freq / (millis() - proojector_start_millis) / 1000))
+->  From 0 Pulses to 0 * 16.67 / (1/12) / (2016)/1000) = nan
+->  My calculation: 0 <-
+    XTAL_16_2_3
 - updated_time_pulses not written back yet since they cause a "stop" deetcted !?
 - Not sure if entering Auto/None works correctly... pretzel brain
 - Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
@@ -392,15 +403,16 @@ void loop()
         if (current_pulse_difference != last_pulse_difference)
         {
             // Uncomment to throttle the Console Output
-            if (millis() % 100 == 1)
-            {
+            // if (millis() % 100 == 1) {
                 Serial.print(F("Mode: "));
                 Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Error: "));
                 Serial.print(current_pulse_difference);
                 Serial.print(F(", DAC: "));
-                Serial.println(new_dac_value);
-            
+                Serial.print(new_dac_value);
+                Serial.print(F(", En: "));
+                Serial.println(digitalRead(ENABLE_PIN));
+
                 /* Add this if PID-Tuning Pots are connected
             Serial.print(" - P ");
             Serial.print(p_pot);
@@ -409,7 +421,7 @@ void loop()
             Serial.print("  D ");
             Serial.println(d_pot);
             */
-            }
+            // }
         }
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
@@ -430,6 +442,11 @@ void loop()
             timer_pulse_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
             shaft_pulses = 0;
             timer_pulses = 0;
+
+            current_pulse_difference = 0;
+            local_timer_pulses = 0;
+            local_shaft_pulses = 0;
+
             // Reset DAC and PID
             dac.setVoltage(DAC_INITIAL_VALUE, false); // reset the DAc to compensate for wound-up break corrections
             myPID.SetMode(MANUAL);
@@ -545,7 +562,7 @@ void checkProjectorRunningYet()
     if (freq_count >= 48)
     {
         float detected_frequency = FreqMeasure.countToFrequency(freq_sum / freq_count);
-        Serial.print(F("Detected frequency: "));
+        Serial.print(F("Detected freq (FreqMeasure): "));
         Serial.println(detected_frequency / SHAFT_SEGMENT_COUNT);
 
         if (speed_mode == XTAL_AUTO)
@@ -613,39 +630,42 @@ void selectNextMode(Button2 &btn)
             break;
     }
 
-    // Update the timer counter to the new truth
-    // Example: After 10 Sec from 18 to 24 fps: -> 180 / 18 * 24 = 240
-    //                                           = 180 * 24 / 18
-    //                                           so
+    if (projector_state == PROJ_RUNNING)  // This is "SEMAPG Mode" where we try to catch up to the new sync point
+    {
+        // Update the timer counter to the new truth
+        // Example: After 10 Sec from 18 to 24 fps: -> 180 / 18 * 24 = 240
+        //                                           = 180 * 24 / 18
+        //                                           so
 
-    // Debug Code
-    // Serial.println(F("timer_pulses * next_freq / (millis() - proojector_start_millis) / 1000))"));
-    // Serial.print(F("From "));
-    // Serial.print(local_timer_pulses);
-    // Serial.print(F(" Pulses to "));
-    // Serial.print(local_timer_pulses);
-    // Serial.print(F(" * "));
-    // Serial.print(next_freq);
-    // Serial.print(F(" / ("));
-    // Serial.print(local_shaft_pulses);
-    // Serial.print(F("/"));
-    // Serial.print(F("12) / ("));
-    // Serial.print(millis() - projector_start_millis);
-    // Serial.print(F(")/1000) = "));
-    // Serial.println(local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000)));
+        // Debug Code
+        // Serial.println(F("timer_pulses * next_freq / (millis() - proojector_start_millis) / 1000))"));
+        // Serial.print(F("From "));
+        // Serial.print(local_timer_pulses);
+        // Serial.print(F(" Pulses to "));
+        // Serial.print(local_timer_pulses);
+        // Serial.print(F(" * "));
+        // Serial.print(next_freq);
+        // Serial.print(F(" / ("));
+        // Serial.print(local_shaft_pulses);
+        // Serial.print(F("/"));
+        // Serial.print(F("12) / ("));
+        // Serial.print(millis() - projector_start_millis);
+        // Serial.print(F(")/1000) = "));
+        // Serial.println(local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000)));
 
-    uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000));
-   
-    // This should be a bit more precise, but actually leads to results that apepar rather off. Not sure yet why
-    // uint32_t fuckdated_timer_pulses = (local_timer_pulses * next_freq * (millis() - projector_start_millis)) / (local_shaft_pulses * 1000 / SHAFT_SEGMENT_COUNT);
+        uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000));
+    
+        // This should be a bit more precise, but actually leads to results that apepar rather off. Not sure yet why
+        // uint32_t fuckdated_timer_pulses = (local_timer_pulses * next_freq * (millis() - projector_start_millis)) / (local_shaft_pulses * 1000 / SHAFT_SEGMENT_COUNT);
 
-    Serial.print(F("My calculation: "));
-    Serial.println(updated_timer_pulses);
- 
-    noInterrupts();
-    timer_pulses = updated_timer_pulses;
-    timer_frame_count_updated = true;
-    interrupts();
+        Serial.print(F("My calculation: "));
+        Serial.println(updated_timer_pulses);
+    
+        noInterrupts();
+        timer_pulses = updated_timer_pulses;
+        timer_frame_count_updated = true;
+        interrupts();
+    }
 
     changeSpeedMode(speed_mode);
 }
@@ -653,7 +673,6 @@ void selectNextMode(Button2 &btn)
 void changeSpeedMode(byte run_mode)
 {
     // connect or disconnect the DAC
-    digitalWrite(ENABLE_PIN, (run_mode == XTAL_NONE) ? LOW : HIGH);
 
     switch (run_mode)
     {
@@ -694,6 +713,8 @@ void changeSpeedMode(byte run_mode)
         Serial.println(F("Unknown Mode"));
         break;
     }
+ 
+    digitalWrite(ENABLE_PIN, (run_mode == XTAL_NONE) ? LOW : HIGH);
 }
 
 void handleButtonTap(Button2 &btn)
