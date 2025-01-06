@@ -1,12 +1,18 @@
 /* Todo
 
+- New Bugs: 
+- Cannot restart after a detected stop
+- updated_time_pulses not written back yet since they cause a "stop" deetcted !?
+- Not sure if entering Auto/None works correctly... pretzel brain
+- Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
+- Decrement Shaft Impulses after detected shaft noise!
+- Cannot start in a manual selected mode
 
-Move controller and stop detection from loop into functions
 
 Pending Bugs for Sepmag Sync:
-- Estimated fps so far (for previous_freq) seems wrong (low)
 - Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
 - rundetection does not kick in when starting after manual mode selection
+
 
 Hardware
 - add IR emitter
@@ -15,41 +21,16 @@ Hardware
 - Reconfigure OpAmp offset to allow tha DAC to halt the motor
 
 Code
-- Implement 3 catch-up modes for speed changes while running:
-    - A:  Convert timer_pulses to new speed: Projector will catch up until sync is reached again.
-          Stopping the projector resets the counters.
-        + allows speed corrections without finding the start mark again
-        + good for sepmag
-        - projector might "run" of "crawl" for quite some time
-    Timecode conversion is possible.
-
-    Todo:
-    √ Keep prevvious speed_mode around
-    - capture millis when projector started running (for Auto -> Fixed transition)
-
-
+- Move controller and stop detection from loop into functions
     - B:  Forget any previous errors and start fresh
         + allws for quick speed changes
         + ideal mode for use as "Peaceman's Box" (ESS out mode)
         + good for telecine (which could also just restartm though)
         - loses sync with any sepmag audio
     Timecode would restart at 0:00:00.00
-
-    - C: keep old errors around and correct them too
-         Shaft and Pulse totals will always be in sync, speed changes cause no pulse loss
-        • currently implemented already
-        • not very meaningful though?
-    Timecode conversion is possible, but pointless (since not in sync with virtual sepmag time)
-
-Bug:
-- Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
-- Decrement Shaft Impulses after detected shaft noise!
-- Cannot start in a manual selected mode
-
 - Use the display
 - Review volatile vars (only for variables modified inside ISRs and used outside)
 - Reset Counters? (long press both buttons?)
-- consider an adaptive PID
 - Rangieren (langsam)
 - "start the audio" IR
 - Clamp the PID output to avoid halting the motor
@@ -58,7 +39,6 @@ Irgendwann
 - Fernstart/stop support
 - ESS support
 - Add Realtime Timecode
-
 
 */
 
