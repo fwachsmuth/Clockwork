@@ -85,6 +85,9 @@ const byte SHAFT_PULSE_PIN = 2;
 const byte LED_RED_PIN = 5;
 const byte LED_GREEN_PIN = 7;
 const byte ENABLE_PIN = 9;
+const byte P_PIN = A6;
+const byte I_PIN = A7;
+const byte D_PIN = A3;
 
 const byte LEFT_BTTN_PIN = 10;
 const byte RIGHT_BTTN_PIN = 13;
@@ -130,11 +133,11 @@ double pid_setpoint, pid_input, pid_output;
 double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0; // old PID values for frame based controlling
 
 // Adaptive PID
-double cons_Kp = 20, cons_Ki = 8, cons_Kd = 0; // old PID values for frame based controlling
-double agg_Kp = 50, agg_Ki = 10, agg_Kd = 0; // old PID values for frame based controlling
+// double cons_Kp = 20, cons_Ki = 8, cons_Kd = 0; // old PID values for frame based controlling
+// double agg_Kp = 50, agg_Ki = 10, agg_Kd = 0; // old PID values for frame based controlling
 
 // PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
-PID myPID(&pid_input, &pid_output, &pid_setpoint, agg_Kp, agg_Ki, agg_Kd, REVERSE);
+PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
 // Instantiate the DAC
 Adafruit_MCP4725 dac;
@@ -275,6 +278,10 @@ void setup()
     pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
     pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
 
+    pinMode(P_PIN, INPUT);
+    pinMode(I_PIN, INPUT);
+    pinMode(D_PIN, INPUT);
+
     attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
@@ -314,6 +321,40 @@ void loop()
     static long last_pid_update_millis;
     static long current_pid_update_millis;
 
+    // read the pots
+
+    // Read the potentiometer values
+    uint16_t p_pot = analogRead(P_PIN) >> 1;
+    // delayMicroseconds(10); // Short delay (adjust if needed)
+    uint16_t i_pot = analogRead(I_PIN) >> 1;
+    // delayMicroseconds(10); // Short delay (adjust if needed)
+    uint16_t d_pot = analogRead(D_PIN) >> 4;
+    // delayMicroseconds(10); // Short delay (adjust if needed)
+
+    // Variables to track previous values
+    static uint16_t last_p_pot = 0;
+    static uint16_t last_i_pot = 0;
+    static uint16_t last_d_pot = 0;
+
+    // Check for changes and print if any of the values have changed
+    if (p_pot != last_p_pot || i_pot != last_i_pot || d_pot != last_d_pot)
+    {
+        // Serial.print("P: ");
+        // Serial.print(p_pot);
+        // Serial.print("   I: ");
+        // Serial.print(i_pot);
+        // Serial.print("   D: ");
+        // Serial.println(d_pot);
+
+        // Update the last values
+        last_p_pot = p_pot;
+        last_i_pot = i_pot;
+        last_d_pot = d_pot;
+    
+        // Update the PID with new values
+        myPID.SetTunings((double)p_pot, (double)i_pot, (double)d_pot);
+    }
+
     // Poll the buttons
     leftButton.loop();
     rightButton.loop();
@@ -349,16 +390,16 @@ void loop()
 
 
         // Adaptive PID
-        double gap = abs(pid_setpoint - pid_input); // distance away from setpoint
-        if (gap < 10)
-        { // we're close to setpoint, use conservative tuning parameters
-            myPID.SetTunings(cons_Kp, cons_Ki, cons_Kd);
-        }
-        else
-        {
-            // we're far from setpoint, use aggressive tuning parameters
-            myPID.SetTunings(agg_Kp, agg_Ki, agg_Kd);
-        }
+        // double gap = abs(pid_setpoint - pid_input); // distance away from setpoint
+        // if (gap < 10)
+        // { // we're close to setpoint, use conservative tuning parameters
+        //     myPID.SetTunings(cons_Kp, cons_Ki, cons_Kd);
+        // }
+        // else
+        // {
+        //     // we're far from setpoint, use aggressive tuning parameters
+        //     myPID.SetTunings(agg_Kp, agg_Ki, agg_Kd);
+        // }
 
         pid_input = current_pulse_difference;
         myPID.Compute();
@@ -377,9 +418,9 @@ void loop()
         }
 
         // Debug output
-        if (new_dac_value != last_dac_value)
+     // if (new_dac_value != last_dac_value)
      // if (current_pulse_difference != last_pulse_difference)
-            {
+          // {
                 // Throttle the Console Output
                 // if (millis() % 100 == 1)
                 // {
@@ -388,12 +429,19 @@ void loop()
                 Serial.print(F(", Error: "));
                 Serial.print(current_pulse_difference);
                 Serial.print(F(", DAC: "));
-                Serial.println(new_dac_value);
-            // }
+                
+                Serial.print(new_dac_value);
+                Serial.print(" - P ");
+                Serial.print(p_pot);
+                Serial.print("  I ");
+                Serial.print(i_pot);
+                Serial.print("  D ");
+                Serial.println(d_pot);
+                // }
 
-            last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
-            last_dac_value = new_dac_value;
-            }
+                last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
+                last_dac_value = new_dac_value;
+            // }
 
         // Stop detection
         if (shaft_pulse_count_updated) // This is set in the shaft ISR
