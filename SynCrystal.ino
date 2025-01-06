@@ -53,7 +53,7 @@ Irgendwann
 
 // projector specific constants
 const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
-const unsigned long STOP_THRESHOLD = 15000; // microseconds until a stop will be detected
+const unsigned long STOP_THRESHOLD = 25000; // microseconds until a stop will be detected
 const unsigned long SAVE_THRESHOLD = 10000; // ms until a stable DAC value will be considered as new EPROM default
 constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Window. We use 12 to capture one entire shaft revolution
 
@@ -388,12 +388,12 @@ void loop()
         }
 
         // Debug output
-        if (new_dac_value != last_dac_value)
-     // if (current_pulse_difference != last_pulse_difference)
+     // if (new_dac_value != last_dac_value)
+        if (current_pulse_difference != last_pulse_difference)
         {
             // Uncomment to throttle the Console Output
-            // if (millis() % 100 == 1)
-            //{
+            if (millis() % 100 == 1)
+            {
                 Serial.print(F("Mode: "));
                 Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Error: "));
@@ -409,7 +409,7 @@ void loop()
             Serial.print("  D ");
             Serial.println(d_pot);
             */
-            //}
+            }
         }
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
@@ -643,8 +643,8 @@ void selectNextMode(Button2 &btn)
     Serial.println(updated_timer_pulses);
  
     noInterrupts();
-    // timer_pulses = updated_timer_pulses;
-    // timer_frame_count_updated = true;
+    timer_pulses = updated_timer_pulses;
+    timer_frame_count_updated = true;
     interrupts();
 
     changeSpeedMode(speed_mode);
