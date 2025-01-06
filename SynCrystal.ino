@@ -365,6 +365,8 @@ void loop()
         local_shaft_pulses = shaft_pulses;
         interrupts();
 
+
+
         // Compute Error and feed PID and DAC
         current_pulse_difference = local_timer_pulses - local_shaft_pulses;
 
@@ -403,15 +405,17 @@ void loop()
         if (current_pulse_difference != last_pulse_difference)
         {
             // Uncomment to throttle the Console Output
-            // if (millis() % 100 == 1) {
+            if (millis() % 100 == 1) {
                 Serial.print(F("Mode: "));
                 Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Error: "));
                 Serial.print(current_pulse_difference);
                 Serial.print(F(", DAC: "));
                 Serial.print(new_dac_value);
-                Serial.print(F(", En: "));
-                Serial.println(digitalRead(ENABLE_PIN));
+                Serial.print(F(", timer: "));
+                Serial.print(timer_pulses);
+                Serial.print(F(", shaft: "));
+                Serial.println(shaft_pulses);
 
                 /* Add this if PID-Tuning Pots are connected
             Serial.print(" - P ");
@@ -421,7 +425,7 @@ void loop()
             Serial.print("  D ");
             Serial.println(d_pot);
             */
-            // }
+            }
         }
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
@@ -575,13 +579,14 @@ void checkProjectorRunningYet()
 
         // Update projector state
         projector_state = PROJ_RUNNING;
+        setupTimer1forFps(speed_mode);
     }
 
     // Reset variables
     freq_sum = 0;
     freq_count = 0;
+    
 }
-
 
 void selectNextMode(Button2 &btn)
 {
