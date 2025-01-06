@@ -85,9 +85,11 @@ const byte SHAFT_PULSE_PIN = 2;
 const byte LED_RED_PIN = 5;
 const byte LED_GREEN_PIN = 7;
 const byte ENABLE_PIN = 9;
-const byte P_PIN = A6;
-const byte I_PIN = A7;
-const byte D_PIN = A3;
+
+// Use this for PID tuning with Pots
+// const byte P_PIN = A6;
+// const byte I_PIN = A7;
+// const byte D_PIN = A3;
 
 const byte LEFT_BTTN_PIN = 10;
 const byte RIGHT_BTTN_PIN = 13;
@@ -130,24 +132,11 @@ volatile bool timer_pulse_count_updated;
 
 // PID stuff
 double pid_setpoint, pid_input, pid_output;
-double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0; // old PID values for frame based controlling
+double pid_Kp = 30, pid_Ki = 50, pid_Kd = 0; // old PID values for frame based controlling
 
 // Adaptive PID
 // double cons_Kp = 20, cons_Ki = 8, cons_Kd = 0; // old PID values for frame based controlling
 // double agg_Kp = 50, agg_Ki = 10, agg_Kd = 0; // old PID values for frame based controlling
-
-// PID Analyse
-// Variablen für die Analyse
-long prev_value = 0;
-long max_value = LONG_MIN;
-long min_value = LONG_MAX;
-bool is_rising = true;
-unsigned long last_transition_time = 0;
-unsigned long current_time = 0;
-long smoothed_difference = 0;
-const int smoothing_factor = 5;                // Anzahl der Werte für Glättung
-const unsigned long MIN_CYCLE_LENGTH_MS = 500; // Nur Schwingungen > 0,5 Sekunden
-const long MIN_AMPLITUDE = 4;                  // Nur Schwingungen mit Amplitude >= 4
 
 // PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
@@ -291,9 +280,10 @@ void setup()
     pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
     pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
 
-    pinMode(P_PIN, INPUT);
-    pinMode(I_PIN, INPUT);
-    pinMode(D_PIN, INPUT);
+    // Use this for PID tuning with Pots
+    // pinMode(P_PIN, INPUT);
+    // pinMode(I_PIN, INPUT);
+    // pinMode(D_PIN, INPUT);
 
     attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
@@ -334,14 +324,14 @@ void loop()
     static long last_pid_update_millis;
     static long current_pid_update_millis;
 
-    // read the pots
+    /* Use the below to tune the PID with Pots connected to Analog in
 
     // Read the potentiometer values
     uint16_t p_pot = analogRead(P_PIN) >> 1;
     // delayMicroseconds(10); // Short delay (adjust if needed)
     uint16_t i_pot = analogRead(I_PIN) >> 1;
     // delayMicroseconds(10); // Short delay (adjust if needed)
-    uint16_t d_pot = analogRead(D_PIN) >> 4;
+    uint16_t d_pot = analogRead(D_PIN) >> 6;
     // delayMicroseconds(10); // Short delay (adjust if needed)
 
     // Variables to track previous values
@@ -352,12 +342,12 @@ void loop()
     // Check for changes and print if any of the values have changed
     if (p_pot != last_p_pot || i_pot != last_i_pot || d_pot != last_d_pot)
     {
-        // Serial.print("P: ");
-        // Serial.print(p_pot);
-        // Serial.print("   I: ");
-        // Serial.print(i_pot);
-        // Serial.print("   D: ");
-        // Serial.println(d_pot);
+        Serial.print("P: ");
+        Serial.print(p_pot);
+        Serial.print("   I: ");
+        Serial.print(i_pot);
+        Serial.print("   D: ");
+        Serial.println(d_pot);
 
         // Update the last values
         last_p_pot = p_pot;
@@ -367,6 +357,7 @@ void loop()
         // Update the PID with new values
         myPID.SetTunings((double)p_pot, (double)i_pot, (double)d_pot);
     }
+    */
 
     // Poll the buttons
     leftButton.loop();
@@ -431,111 +422,29 @@ void loop()
         }
 
         // Debug output
-     // if (new_dac_value != last_dac_value)
+     if (new_dac_value != last_dac_value)
      // if (current_pulse_difference != last_pulse_difference)
-          // {
+          {
                 // Throttle the Console Output
                 // if (millis() % 100 == 1)
-                // {
-                // Serial.print(F("Mode: "));
-                // Serial.print(speedModeToString(speed_mode));
-                // Serial.print(F(", Error: "));
-                // Serial.print(current_pulse_difference);
-                // Serial.print(F(", DAC: "));
+                //{
+                Serial.print(F("Mode: "));
+                Serial.print(speedModeToString(speed_mode));
+                Serial.print(F(", Error: "));
+                Serial.print(current_pulse_difference);
+                Serial.println(F(", DAC: "));
                 
-                // Serial.print(new_dac_value);
-                // Serial.print(" - P ");
-                // Serial.print(p_pot);
-                // Serial.print("  I ");
-                // Serial.print(i_pot);
-                // Serial.print("  D ");
-                // Serial.println(d_pot);
-                // }
-
-        // --------------------------------
-
-        static long smoothed_values[smoothing_factor];
-        static int smooth_index = 0;
-
-        // Gleitender Mittelwert
-        smoothed_values[smooth_index] = current_pulse_difference;
-        smooth_index = (smooth_index + 1) % smoothing_factor;
-
-        long total = 0;
-        for (int i = 0; i < smoothing_factor; i++)
-        {
-            total += smoothed_values[i];
-        }
-        smoothed_difference = total / smoothing_factor;
-
-        current_time = millis(); // Aktuelle Zeit erfassen
-
-        if (smoothed_difference > prev_value)
-        {
-            // Steigende Flanke
-            is_rising = true;
-            if (smoothed_difference > max_value)
-            {
-                max_value = smoothed_difference; // Neues Maximum
-            }
-        }
-        else if (smoothed_difference < prev_value)
-        {
-            // Fallende Flanke
-            if (is_rising)
-            {
-                // Übergang von steigend zu fallend -> Schwingung erkannt
-                unsigned long cycle_length = current_time - last_transition_time; // Dauer der Schwingung
-                if (cycle_length >= MIN_CYCLE_LENGTH_MS)
-                {
-                    long amplitude = max_value - min_value; // Berechne Amplitude
-                    if (amplitude >= MIN_AMPLITUDE)
-                    {
-                        last_transition_time = current_time;
-
-                        // Ausgabe der Ergebnisse
-                        Serial.print(F("Mode: "));
-                        Serial.print(speedModeToString(speed_mode));
-                        Serial.print(F(", Error: "));
-                        Serial.print(current_pulse_difference);
-                        Serial.print(F(", DAC: "));
-                        Serial.print(" - Schwingung erkannt! ");
-                        Serial.print("Max: ");
-                        Serial.print(max_value);
-                        Serial.print(", Min: ");
-                        Serial.print(min_value);
-                        Serial.print(", Amplitude: ");
-                        Serial.print(amplitude);
-                        Serial.print(", Dauer: ");
-                        Serial.print(cycle_length / 1000.0); // Ausgabe in Sekunden
-                        Serial.println(" s");
-                        Serial.print(new_dac_value);
-                        Serial.print(" - P ");
-                        Serial.print(p_pot);
-                        Serial.print("  I ");
-                        Serial.print(i_pot);
-                        Serial.print("  D ");
-                        Serial.println(d_pot);
-                    }
-                }
-
-                // Zurücksetzen für die nächste Schwingung
-                max_value = LONG_MIN;
-                min_value = LONG_MAX;
-            }
-            is_rising = false;
-        }
-        else
-        {
-            // Flachpunkt, keine Änderung
-            if (smoothed_difference < min_value)
-            {
-                min_value = smoothed_difference; // Neues Minimum
-            }
-        }
-
-        // Vorherigen Wert aktualisieren
-        prev_value = smoothed_difference;
+                /* Add this if PID-Tuning Pots are connected
+                Serial.print(new_dac_value);
+                Serial.print(" - P ");
+                Serial.print(p_pot);
+                Serial.print("  I ");
+                Serial.print(i_pot);
+                Serial.print("  D ");
+                Serial.println(d_pot);
+                */
+                //}
+          }
 
         // --------------------------------
 
