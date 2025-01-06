@@ -129,7 +129,12 @@ volatile bool timer_pulse_count_updated;
 double pid_setpoint, pid_input, pid_output;
 double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0; // old PID values for frame based controlling
 
-PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
+// Adaptive PID
+double cons_Kp = 20, cons_Ki = 8, cons_Kd = 0; // old PID values for frame based controlling
+double agg_Kp = 50, agg_Ki = 10, agg_Kd = 0; // old PID values for frame based controlling
+
+// PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
+PID myPID(&pid_input, &pid_output, &pid_setpoint, agg_Kp, agg_Ki, agg_Kd, REVERSE);
 
 // Instantiate the DAC
 Adafruit_MCP4725 dac;
@@ -279,7 +284,7 @@ void setup()
     pid_input = 0;
     pid_setpoint = 0;
     myPID.SetOutputLimits(0, 4095);
-    myPID.SetSampleTime(50);
+    myPID.SetSampleTime(100);
     myPID.SetMode(MANUAL);
     pid_output = DAC_INITIAL_VALUE; // This avoids starting with a 0-Output signal
     myPID.SetMode(AUTOMATIC);
@@ -339,7 +344,21 @@ void loop()
         // reduce the osciallation (and precision)
         // current_pulse_difference &= ~1;
 
-        // unsigned long current_time = micros(); 
+        // unsigned long current_time = micros();
+
+
+
+        // Adaptive PID
+        double gap = abs(pid_setpoint - pid_input); // distance away from setpoint
+        if (gap < 10)
+        { // we're close to setpoint, use conservative tuning parameters
+            myPID.SetTunings(cons_Kp, cons_Ki, cons_Kd);
+        }
+        else
+        {
+            // we're far from setpoint, use aggressive tuning parameters
+            myPID.SetTunings(agg_Kp, agg_Ki, agg_Kd);
+        }
 
         pid_input = current_pulse_difference;
         myPID.Compute();
