@@ -127,7 +127,8 @@ volatile bool timer_pulse_count_updated;
 
 // PID stuff
 double pid_setpoint, pid_input, pid_output;
-double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0;
+double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0; // old PID values for frame based controlling
+
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
 // Instantiate the DAC
@@ -297,7 +298,10 @@ void loop()
     static long local_shaft_frames = 0;    // for atomic reads
     static long local_timer_pulses = 0;    // for atomic reads
     static long local_shaft_pulses = 0;    // for atomic reads
-    static long last_pulse_difference = 0; // Stores the last output difference. )Just used to limit the printf output)
+    static long last_pulse_difference = 0; // Stores the last output difference. (Just used to limit the printf output)
+
+    static long last_dac_value = 1500; // also just used to limit the printf output
+
     static long current_frame_difference = 0;
     static long current_pulse_difference = 0;
     uint16_t new_dac_value = 0;
@@ -331,7 +335,10 @@ void loop()
         // Compute Error and feed PID and DAC
         // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
         current_pulse_difference = local_timer_pulses - local_shaft_pulses;
-        
+
+        // reduce the osciallation (and precision)
+        // current_pulse_difference &= ~1;
+
         // unsigned long current_time = micros(); 
 
         pid_input = current_pulse_difference;
@@ -351,21 +358,23 @@ void loop()
         }
 
         // Debug output
-        if (current_pulse_difference != last_pulse_difference)
-        {
-            // Throttle the Console Output
-            if (millis() % 500 == 2)
+        if (new_dac_value != last_dac_value)
+     // if (current_pulse_difference != last_pulse_difference)
             {
+                // Throttle the Console Output
+                // if (millis() % 100 == 1)
+                // {
                 Serial.print(F("Mode: "));
                 Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Error: "));
                 Serial.print(current_pulse_difference);
                 Serial.print(F(", DAC: "));
                 Serial.println(new_dac_value);
-            }
+            // }
 
             last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
-        }
+            last_dac_value = new_dac_value;
+            }
 
         // Stop detection
         if (shaft_pulse_count_updated) // This is set in the shaft ISR
@@ -373,7 +382,7 @@ void loop()
  
          if (hasStoppedSince(last_pulse_timestamp, STOP_THRESHOLD))
         {
-             projector_state = PROJ_IDLE; // Projector is stopped
+            projector_state = PROJ_IDLE; // Projector is stopped
             Serial.println(F("[DEBUG] Projector stopped."));
             stopTimer1();
             timer_frame_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
