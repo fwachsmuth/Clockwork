@@ -1,8 +1,7 @@
 /* Todo
 
-Test controlling pulse count, not framecount!
 
-Move controller and stop detection from loop intofunctions
+Move controller and stop detection from loop into functions
 
 Pending Bugs for Sepmag Sync:
 - Estimated fps so far (for previous_freq) seems wrong (low)
@@ -46,7 +45,6 @@ Bug:
 - Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
 - Decrement Shaft Impulses after detected shaft noise!
 - Cannot start in a manual selected mode
-- Clamp the error to not switch sign
 
 - Use the display
 - Review volatile vars (only for variables modified inside ISRs and used outside)
@@ -134,7 +132,7 @@ volatile bool timer_pulse_count_updated;
 double pid_setpoint, pid_input, pid_output;
 double pid_Kp = 30, pid_Ki = 50, pid_Kd = 0; // old PID values for frame based controlling
 
-// Adaptive PID
+// Adaptive PID — not worth it.
 // double cons_Kp = 20, cons_Ki = 8, cons_Kd = 0; // old PID values for frame based controlling
 // double agg_Kp = 50, agg_Ki = 10, agg_Kd = 0; // old PID values for frame based controlling
 
@@ -383,14 +381,10 @@ void loop()
         interrupts();
 
         // Compute Error and feed PID and DAC
-        // only consume pulse counters if both ISRs did their updates yet, otherwise we get plenty of false +/-1 diffs
         current_pulse_difference = local_timer_pulses - local_shaft_pulses;
 
         // reduce the osciallation (and precision)
         // current_pulse_difference &= ~1;
-
-        // unsigned long current_time = micros();
-
 
 
         // Adaptive PID
@@ -422,10 +416,10 @@ void loop()
         }
 
         // Debug output
-     if (new_dac_value != last_dac_value)
+        if (new_dac_value != last_dac_value)
      // if (current_pulse_difference != last_pulse_difference)
           {
-                // Throttle the Console Output
+                // Uncomment to throttle the Console Output
                 // if (millis() % 100 == 1)
                 //{
                 Serial.print(F("Mode: "));
@@ -483,11 +477,9 @@ void loop()
         // reset the flag and be ready for another incoming pulse
         {
             shaft_pulse_count_updated = false;
-            // 
         }
     }
 }
-
 
 
 void measureFrequency()
@@ -604,6 +596,114 @@ void checkProjectorRunningYet()
     }
 }
 
+void selectNextMode(Button2 &btn)
+{
+    // Determine the change based on which button was pressed
+    int8_t change = (btn == leftButton) ? -1 : 1;
+
+    // Update the run mode
+    // previous_freq = ditherEndFreq;  // the struct's float with the actual fps. Could probably just use ditherEndFreq here.
+
+    // Change the speed mode to an adjacent enum value ("change")
+    speed_mode = (speed_mode + change + MODES_COUNT) % MODES_COUNT;
+    
+    // Prepare for re-calculating the ISR's timer_frames in sepmag mode
+    float next_freq;
+
+    noInterrupts();
+    uint32_t local_shaft_pulses = shaft_pulses;
+    uint32_t local_timer_pulses = timer_pulses;
+    interrupts();
+
+
+    // Debug
+    Serial.print(F("Average fps since start: "));
+    // Serial.print((float)local_shaft_pulses / SHAFT_SEGMENT_COUNT);
+    // Serial.print(F(" / "));
+    // Serial.print((float)(millis() - projector_start_millis) / 1000);
+    // Serial.print(F(" = "));
+    Serial.println(((float)local_shaft_pulses / SHAFT_SEGMENT_COUNT) / (((float)millis() - projector_start_millis) / 1000), 2);
+
+
+    switch (speed_mode) // This is the new speed_mode we are about to switch TO
+    // we calculate next_freq here.
+    {
+        case XTAL_NONE:
+            break;
+        case XTAL_AUTO:
+            // Since
+            Serial.print(F("Estimated fps so far (for previous_freq):"));
+            Serial.println((millis() - projector_start_millis) / local_shaft_pulses / SHAFT_SEGMENT_COUNT, 2);
+            Serial.print(F("Proj. Speed Switch (to): "));
+            Serial.println(projector_speed_switch);
+            break;
+        case XTAL_16_2_3:
+        case XTAL_18:
+        case XTAL_23_976:
+        case XTAL_24:
+        case XTAL_25:
+            // Serial.println(F("Multi-Case!"));
+            // copy the endFreq of the struct wuth speed_mode index - 2 (0 and 1 are NONE and AUTO)
+            memcpy_P(&next_freq, &s_ditherTable[((speed_mode - 2))].endFreq, sizeof(float));
+            break;
+    }
+
+    // Update the timer counter to the new truth
+    // Example: After 10 Sec from 18 to 24 fps: -> 180 / 18 * 24 = 240
+    //                                           = 180 * 24 / 18
+    //                                           so
+
+    // Serial.println(F("timer_pulses * next_freq / (millis() - proojector_start_millis) / 1000))"));
+    // Serial.print(F("From "));
+    // Serial.print(local_timer_pulses);
+    // Serial.print(F(" Pulses to "));
+    // Serial.print(local_timer_pulses);
+    // Serial.print(F(" * "));
+    // Serial.print(next_freq);
+    // Serial.print(F(" / ("));
+    // Serial.print(local_shaft_pulses);
+    // Serial.print(F("/"));
+    // Serial.print(F("12) / ("));
+    // Serial.print(millis() - projector_start_millis);
+    // Serial.print(F(")/1000) = "));
+    // Serial.println(local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000)));
+
+
+    uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000));
+   
+    // This should be a bit more precise, but actually leads to results that apepar rather off. Not sure yet why
+    // uint32_t fuckdated_timer_pulses = (local_timer_pulses * next_freq * (millis() - projector_start_millis)) / (local_shaft_pulses * 1000 / SHAFT_SEGMENT_COUNT);
+
+
+    Serial.print(F("My calculation: "));
+    Serial.println(updated_timer_pulses);
+ 
+
+    noInterrupts();
+    // timer_pulses = updated_timer_pulses;
+    interrupts();
+
+
+    changeSpeedMode(speed_mode);
+
+
+
+    // if (speed_mode != XTAL_AUTO && speed_mode != XTAL_NONE)
+    // {
+    //     Serial.print(timer_frames);
+    //     Serial.print(F(" / "));
+    //     Serial.print(previous_freq);
+    //     Serial.print(F(" * "));
+    //     Serial.print(next_freq);
+    //     Serial.print(F(" = "));
+    //     Serial.println(static_cast<uint32_t>((timer_frames / previous_freq) * next_freq));
+
+    //     noInterrupts();
+    //     timer_frames = static_cast<uint32_t>((timer_frames / previous_freq) * next_freq);
+    //     interrupts();
+    // }
+
+}
 
 void changeSpeedMode(byte run_mode)
 {
@@ -677,81 +777,6 @@ void handleButtonTap(Button2 &btn)
             interrupts();
         }
     }
-}
-
-void selectNextMode(Button2 &btn)
-{
-    // Determine the change based on which button was pressed
-    int8_t change = (btn == leftButton) ? -1 : 1;
-
-    // Update the run mode
-    // previous_freq = ditherEndFreq;  // the struct's float with the actual fps. Could probably just use ditherEndFreq here.
-
-    // Change the speed mode to an adjacent enum value ("change")
-    speed_mode = (speed_mode + change + MODES_COUNT) % MODES_COUNT;
-    
-    // Prepare for re-calculating the ISR's timer_frames in sepmag mode
-    float next_freq;
-
-    noInterrupts();
-    long local_shaft_impulse_count = shaft_pulses;
-    interrupts();
-
-    Serial.print(F("Average fps since start: "));
-    // Serial.print((float)local_shaft_impulse_count / SHAFT_SEGMENT_COUNT);
-    // Serial.print(F(" / "));
-    // Serial.print((float)(millis() - projector_start_millis) / 1000);
-    // Serial.print(F(" = "));
-    Serial.println(((float)local_shaft_impulse_count / SHAFT_SEGMENT_COUNT) / (((float)millis() - projector_start_millis) / 1000), 2);
-
-    // switch (speed_mode) // This is the new speed_mode we are about to switch TO
-    // {
-    //     case XTAL_NONE:
-    //         break;
-    //     case XTAL_AUTO:
-    //         // Since
-    //         Serial.print(F("Estimated fps so far (for previous_freq):"));
-    //         Serial.println((millis() - projector_start_millis) / shaft_frames, 2);
-    //         Serial.print(F("Proj. Speed Switch (to): "));
-    //         Serial.println(projector_speed_switch);
-    //         break;
-    //     case XTAL_16_2_3:
-    //     case XTAL_18:
-    //     case XTAL_23_976:
-    //     case XTAL_24:
-    //     case XTAL_25:
-    //         // Serial.println(F("Multi-Case!"));
-    //         // copy the endFreq of the struct wuth speed_mode index - 2 (0 and 1 are NONE and AUTO)
-    //         memcpy_P(&next_freq, &s_ditherTable[((speed_mode - 2))].endFreq, sizeof(float));
-    //         break;
-    // }
-
-    // memcpy_P(&next_freq, &s_ditherTable[((speed_mode - 2))].endFreq, sizeof(float));
-
-    // Serial.print(F("Speed change: "));
-    // Serial.print(previous_freq, 4); // Print the float with 4 decimal places
-    // Serial.print(F(" -> "));
-    // Serial.println(next_freq, 4 );
-
-    // Serial.print(timer_frames);
-    // Serial.print(" / ");
-
-    // if (speed_mode != XTAL_AUTO && speed_mode != XTAL_NONE)
-    // {
-    //     Serial.print(timer_frames);
-    //     Serial.print(F(" / "));
-    //     Serial.print(previous_freq);
-    //     Serial.print(F(" * "));
-    //     Serial.print(next_freq);
-    //     Serial.print(F(" = "));
-    //     Serial.println(static_cast<uint32_t>((timer_frames / previous_freq) * next_freq));
-
-    //     noInterrupts();
-    //     timer_frames = static_cast<uint32_t>((timer_frames / previous_freq) * next_freq);
-    //     interrupts();
-    // }
-
-    changeSpeedMode(speed_mode);
 }
 
 bool setupTimer1forFps(byte desiredFps)
