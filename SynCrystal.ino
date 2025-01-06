@@ -136,6 +136,19 @@ double pid_Kp = 25, pid_Ki = 35, pid_Kd = 0; // old PID values for frame based c
 // double cons_Kp = 20, cons_Ki = 8, cons_Kd = 0; // old PID values for frame based controlling
 // double agg_Kp = 50, agg_Ki = 10, agg_Kd = 0; // old PID values for frame based controlling
 
+// PID Analyse
+// Variablen für die Analyse
+long prev_value = 0;
+long max_value = LONG_MIN;
+long min_value = LONG_MAX;
+bool is_rising = true;
+unsigned long last_transition_time = 0;
+unsigned long current_time = 0;
+long smoothed_difference = 0;
+const int smoothing_factor = 5;                // Anzahl der Werte für Glättung
+const unsigned long MIN_CYCLE_LENGTH_MS = 500; // Nur Schwingungen > 0,5 Sekunden
+const long MIN_AMPLITUDE = 4;                  // Nur Schwingungen mit Amplitude >= 4
+
 // PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
@@ -424,24 +437,111 @@ void loop()
                 // Throttle the Console Output
                 // if (millis() % 100 == 1)
                 // {
-                Serial.print(F("Mode: "));
-                Serial.print(speedModeToString(speed_mode));
-                Serial.print(F(", Error: "));
-                Serial.print(current_pulse_difference);
-                Serial.print(F(", DAC: "));
+                // Serial.print(F("Mode: "));
+                // Serial.print(speedModeToString(speed_mode));
+                // Serial.print(F(", Error: "));
+                // Serial.print(current_pulse_difference);
+                // Serial.print(F(", DAC: "));
                 
-                Serial.print(new_dac_value);
-                Serial.print(" - P ");
-                Serial.print(p_pot);
-                Serial.print("  I ");
-                Serial.print(i_pot);
-                Serial.print("  D ");
-                Serial.println(d_pot);
+                // Serial.print(new_dac_value);
+                // Serial.print(" - P ");
+                // Serial.print(p_pot);
+                // Serial.print("  I ");
+                // Serial.print(i_pot);
+                // Serial.print("  D ");
+                // Serial.println(d_pot);
                 // }
 
-                last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
-                last_dac_value = new_dac_value;
-            // }
+        // --------------------------------
+
+        static long smoothed_values[smoothing_factor];
+        static int smooth_index = 0;
+
+        // Gleitender Mittelwert
+        smoothed_values[smooth_index] = current_pulse_difference;
+        smooth_index = (smooth_index + 1) % smoothing_factor;
+
+        long total = 0;
+        for (int i = 0; i < smoothing_factor; i++)
+        {
+            total += smoothed_values[i];
+        }
+        smoothed_difference = total / smoothing_factor;
+
+        current_time = millis(); // Aktuelle Zeit erfassen
+
+        if (smoothed_difference > prev_value)
+        {
+            // Steigende Flanke
+            is_rising = true;
+            if (smoothed_difference > max_value)
+            {
+                max_value = smoothed_difference; // Neues Maximum
+            }
+        }
+        else if (smoothed_difference < prev_value)
+        {
+            // Fallende Flanke
+            if (is_rising)
+            {
+                // Übergang von steigend zu fallend -> Schwingung erkannt
+                unsigned long cycle_length = current_time - last_transition_time; // Dauer der Schwingung
+                if (cycle_length >= MIN_CYCLE_LENGTH_MS)
+                {
+                    long amplitude = max_value - min_value; // Berechne Amplitude
+                    if (amplitude >= MIN_AMPLITUDE)
+                    {
+                        last_transition_time = current_time;
+
+                        // Ausgabe der Ergebnisse
+                        Serial.print(F("Mode: "));
+                        Serial.print(speedModeToString(speed_mode));
+                        Serial.print(F(", Error: "));
+                        Serial.print(current_pulse_difference);
+                        Serial.print(F(", DAC: "));
+                        Serial.print(" - Schwingung erkannt! ");
+                        Serial.print("Max: ");
+                        Serial.print(max_value);
+                        Serial.print(", Min: ");
+                        Serial.print(min_value);
+                        Serial.print(", Amplitude: ");
+                        Serial.print(amplitude);
+                        Serial.print(", Dauer: ");
+                        Serial.print(cycle_length / 1000.0); // Ausgabe in Sekunden
+                        Serial.println(" s");
+                        Serial.print(new_dac_value);
+                        Serial.print(" - P ");
+                        Serial.print(p_pot);
+                        Serial.print("  I ");
+                        Serial.print(i_pot);
+                        Serial.print("  D ");
+                        Serial.println(d_pot);
+                    }
+                }
+
+                // Zurücksetzen für die nächste Schwingung
+                max_value = LONG_MIN;
+                min_value = LONG_MAX;
+            }
+            is_rising = false;
+        }
+        else
+        {
+            // Flachpunkt, keine Änderung
+            if (smoothed_difference < min_value)
+            {
+                min_value = smoothed_difference; // Neues Minimum
+            }
+        }
+
+        // Vorherigen Wert aktualisieren
+        prev_value = smoothed_difference;
+
+        // --------------------------------
+
+        last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
+        last_dac_value = new_dac_value;
+        // }
 
         // Stop detection
         if (shaft_pulse_count_updated) // This is set in the shaft ISR
