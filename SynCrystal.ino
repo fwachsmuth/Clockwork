@@ -415,7 +415,11 @@ void loop()
                 Serial.print(F(", timer: "));
                 Serial.print(timer_pulses);
                 Serial.print(F(", shaft: "));
-                Serial.println(shaft_pulses);
+                Serial.print(shaft_pulses);
+                Serial.print(F(", Mode: "));
+                Serial.print(speedModeToString(speed_mode));
+                Serial.print(F(", Enable: "));
+                Serial.println(digitalRead(ENABLE_PIN));
 
                 /* Add this if PID-Tuning Pots are connected
             Serial.print(" - P ");
@@ -579,7 +583,10 @@ void checkProjectorRunningYet()
 
         // Update projector state
         projector_state = PROJ_RUNNING;
+        Serial.print(F("Not Auto, Speed "));
+        Serial.println(speedModeToString(speed_mode));
         setupTimer1forFps(speed_mode);
+        digitalWrite(ENABLE_PIN, HIGH);
     }
 
     // Reset variables
@@ -615,7 +622,7 @@ void selectNextMode(Button2 &btn)
     switch (speed_mode) // This is the new speed_mode we are about to switch TO
     
     {
-        // we pick the right  next_freq here.
+        // we pick the right next_freq here.
         case XTAL_NONE:
         break;
         case XTAL_AUTO:
@@ -632,6 +639,7 @@ void selectNextMode(Button2 &btn)
         case XTAL_25:
             // copy the endFreq of the struct wuth speed_mode index - 2 (0 and 1 are NONE and AUTO)
             memcpy_P(&next_freq, &s_ditherTable[((speed_mode - 2))].endFreq, sizeof(float));
+            Serial.println(next_freq);
             break;
     }
 
