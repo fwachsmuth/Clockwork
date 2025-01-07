@@ -413,8 +413,6 @@ void loop()
                 Serial.print(timer_pulses);
                 Serial.print(F(", shaft: "));
                 Serial.print(shaft_pulses);
-                Serial.print(F(", Mode: "));
-                Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Enable: "));
                 Serial.print(digitalRead(ENABLE_PIN));
                 Serial.print(F(", Running: "));
@@ -582,7 +580,7 @@ void checkProjectorRunningYet()
 
         // Update projector state
         projector_state = PROJ_RUNNING;
-        Serial.print(F("Not Auto, Speed "));
+        Serial.print(F("Setting up Timer for "));
         Serial.println(speedModeToString(speed_mode));
         setupTimer1forFps(speed_mode);
         digitalWrite(ENABLE_PIN, HIGH);
@@ -726,6 +724,7 @@ void changeSpeedMode(byte run_mode)
         break;
     }
  
+    // disconnect the DAC for "NONE" mode
     digitalWrite(ENABLE_PIN, (run_mode == XTAL_NONE) ? LOW : HIGH);
 }
 
@@ -759,7 +758,8 @@ void handleButtonTap(Button2 &btn)
 
 bool setupTimer1forFps(byte desiredFps)
 {
-    // start with a new sync point, no need to catch up differences from before.
+
+    // start with a new sync point, no need to catch up differences from before 
     if (projector_state == PROJ_IDLE)
     {
         noInterrupts();
@@ -794,6 +794,9 @@ bool setupTimer1forFps(byte desiredFps)
     TCCR1B |= (1 << WGM12) | (1 << CS11); // CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
     TIMSK1 |= (1 << OCIE1A);              // enable Compare-A-Interrupt
     interrupts();
+
+    Serial.print(F("*** Timer 1 set up for speed "));
+    Serial.println(ditherEndFreq);
 
     return true;
 }
@@ -861,5 +864,24 @@ const char *speedModeToString(byte run_mode)
         return "24";
     case XTAL_25:
         return "25";
+    }
+}
+
+const char *fpsToString(byte fps_mode)
+{
+    switch (fps_mode)
+    {
+    case FPS_16_2_3:
+        return "16 2/3 fps";
+    case FPS_18:
+        return "18 fps";
+    case FPS_23_976:
+        return "23.NTSC";
+    case FPS_24:
+        return "24";
+    case FPS_25:
+        return "25";
+    default:
+        return "Oh-Oh";
     }
 }
