@@ -1,5 +1,15 @@
 /* Todo
 
+- refactor activateNextMode() (If instead of switch)
+
+- use speed.timer_factor
+- use speed.dac_enable
+- use speed.auto_mode
+- use speed.dac_init
+- update comments in the new struct
+- flash the DAC just once on very first start
+
+
 - New Bugs:
 - Remaining pid-Errors seem to add up on speed changes?
     Mode: AUTO, Error: 1, DAC: 1415
@@ -60,7 +70,7 @@ Irgendwann
 #include <U8x8lib.h> // Display Driver
 
 // projector specific constants
-const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
+// const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
 const unsigned long STOP_THRESHOLD = 25000; // microseconds until a stop will be detected
 const unsigned long SAVE_THRESHOLD = 10000; // ms until a stable DAC value will be considered as new EPROM default
 constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Window. We use 12 to capture one entire shaft revolution
@@ -97,6 +107,7 @@ volatile uint32_t timer_frames = 0; // This is the timer1 (frequency / timer_fac
 volatile uint8_t timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
 // int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
 volatile uint32_t last_pulse_timestamp; // Timestamp of the last pulse, used to detect a stop
+volatile uint32_t dither_accumulator_32 = 0; // Accumulator for Timer Dithering
 
 
 // Shaft Encoder Variables
@@ -136,18 +147,19 @@ Button2 leftButton, rightButton, dropBackButton, catchUpButton;
 // Instantiate the Display
 U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 
-enum SpeedModes
-{
-    XTAL_NONE = 0, /* We use this as array index, too */
-    XTAL_AUTO,
-    XTAL_16_2_3,
-    XTAL_18,
-    XTAL_23_976,
-    XTAL_24,
-    XTAL_25,
-    MODES_COUNT // Automatically equals the number of entries in the enum
-};
-byte speed_mode = XTAL_AUTO;
+// enum SpeedModes
+// {
+//     XTAL_NONE = 0, /* We use this as array index, too */
+//     XTAL_AUTO,
+//     XTAL_16_2_3,
+//     XTAL_18,
+//     XTAL_23_976,
+//     XTAL_24,
+//     XTAL_25,
+//     MODES_COUNT // Automatically equals the number of entries in the enum
+// };
+
+byte current_speed_mode;
 float previous_freq = 1.00; // to allow recalculation of timer_frames and timecode
 
 enum ProjectorStates
@@ -157,39 +169,25 @@ enum ProjectorStates
 };
 byte projector_state = PROJ_IDLE;
 
-enum FpsSpeeds
-{
-    /* FPS_9,       // => 108 Hz */
-    FPS_16_2_3,  // => 200 Hz
-    FPS_18,      // => 216 Hz
-    FPS_23_976,  // => ~287.712 Hz
-    FPS_24,      // => 288 Hz
-    FPS_25,      // => 300 Hz
-    SPEEDS_COUNT // Total Count of speeds supported
-};
-
 enum BlendModes
 {
-    BLEND_SEPMAG,  // Option A: Convert timer_pulses to new speed: Projector will catch up until sync is reached again.
-    BLEND_RESET,   // Option B: Forget any previous pulses and start fresh
-    BLEND_EQUAL    // Option C: keep old errors around and correct them too
+    BLEND_SEPMAG, // Option A: Convert timer_pulses to new speed: Projector will catch up until sync is reached again.
+    BLEND_RESET,  // Option B: Forget any previous pulses and start fresh
+    BLEND_EQUAL   // Option C: keep old errors around and correct them too
 };
 byte blend_mode = BLEND_SEPMAG;
 
-// Global dithering variables for the ISR:
-// volatile uint16_t ditherBase = 0;   // base for OCR1A
-// volatile uint32_t ditherFrac32 = 0; // fraction in UQ0.32
-volatile uint32_t dither_accumulator_32 = 0; // Accumulator
-// volatile float ditherEndFreq = 0;   // Actual frequency of the dithered timer / SHAFT_SEGMENT_COUNT (proj. freq)
 
-// struct DitherConfig
-// {
-//     uint16_t base;   // Grundwert für OCR1A
-//     uint32_t frac32; // fractional part (UQ0.32), 0..(2^32-1)
-//     uint8_t timerFactor; // a frequency multiplier for each timer config (some multiples give better accuracy)
-//     float endFreq; // the actual frequency we get with this config
-// };
-
+// Name the indices of the speed config struct
+// Make sure these align with the SpeedConfig struct array below.
+#define FPS_AUTO    0
+#define FPS_NONE    1
+#define FPS_16_2_3  2   // => 200 Hz
+#define FPS_18      3   // => 216 Hz
+#define FPS_23_976  4   // => ~287.712 Hz
+#define FPS_24      5   // => 288 Hz
+#define FPS_25      6   // => 300 Hz
+#define MODES_COUNT 7   // to know where to roll over in the menu
 
 // Struct with all the information we need to configure the controller for a speed:
 struct SpeedConfig
@@ -206,7 +204,6 @@ struct SpeedConfig
 SpeedConfig speed;
 
 static const SpeedConfig PROGMEM s_speed_table[] = {
-    /*    Name      base    frac32          t  freq       dac   auto    dac_init */
     {"AUTO", 0, 0, 0, 0, 1, 1, 1500},
     {"NONE", 0, 0, 0, 0, 0, 0, 0},
     {"16.66", 10000, 0x00000000, 1, 16.666666, 1, 0, 1200},
@@ -299,10 +296,12 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
         // pinMode(I_PIN, INPUT);
         // pinMode(D_PIN, INPUT);
 
+        loadSpeedConfig(FPS_AUTO);
+
         attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
         dac.begin(0x60);
 
-        dac.setVoltage(DAC_INITIAL_VALUE, false); // 1537 is petty much 18 fps and 24 fps
+        dac.setVoltage(speed.dac_init, false); // 1537 is petty much 18 fps and 24 fps
 
         // Init the PID
         pid_input = 0;
@@ -310,10 +309,10 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
         myPID.SetOutputLimits(0, 4095);
         myPID.SetSampleTime(100);
         myPID.SetMode(MANUAL);
-        pid_output = DAC_INITIAL_VALUE; // This avoids starting with a 0-Output signal
+        pid_output = speed.dac_init; // This avoids starting with a 0-Output signal
         myPID.SetMode(AUTOMATIC);
 
-        changeSpeedMode(speed_mode);
+        activateSpeed(FPS_AUTO);
 
         u8x8.begin();
         u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
@@ -481,9 +480,9 @@ void loop()
             local_shaft_pulses = 0;
 
             // Reset DAC and PID
-            dac.setVoltage(DAC_INITIAL_VALUE, false); // reset the DAc to compensate for wound-up break corrections
+            dac.setVoltage(speed.dac_init, false); // reset the DAc to compensate for wound-up break corrections
             myPID.SetMode(MANUAL);
-            pid_output = DAC_INITIAL_VALUE;
+            pid_output = speed.dac_init;
             pid_input = 0;
             myPID.Compute();
             Serial.print(F("PID Reset to initial DAC value: "));
@@ -598,9 +597,9 @@ void checkProjectorRunningYet()
         Serial.print(F("Detected freq (FreqMeasure): "));
         Serial.println(detected_frequency / SHAFT_SEGMENT_COUNT);
 
-        if (speed_mode == XTAL_AUTO)
+        if (current_speed_mode == FPS_AUTO)
         { // Determine the mode based on the detected frequency
-            changeSpeedMode(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? XTAL_18 : XTAL_24);
+            activateSpeed(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? FPS_18 : FPS_24);
             projector_speed_switch = (detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? 18 : 24);
         }
         // Init the pulse timer to not lose those first frames
@@ -610,7 +609,7 @@ void checkProjectorRunningYet()
         projector_state = PROJ_RUNNING;
         Serial.print(F("Setting up Timer for "));
         Serial.println(speed.name);
-        setupTimer1forFps(speed_mode);
+        setupTimer1forFps(current_speed_mode);
         digitalWrite(ENABLE_PIN, HIGH);
     }
 
@@ -637,7 +636,7 @@ void selectNextMode(Button2 &btn)
     int8_t change = (btn == leftButton) ? -1 : 1;
 
     // Change the speed mode to an adjacent enum value ("change")
-    speed_mode = (speed_mode + change + MODES_COUNT) % MODES_COUNT;
+    current_speed_mode = (current_speed_mode + change + MODES_COUNT) % MODES_COUNT;
     
     // Prepare for re-calculating the ISR's timer_frames in sepmag mode
     float next_freq;
@@ -655,26 +654,28 @@ void selectNextMode(Button2 &btn)
     // Serial.print(F(" = "));
     // Serial.println(((float)local_shaft_pulses / SHAFT_SEGMENT_COUNT) / (((float)millis() - projector_start_millis) / 1000), 2);
 
-    switch (speed_mode) // This is the new speed_mode we are about to switch TO
+    // Put an IF instead of the SWITCH here to do the auto measurement
+
+    switch (current_speed_mode) // This is the new current_speed_mode we are about to switch TO
     
     {
         // we pick the right next_freq here.
-        case XTAL_NONE:
+        case FPS_NONE:
         break;
-        case XTAL_AUTO:
+        case FPS_AUTO:
             // Since
             Serial.print(F("Estimated fps so far (for previous_freq):"));
             Serial.println((float)(millis() - projector_start_millis) / local_shaft_pulses / SHAFT_SEGMENT_COUNT, 2);
             Serial.print(F("Proj. Speed Switch (to): "));
             Serial.println(projector_speed_switch);
             break;
-        case XTAL_16_2_3:
-        case XTAL_18:
-        case XTAL_23_976:
-        case XTAL_24:
-        case XTAL_25:
-            // copy the endFreq of the struct wuth speed_mode index - 2 (0 and 1 are NONE and AUTO)
-            memcpy_P(&next_freq, &s_speed_table[((speed_mode))].end_freq, sizeof(float));
+        case FPS_16_2_3:
+        case FPS_18:
+        case FPS_23_976:
+        case FPS_24:
+        case FPS_25:
+            // copy the endFreq of the struct wuth current_speed_mode index - 2 (0 and 1 are NONE and AUTO)
+            memcpy_P(&next_freq, &s_speed_table[((current_speed_mode))].end_freq, sizeof(float));
             Serial.println(next_freq);
             break;
     }
@@ -702,6 +703,8 @@ void selectNextMode(Button2 &btn)
         // Serial.print(F(")/1000) = "));
         // Serial.println(local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000)));
 
+// These calclulations might belong in activatSpeed?
+
         uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000));
     
         // This should be a bit more precise, but actually leads to results that apepar rather off. Not sure yet why
@@ -716,55 +719,64 @@ void selectNextMode(Button2 &btn)
         interrupts();
     }
 
-    changeSpeedMode(speed_mode);
+    activateSpeed(current_speed_mode);
 }
 
-void changeSpeedMode(byte run_mode)
+void activateSpeed(byte next_speed)
 {
-    // connect or disconnect the DAC
+    loadSpeedConfig(next_speed);
+    Serial.println(speed.name);
 
-    switch (run_mode)
-    {
-    case XTAL_NONE:
-        Serial.println(F("XTAL_NONE"));
-        break;
-    case XTAL_AUTO:
-        // reset the PID Output
-        myPID.SetMode(MANUAL);
-        pid_output = DAC_INITIAL_VALUE;
-        myPID.Compute();
-        myPID.SetMode(AUTOMATIC);
-        // set DAC to initial value
-        dac.setVoltage(DAC_INITIAL_VALUE, false);
-        Serial.println(F("XTAL_AUTO"));
-        break;
-    case XTAL_16_2_3:
-        Serial.println(F("XTAL_16_2_3"));
-        setupTimer1forFps(FPS_16_2_3);
-        break;
-    case XTAL_18:
-        Serial.println(F("XTAL_18"));
-        setupTimer1forFps(FPS_18);
-        break;
-    case XTAL_23_976:
-        Serial.println(F("XTAL_23_976"));
-        setupTimer1forFps(FPS_23_976);
-        break;
-    case XTAL_24:
-        Serial.println(F("XTAL_24"));
-        setupTimer1forFps(FPS_24);
-        break;
-    case XTAL_25:
-        Serial.println(F("XTAL_25"));
-        setupTimer1forFps(FPS_25);
-        break;
-    default:
-        Serial.println(F("Unknown Mode"));
-        break;
-    }
- 
-    // disconnect the DAC for "NONE" mode
-    digitalWrite(ENABLE_PIN, (run_mode == XTAL_NONE) ? LOW : HIGH);
+    // connect or disconnect the DAC
+    digitalWrite(ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
+    // or: digitalWrite(ENABLE_PIN, (next_speed == XTAL_NONE) ? LOW : HIGH);
+
+    // Init the DAC with a start value
+    myPID.SetMode(MANUAL);
+    pid_output = speed.dac_init;
+    myPID.Compute();
+    myPID.SetMode(AUTOMATIC);
+    dac.setVoltage(speed.dac_init, false);      // false: Do not make this the default value of the DAC
+
+    // old switch case
+    // switch (next_speed)
+    // {
+    // case FPS_NONE:
+    //     break;
+    // case FPS_AUTO:
+    //     // reset the PID Output
+    //     myPID.SetMode(MANUAL);
+    //     pid_output = speed.dac_init;
+    //     myPID.Compute();
+    //     myPID.SetMode(AUTOMATIC);
+    //     // set DAC to initial value
+    //     dac.setVoltage(speed.dac_init, false);
+    //     Serial.println(F("XTAL_AUTO"));
+    //     break;
+    // case FPS_16_2_3:
+    //     Serial.println(F("XTAL_16_2_3"));
+    //     setupTimer1forFps(FPS_16_2_3);
+    //     break;
+    // case FPS_18:
+    //     Serial.println(F("XTAL_18"));
+    //     setupTimer1forFps(FPS_18);
+    //     break;
+    // case FPS_23_976:
+    //     Serial.println(F("XTAL_23_976"));
+    //     setupTimer1forFps(FPS_23_976);
+    //     break;
+    // case FPS_24:
+    //     Serial.println(F("XTAL_24"));
+    //     setupTimer1forFps(FPS_24);
+    //     break;
+    // case FPS_25:
+    //     Serial.println(F("XTAL_25"));
+    //     setupTimer1forFps(FPS_25);
+    //     break;
+    // default:
+    //     Serial.println(F("Unknown Mode"));
+    //     break;
+    // }
 }
 
 void handleButtonTap(Button2 &btn)
@@ -876,28 +888,10 @@ ISR(TIMER1_COMPA_vect)
 }
 
 void stopTimer1()
-{ // Stops Timer1, for when we are not in craystal running run_mode
+{ // Stops Timer1, for when we are not in craystal running next_speed
     // TCCR1B &= ~(1 << CS11);
     noInterrupts();
     TIMSK1 &= ~(1 << OCIE1A);
     interrupts();
 }
 
-const char *fpsToString(byte fps_mode)
-{
-    switch (fps_mode)
-    {
-    case FPS_16_2_3:
-        return "16 2/3 fps";
-    case FPS_18:
-        return "18 fps";
-    case FPS_23_976:
-        return "23.NTSC";
-    case FPS_24:
-        return "24";
-    case FPS_25:
-        return "25";
-    default:
-        return "Oh-Oh";
-    }
-}
