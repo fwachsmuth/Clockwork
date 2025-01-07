@@ -2,9 +2,6 @@
 
 - New Bugs:
 - Remaining pid-Errors seem to add up on speed changes?
-- Cannot start correctly in a manual selected mode: somehow the DAC is pulled to 0
-
-
     Mode: AUTO, Error: 1, DAC: 1415
     [DEBUG] Projector stopped.
     PID Reset to initial DAC value: 1500.00
@@ -419,7 +416,9 @@ void loop()
                 Serial.print(F(", Mode: "));
                 Serial.print(speedModeToString(speed_mode));
                 Serial.print(F(", Enable: "));
-                Serial.println(digitalRead(ENABLE_PIN));
+                Serial.print(digitalRead(ENABLE_PIN));
+                Serial.print(F(", Running: "));
+                Serial.println(projector_state);
 
                 /* Add this if PID-Tuning Pots are connected
             Serial.print(" - P ");
@@ -773,7 +772,7 @@ bool setupTimer1forFps(byte desiredFps)
 
     // Read the required dither config from PROGMEM, this saves RAM
     DitherConfig cfg;
-    memcpy_P(&cfg, &s_ditherTable[desiredFps], sizeof(DitherConfig));
+    memcpy_P(&cfg, &s_ditherTable[desiredFps - 2], sizeof(DitherConfig));
 
     // Übernehmen in globale (ISR-)Variablen
     noInterrupts();
