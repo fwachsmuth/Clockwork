@@ -95,7 +95,7 @@ const byte ledFasterYellow = 8; //  +
 volatile uint32_t timer_pulses = 0;
 volatile uint32_t timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
 volatile uint8_t timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
-int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
+// int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
 volatile uint32_t last_pulse_timestamp; // Timestamp of the last pulse, used to detect a stop
 
 
@@ -138,7 +138,7 @@ U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 
 enum SpeedModes
 {
-    XTAL_NONE,
+    XTAL_NONE = 0, /* We use this as array index, too */
     XTAL_AUTO,
     XTAL_16_2_3,
     XTAL_18,
@@ -177,120 +177,148 @@ enum BlendModes
 byte blend_mode = BLEND_SEPMAG;
 
 // Global dithering variables for the ISR:
-volatile uint16_t ditherBase = 0;   // base for OCR1A
-volatile uint32_t ditherFrac32 = 0; // fraction in UQ0.32
-volatile uint32_t ditherAccu32 = 0; // Accumulator
-volatile float ditherEndFreq = 0;   // Actual frequency of the dithered timer / SHAFT_SEGMENT_COUNT (proj. freq)
+// volatile uint16_t ditherBase = 0;   // base for OCR1A
+// volatile uint32_t ditherFrac32 = 0; // fraction in UQ0.32
+volatile uint32_t dither_accumulator_32 = 0; // Accumulator
+// volatile float ditherEndFreq = 0;   // Actual frequency of the dithered timer / SHAFT_SEGMENT_COUNT (proj. freq)
 
-// Struct with all the information we need for dithering & postscaler:
-struct DitherConfig
+// struct DitherConfig
+// {
+//     uint16_t base;   // Grundwert für OCR1A
+//     uint32_t frac32; // fractional part (UQ0.32), 0..(2^32-1)
+//     uint8_t timerFactor; // a frequency multiplier for each timer config (some multiples give better accuracy)
+//     float endFreq; // the actual frequency we get with this config
+// };
+
+
+// Struct with all the information we need to configure the controller for a speed:
+struct SpeedConfig
 {
-    uint16_t base;   // Grundwert für OCR1A
-    uint32_t frac32; // fractional part (UQ0.32), 0..(2^32-1)
-    uint8_t timerFactor; // a frequency multiplier for each timer config (some multiples give better accuracy)
-    float endFreq; // the actual frequency we get with this config
+    char name[6];           // short name for debugging
+    volatile uint16_t dither_base;   // Grundwert für OCR1A
+    volatile uint32_t dither_frac32; // fractional part (UQ0.32), 0..(2^32-1)
+    uint8_t timer_factor;   // a frequency multiplier for each timer config (some multiples give better accuracy)
+    float end_freq;         // the actual frequency we get with this config as an approx. float
+    bool dac_enable;        // to allow freewheeling (no speed controller impact)
+    bool auto_mode;         // to determine the projector's speed switch pos
+    uint16_t dac_init;      // approx dac values to start with
+};
+SpeedConfig speed;
+
+static const SpeedConfig PROGMEM s_speed_table[] = {
+    /*    Name      base    frac32          t  freq       dac   auto    dac_init */
+    {"AUTO", 0, 0, 0, 0, 1, 1, 1500},
+    {"NONE", 0, 0, 0, 0, 0, 0, 0},
+    {"16.66", 10000, 0x00000000, 1, 16.666666, 1, 0, 1200},
+    {"18.00", 2314, 0xD0BE9C00, 4, 18.000000, 1, 0, 1500},
+    {"23.98", 6951, 0x638E38E4, 1, 23.976024, 1, 0, 2000},
+    {"24.00", 2314, 0xD0BE9C00, 3, 24.000000, 1, 0, 2100},
+    {"25.00", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 0, 2200}   
 };
 
-static const DitherConfig PROGMEM s_ditherTable[] = {
+/* old struct
 
-    /*
-    ---------------------------------------------------------------------------
-     Table with Base/Frac/Factor values for each target frequency
-       Prescaler=8 => Timer frequency = 2 MHz
-       The values are tailored for “fps * 12” = final frequency.
+ static const DitherConfig PROGMEM s_ditherTable[] = {
 
-       Explanation:
-         - base = floor( (2000000 / (target freq)) ) or floor( (2000000 / (a multiple)) )
-         - frac32 = (decimal point * 2^32) (UQ0.32 fixed decimal point)
-         - timerFactor => Software divider in the ISR
+        
+        ---------------------------------------------------------------------------
+         Table with Base/Frac/Factor values for each target frequency
+           Prescaler=8 => Timer frequency = 2 MHz
+           The values are tailored for “fps * 12” = final frequency.
 
-       Examples:
-         * FPS_9 => 108 Hz = 864 / 8 => Timer-ISR=864 Hz => base=2314.8 => 2314 + frac~0.8148 => frac32~0xD0E14710
-         * FPS_16_2_3 => 200 Hz => exact divider=10,000 => OCR1A=9999 => fraction=0 => no dither
-         * etc.
+           Explanation:
+             - base = floor( (2000000 / (target freq)) ) or floor( (2000000 / (a multiple)) )
+             - frac32 = (decimal point * 2^32) (UQ0.32 fixed decimal point)
+             - timerFactor => Software divider in the ISR
 
-     Note: All frac32 values here rounded to ~ <5 ppm.
-    ---------------------------------------------------------------------------
-    */
+           Examples:
+             * FPS_9 => 108 Hz = 864 / 8 => Timer-ISR=864 Hz => base=2314.8 => 2314 + frac~0.8148 => frac32~0xD0E14710
+             * FPS_16_2_3 => 200 Hz => exact divider=10,000 => OCR1A=9999 => fraction=0 => no dither
+             * etc.
 
-    // 1) FPS_9 => 108 Hz = 864 Hz ISR / 8
-    //    => idealDiv = 2314.8148148..., base=2314, fraction=~0.8148148
-    //    => frac32 = round(0.8148148 * 2^32) = 0xD0BE9C00
-    //    => Endfreq ~ 108.000000 => 0 ppm
-    // {2314, 0xD0BE9C00, 8, 9.000000},
+         Note: All frac32 values here rounded to ~ <5 ppm.
+        ---------------------------------------------------------------------------
+        
 
-    // 2) FPS_16_2_3 => 200 Hz => idealDiv=10000 => fraction=0 => no dithering
-    //    => base=9999, frac32=0
-    //    => Endfreq=200 => 0 ppm
-    {10000, 0x00000000, 1, 16.666666},
+        // 1) FPS_9 => 108 Hz = 864 Hz ISR / 8
+        //    => idealDiv = 2314.8148148..., base=2314, fraction=~0.8148148
+        //    => frac32 = round(0.8148148 * 2^32) = 0xD0BE9C00
+        //    => Endfreq ~ 108.000000 => 0 ppm
+        // {2314, 0xD0BE9C00, 8, 9.000000},
 
-    // 3) FPS_18 => 216 Hz = 864 Hz ISR / 4
-    //    => same as 108 Hz example but factor=4 => 0 ppm
-    {2314, 0xD0BE9C00, 4, 18.000000},
+        // 2) FPS_16_2_3 => 200 Hz => idealDiv=10000 => fraction=0 => no dithering
+        //    => base=9999, frac32=0
+        //    => Endfreq=200 => 0 ppm
+        {10000, 0x00000000, 1, 16.666666},
 
-    // 4) FPS_23_976
-    /*  => fraction = 288000/1001 ~ 287.712287712288 Hz
-    timer_factor= 1
-    best base   = 6951
-    best frac32 = 0x638E38E4  (decimal 1670265060)
-    freqActual  = 2147483648000000/7463996984889 ~ 287.712287712283 Hz
-    error Hz    = -0.000000000004
-    ppm error   = -0.000000
-    */
-    {6951, 0x638E38E4, 1, 23.976024},
+        // 3) FPS_18 => 216 Hz = 864 Hz ISR / 4
+        //    => same as 108 Hz example but factor=4 => 0 ppm
+        {2314, 0xD0BE9C00, 4, 18.000000},
 
-    // 5) FPS_24 => 288 Hz = 864 Hz ISR / 3
-    //    => same base/fraction as 108 Hz, factor=3 => 0 ppm
-    {2314, 0xD0BE9C00, 3, 24.000000},
+        // 4) FPS_23_976
+        /*  => fraction = 288000/1001 ~ 287.712287712288 Hz
+        timer_factor= 1
+        best base   = 6951
+        best frac32 = 0x638E38E4  (decimal 1670265060)
+        freqActual  = 2147483648000000/7463996984889 ~ 287.712287712283 Hz
+        error Hz    = -0.000000000004
+        ppm error   = -0.000000
+        
+        {6951, 0x638E38E4, 1, 23.976024},
 
-    // 6) FPS_25 => 300 Hz => idealDiv=6666.666..., fraction=0.666..., frac32=0xAAAAAAAB => 0 ppm
-    {6666, 0xAAAAAAAB, 1, 25.000000},
-};
+        // 5) FPS_24 => 288 Hz = 864 Hz ISR / 3
+        //    => same base/fraction as 108 Hz, factor=3 => 0 ppm
+        {2314, 0xD0BE9C00, 3, 24.000000},
 
-void setup()
-{
-    // Initialize buttons using the helper function
-    initializeButton(leftButton, LEFT_BTTN_PIN);
-    initializeButton(rightButton, RIGHT_BTTN_PIN);
-    initializeButton(dropBackButton, DROP_BACK_BTTN_PIN);
-    initializeButton(catchUpButton, CATCH_UP_BTTN_PIN);
+        // 6) FPS_25 => 300 Hz => idealDiv=6666.666..., fraction=0.666..., frac32=0xAAAAAAAB => 0 ppm
+        {6666, 0xAAAAAAAB, 1, 25.000000},
+    };
+*/
 
-    Serial.begin(115200);
+    void setup()
+    {
+        // Initialize buttons using the helper function
+        initializeButton(leftButton, LEFT_BTTN_PIN);
+        initializeButton(rightButton, RIGHT_BTTN_PIN);
+        initializeButton(dropBackButton, DROP_BACK_BTTN_PIN);
+        initializeButton(catchUpButton, CATCH_UP_BTTN_PIN);
 
-    pinMode(SHAFT_PULSE_PIN, INPUT);
-    pinMode(LED_GREEN_PIN, OUTPUT);
-    pinMode(LED_RED_PIN, OUTPUT);
-    pinMode(ENABLE_PIN, OUTPUT);
-    pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
-    pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
-    pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
-    pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
+        Serial.begin(115200);
 
-    // Use this for PID tuning with Pots
-    // pinMode(P_PIN, INPUT);
-    // pinMode(I_PIN, INPUT);
-    // pinMode(D_PIN, INPUT);
+        pinMode(SHAFT_PULSE_PIN, INPUT);
+        pinMode(LED_GREEN_PIN, OUTPUT);
+        pinMode(LED_RED_PIN, OUTPUT);
+        pinMode(ENABLE_PIN, OUTPUT);
+        pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
+        pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
+        pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
+        pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
 
-    attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
-    dac.begin(0x60);
+        // Use this for PID tuning with Pots
+        // pinMode(P_PIN, INPUT);
+        // pinMode(I_PIN, INPUT);
+        // pinMode(D_PIN, INPUT);
 
-    dac.setVoltage(DAC_INITIAL_VALUE, false); // 1537 is petty much 18 fps and 24 fps
+        attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
+        dac.begin(0x60);
 
-    // Init the PID
-    pid_input = 0;
-    pid_setpoint = 0;
-    myPID.SetOutputLimits(0, 4095);
-    myPID.SetSampleTime(100);
-    myPID.SetMode(MANUAL);
-    pid_output = DAC_INITIAL_VALUE; // This avoids starting with a 0-Output signal
-    myPID.SetMode(AUTOMATIC);
+        dac.setVoltage(DAC_INITIAL_VALUE, false); // 1537 is petty much 18 fps and 24 fps
 
-    changeSpeedMode(speed_mode);
+        // Init the PID
+        pid_input = 0;
+        pid_setpoint = 0;
+        myPID.SetOutputLimits(0, 4095);
+        myPID.SetSampleTime(100);
+        myPID.SetMode(MANUAL);
+        pid_output = DAC_INITIAL_VALUE; // This avoids starting with a 0-Output signal
+        myPID.SetMode(AUTOMATIC);
 
-    u8x8.begin();
-    u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
+        changeSpeedMode(speed_mode);
 
-    // FreqMeasure.begin();
+        u8x8.begin();
+        u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
+
+        // FreqMeasure.begin();
 }
 
 void loop()
@@ -404,7 +432,7 @@ void loop()
             // Uncomment to throttle the Console Output
             if (millis() % 100 == 1) {
                 Serial.print(F("Mode: "));
-                Serial.print(speedModeToString(speed_mode));
+                Serial.print(speed.name);
                 Serial.print(F(", Error: "));
                 Serial.print(current_pulse_difference);
                 Serial.print(F(", DAC: "));
@@ -581,7 +609,7 @@ void checkProjectorRunningYet()
         // Update projector state
         projector_state = PROJ_RUNNING;
         Serial.print(F("Setting up Timer for "));
-        Serial.println(speedModeToString(speed_mode));
+        Serial.println(speed.name);
         setupTimer1forFps(speed_mode);
         digitalWrite(ENABLE_PIN, HIGH);
     }
@@ -591,6 +619,17 @@ void checkProjectorRunningYet()
     freq_count = 0;
     
 }
+
+void loadSpeedConfig(uint8_t desired_config)
+{
+    memcpy_P(&speed, &s_speed_table[desired_config], sizeof(SpeedConfig));
+    
+    // Globale (why?) Dither-Variablen belegen
+    // ditherFrac32 = speed.dither_frac32;
+    // timer_factor = speed.timer_factor;
+    // ditherEndFreq = speed.end_freq;
+}
+
 
 void selectNextMode(Button2 &btn)
 {
@@ -635,7 +674,7 @@ void selectNextMode(Button2 &btn)
         case XTAL_24:
         case XTAL_25:
             // copy the endFreq of the struct wuth speed_mode index - 2 (0 and 1 are NONE and AUTO)
-            memcpy_P(&next_freq, &s_ditherTable[((speed_mode - 2))].endFreq, sizeof(float));
+            memcpy_P(&next_freq, &s_speed_table[((speed_mode))].end_freq, sizeof(float));
             Serial.println(next_freq);
             break;
     }
@@ -756,8 +795,12 @@ void handleButtonTap(Button2 &btn)
     }
 }
 
+
+
 bool setupTimer1forFps(byte desiredFps)
 {
+    // Read the required speed config from PROGMEM, this saves RAM
+    loadSpeedConfig(desiredFps);
 
     // start with a new sync point, no need to catch up differences from before 
     if (projector_state == PROJ_IDLE)
@@ -770,33 +813,27 @@ bool setupTimer1forFps(byte desiredFps)
         interrupts();
     }
 
-    // Read the required dither config from PROGMEM, this saves RAM
-    DitherConfig cfg;
-    memcpy_P(&cfg, &s_ditherTable[desiredFps - 2], sizeof(DitherConfig));
+    // DitherConfig cfg;
+    // memcpy_P(&cfg, &s_ditherTable[desiredFps - 2], sizeof(DitherConfig));
 
-    // Übernehmen in globale (ISR-)Variablen
+    
+
+
+    dither_accumulator_32 = 0;
+
+    // Setup Timer1
     noInterrupts();
-    // Timer stoppen/Reset
     TCCR1A = 0;
     TCCR1B = 0;
     TIMSK1 = 0;
     TCNT1 = 0;
-
-    // Globale Dither-Variablen belegen
-    ditherBase = cfg.base;
-    ditherFrac32 = cfg.frac32;
-    ditherAccu32 = 0;
-
-    timer_factor = cfg.timerFactor;
-    ditherEndFreq = cfg.endFreq;
-
-    OCR1A = ditherBase;                   // OCR1A start value
-    TCCR1B |= (1 << WGM12) | (1 << CS11); // CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
-    TIMSK1 |= (1 << OCIE1A);              // enable Compare-A-Interrupt
+    OCR1A = speed.dither_base;              // OCR1A start value
+    TCCR1B |= (1 << WGM12) | (1 << CS11);   // CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
+    TIMSK1 |= (1 << OCIE1A);                // enable Compare-A-Interrupt
     interrupts();
 
     Serial.print(F("*** Timer 1 set up for speed "));
-    Serial.println(ditherEndFreq);
+    Serial.println(speed.end_freq);
 
     return true;
 }
@@ -824,7 +861,7 @@ ISR(TIMER1_COMPA_vect)
     timer_modulus++;
 
     // Check if the counter has reached the desired factor
-    if (timer_modulus >= timer_factor)
+    if (timer_modulus >= speed.timer_factor)
     {
         timer_pulses++;    // Increment timer_pulses
         timer_modulus = 0; // Reset the counter
@@ -832,10 +869,10 @@ ISR(TIMER1_COMPA_vect)
     }
 
     // Dither logic (fixed-point accumulator)
-    ditherAccu32 += ditherFrac32;
+    dither_accumulator_32 += speed.dither_frac32;
 
-    // If overflow => ditherAccu32 < ditherFrac32
-    OCR1A = (ditherAccu32 < ditherFrac32) ? (ditherBase + 1) : ditherBase;
+    // If overflow => dither_accumulator_32 < ditherFrac32
+    OCR1A = (dither_accumulator_32 < speed.dither_frac32) ? (speed.dither_base + 1) : speed.dither_base;
 }
 
 void stopTimer1()
@@ -844,27 +881,6 @@ void stopTimer1()
     noInterrupts();
     TIMSK1 &= ~(1 << OCIE1A);
     interrupts();
-}
-
-const char *speedModeToString(byte run_mode)
-{
-    switch (run_mode)
-    {
-    case XTAL_NONE:
-        return "NONE";
-    case XTAL_AUTO:
-        return "AUTO";
-    case XTAL_16_2_3:
-        return "16 2/3";
-    case XTAL_18:
-        return "18";
-    case XTAL_23_976:
-        return "23.976";
-    case XTAL_24:
-        return "24";
-    case XTAL_25:
-        return "25";
-    }
 }
 
 const char *fpsToString(byte fps_mode)
