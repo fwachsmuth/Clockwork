@@ -1,6 +1,7 @@
 /* Todo
 
 - refactor activateNextMode() (If instead of switch)
+- remove unused params in struct: auto_mode, and potentially dac_mode 
 
 - use speed.timer_factor
 - use speed.dac_enable
@@ -198,19 +199,18 @@ struct SpeedConfig
     uint8_t timer_factor;   // a frequency multiplier for each timer config (some multiples give better accuracy)
     float end_freq;         // the actual frequency we get with this config as an approx. float
     bool dac_enable;        // to allow freewheeling (no speed controller impact)
-    bool auto_mode;         // to determine the projector's speed switch pos
     uint16_t dac_init;      // approx dac values to start with
 };
 SpeedConfig speed;
 
 static const SpeedConfig PROGMEM s_speed_table[] = {
-    {"AUTO", 0, 0, 0, 0, 1, 1, 1500},
-    {"NONE", 0, 0, 0, 0, 0, 0, 0},
-    {"16.66", 10000, 0x00000000, 1, 16.666666, 1, 0, 1200},
-    {"18.00", 2314, 0xD0BE9C00, 4, 18.000000, 1, 0, 1500},
-    {"23.98", 6951, 0x638E38E4, 1, 23.976024, 1, 0, 2000},
-    {"24.00", 2314, 0xD0BE9C00, 3, 24.000000, 1, 0, 2100},
-    {"25.00", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 0, 2200}   
+    {"AUTO", 0, 0, 0, 0, 1, 1500},
+    {"NONE", 0, 0, 0, 0, 0, 0},
+    {"16.66", 10000, 0x00000000, 1, 16.666666, 1, 1200},
+    {"18.00", 2314, 0xD0BE9C00, 4, 18.000000, 1, 1500},
+    {"23.98", 6951, 0x638E38E4, 1, 23.976024, 1, 2000},
+    {"24.00", 2314, 0xD0BE9C00, 3, 24.000000, 1, 2100},
+    {"25.00", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 2200}   
 };
 
 /* old struct
@@ -296,7 +296,7 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
         // pinMode(I_PIN, INPUT);
         // pinMode(D_PIN, INPUT);
 
-        loadSpeedConfig(FPS_AUTO);
+        activateSpeedConfig(FPS_AUTO);
 
         attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
         dac.begin(0x60);
@@ -312,7 +312,7 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
         pid_output = speed.dac_init; // This avoids starting with a 0-Output signal
         myPID.SetMode(AUTOMATIC);
 
-        activateSpeed(FPS_AUTO);
+        activateSpeedConfig(FPS_AUTO);
 
         u8x8.begin();
         u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
@@ -599,7 +599,7 @@ void checkProjectorRunningYet()
 
         if (current_speed_mode == FPS_AUTO)
         { // Determine the mode based on the detected frequency
-            activateSpeed(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? FPS_18 : FPS_24);
+            activateSpeedConfig(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? FPS_18 : FPS_24);
             projector_speed_switch = (detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? 18 : 24);
         }
         // Init the pulse timer to not lose those first frames
@@ -619,25 +619,46 @@ void checkProjectorRunningYet()
     
 }
 
-void loadSpeedConfig(uint8_t desired_config)
-{
-    memcpy_P(&speed, &s_speed_table[desired_config], sizeof(SpeedConfig));
-    
-    // Globale (why?) Dither-Variablen belegen
-    // ditherFrac32 = speed.dither_frac32;
-    // timer_factor = speed.timer_factor;
-    // ditherEndFreq = speed.end_freq;
-}
-
 
 void selectNextMode(Button2 &btn)
 {
-    // Determine the change based on which button was pressed
-    int8_t change = (btn == leftButton) ? -1 : 1;
+    float timer_correction_factor;
 
-    // Change the speed mode to an adjacent enum value ("change")
+    // Determine if left or right button was pressed
+    int8_t change = (btn == leftButton) ? -1 : 1;
     current_speed_mode = (current_speed_mode + change + MODES_COUNT) % MODES_COUNT;
     
+    if (projector_state == PROJ_RUNNING)
+    {
+        // read next speed.end_freq
+        // add the error to the timerpulses
+        // calculate timer_correction_factor for current_speed_mode to next_speed_mode
+    } 
+    else
+    {
+        timer_correction_factor = 1;
+    }
+
+    if (current_speed_mode == FPS_AUTO)
+    {
+        if (projector_speed_switch == 0)
+        {
+            // measure the current freq 
+            // set projector_speed_switch to 18 or 24
+        }
+        else
+        {
+            // restore timer config for the equivalent speed
+        }
+    }
+
+    activateSpeedConfig(current_speed_mode);    // sets the PID, registers etc
+
+    // write the timerpulses (+timer_correction_factor) 
+
+
+
+    /* ------------ old code below -----------------------------------------------
     // Prepare for re-calculating the ISR's timer_frames in sepmag mode
     float next_freq;
 
@@ -657,7 +678,7 @@ void selectNextMode(Button2 &btn)
     // Put an IF instead of the SWITCH here to do the auto measurement
 
     switch (current_speed_mode) // This is the new current_speed_mode we are about to switch TO
-    
+
     {
         // we pick the right next_freq here.
         case FPS_NONE:
@@ -706,77 +727,82 @@ void selectNextMode(Button2 &btn)
 // These calclulations might belong in activatSpeed?
 
         uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000));
-    
+
         // This should be a bit more precise, but actually leads to results that apepar rather off. Not sure yet why
         // uint32_t fuckdated_timer_pulses = (local_timer_pulses * next_freq * (millis() - projector_start_millis)) / (local_shaft_pulses * 1000 / SHAFT_SEGMENT_COUNT);
 
         Serial.print(F("My calculation: "));
         Serial.println(updated_timer_pulses);
-    
+
         noInterrupts();
         timer_pulses = updated_timer_pulses;
         timer_frame_count_updated = true;
         interrupts();
     }
 
-    activateSpeed(current_speed_mode);
+    activateSpeedConfig(current_speed_mode);
+ ------------ old code above ----------------------------------------------- */
 }
 
-void activateSpeed(byte next_speed)
-{
-    loadSpeedConfig(next_speed);
-    Serial.println(speed.name);
+void activateSpeedConfig(byte next_speed)
+    {
+        // Copy from PROGMEM to struct
+        memcpy_P(&speed, &s_speed_table[next_speed], sizeof(SpeedConfig));
 
-    // connect or disconnect the DAC
-    digitalWrite(ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
-    // or: digitalWrite(ENABLE_PIN, (next_speed == XTAL_NONE) ? LOW : HIGH);
+        Serial.println(speed.name);
 
-    // Init the DAC with a start value
-    myPID.SetMode(MANUAL);
-    pid_output = speed.dac_init;
-    myPID.Compute();
-    myPID.SetMode(AUTOMATIC);
-    dac.setVoltage(speed.dac_init, false);      // false: Do not make this the default value of the DAC
+        // connect or disconnect the DAC
+        // or: digitalWrite(ENABLE_PIN, (next_speed == XTAL_NONE) ? LOW : HIGH);
 
-    // old switch case
-    // switch (next_speed)
-    // {
-    // case FPS_NONE:
-    //     break;
-    // case FPS_AUTO:
-    //     // reset the PID Output
-    //     myPID.SetMode(MANUAL);
-    //     pid_output = speed.dac_init;
-    //     myPID.Compute();
-    //     myPID.SetMode(AUTOMATIC);
-    //     // set DAC to initial value
-    //     dac.setVoltage(speed.dac_init, false);
-    //     Serial.println(F("XTAL_AUTO"));
-    //     break;
-    // case FPS_16_2_3:
-    //     Serial.println(F("XTAL_16_2_3"));
-    //     setupTimer1forFps(FPS_16_2_3);
-    //     break;
-    // case FPS_18:
-    //     Serial.println(F("XTAL_18"));
-    //     setupTimer1forFps(FPS_18);
-    //     break;
-    // case FPS_23_976:
-    //     Serial.println(F("XTAL_23_976"));
-    //     setupTimer1forFps(FPS_23_976);
-    //     break;
-    // case FPS_24:
-    //     Serial.println(F("XTAL_24"));
-    //     setupTimer1forFps(FPS_24);
-    //     break;
-    // case FPS_25:
-    //     Serial.println(F("XTAL_25"));
-    //     setupTimer1forFps(FPS_25);
-    //     break;
-    // default:
-    //     Serial.println(F("Unknown Mode"));
-    //     break;
-    // }
+        // Init the PID with a start value to not start at 0
+        myPID.SetMode(MANUAL);
+        pid_output = speed.dac_init;
+        myPID.Compute();
+        myPID.SetMode(AUTOMATIC);
+
+        // Configure DAC
+        dac.setVoltage(speed.dac_init, false);      // false: Do not make this the default value of the DAC
+        digitalWrite(ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
+
+        // old switch case
+        // switch (next_speed)
+        // {
+        // case FPS_NONE:
+        //     break;
+        // case FPS_AUTO:
+        //     // reset the PID Output
+        //     myPID.SetMode(MANUAL);
+        //     pid_output = speed.dac_init;
+        //     myPID.Compute();
+        //     myPID.SetMode(AUTOMATIC);
+        //     // set DAC to initial value
+        //     dac.setVoltage(speed.dac_init, false);
+        //     Serial.println(F("XTAL_AUTO"));
+        //     break;
+        // case FPS_16_2_3:
+        //     Serial.println(F("XTAL_16_2_3"));
+        //     setupTimer1forFps(FPS_16_2_3);
+        //     break;
+        // case FPS_18:
+        //     Serial.println(F("XTAL_18"));
+        //     setupTimer1forFps(FPS_18);
+        //     break;
+        // case FPS_23_976:
+        //     Serial.println(F("XTAL_23_976"));
+        //     setupTimer1forFps(FPS_23_976);
+        //     break;
+        // case FPS_24:
+        //     Serial.println(F("XTAL_24"));
+        //     setupTimer1forFps(FPS_24);
+        //     break;
+        // case FPS_25:
+        //     Serial.println(F("XTAL_25"));
+        //     setupTimer1forFps(FPS_25);
+        //     break;
+        // default:
+        //     Serial.println(F("Unknown Mode"));
+        //     break;
+        // }
 }
 
 void handleButtonTap(Button2 &btn)
@@ -807,12 +833,10 @@ void handleButtonTap(Button2 &btn)
     }
 }
 
-
-
 bool setupTimer1forFps(byte desiredFps)
 {
     // Read the required speed config from PROGMEM, this saves RAM
-    loadSpeedConfig(desiredFps);
+    // loadSpeedConfig(desiredFps);
 
     // start with a new sync point, no need to catch up differences from before 
     if (projector_state == PROJ_IDLE)
@@ -827,9 +851,6 @@ bool setupTimer1forFps(byte desiredFps)
 
     // DitherConfig cfg;
     // memcpy_P(&cfg, &s_ditherTable[desiredFps - 2], sizeof(DitherConfig));
-
-    
-
 
     dither_accumulator_32 = 0;
 
