@@ -3736,6 +3736,16 @@
 		)
 		(uuid "8af50058-b1ac-4b43-af3b-bcfdc5dda42d")
 	)
+	(text "D7 Osc TP"
+		(exclude_from_sim no)
+		(at 44.704 41.656 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "8fb89640-ae1f-4510-8bef-ca6172d99b55")
+	)
 	(text "5V Square out"
 		(exclude_from_sim no)
 		(at 181.356 75.184 0)

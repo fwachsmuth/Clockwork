@@ -1,28 +1,13 @@
 /* Todo
 
 - No spped mode activate between 0->1 and 6->0, since the AUTO switch case has no code yet!
+- Is the dithering really deliverin the target frequency? Seems to be slightly below. Use the Oscilloscpe to find out
 
-- refactor activateNextMode() (If instead of switch)
-- remove unused params in struct: auto_mode, and potentially dac_mode
-
-- use speed.timer_factor
-- use speed.dac_enable
-- use speed.auto_mode
-- use speed.dac_init
-- update comments in the new struct
 - flash the DAC just once on very first start
 
 
 - New Bugs:
 - Remaining pid-Errors seem to add up on speed changes?
-    Mode: AUTO, Error: 1, DAC: 1415
-    [DEBUG] Projector stopped.
-    PID Reset to initial DAC value: 1500.00
-    Shaft Noise ignored.
-    timer_pulses * next_freq / (millis() - proojector_start_millis) / 1000))
-->  From 0 Pulses to 0 * 16.67 / (1/12) / (2016)/1000) = nan
-->  My calculation: 0 <-
-    XTAL_16_2_3
 - updated_time_pulses not written back yet since they cause a "stop" deetcted !?
 - Not sure if entering Auto/None works correctly... pretzel brain
 - Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
@@ -82,7 +67,7 @@ constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Win
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
 const byte LED_RED_PIN = 5;
-const byte LED_GREEN_PIN = 7;
+const byte OSCILLOSCOPE_PIN = 7;
 const byte ENABLE_PIN = 9;
 
 // Use this for PID tuning with Pots
@@ -274,7 +259,7 @@ float previous_avg_freq;
         Serial.begin(115200);
 
         pinMode(SHAFT_PULSE_PIN, INPUT);
-        pinMode(LED_GREEN_PIN, OUTPUT);
+        pinMode(OSCILLOSCOPE_PIN, OUTPUT);
         pinMode(LED_RED_PIN, OUTPUT);
         pinMode(ENABLE_PIN, OUTPUT);
         pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
@@ -542,7 +527,8 @@ void checkProjectorRunningYet()
 
     new_shaft_impulse_available = false; // Reset the ISR's "new data available" flag
 
-    projector_start_millis = millis(); // Track the start time of the projector running
+    // This is so early that it pulls the average down
+    // projector_start_millis = millis(); // Track the start time of the projector running. This might be a little early
 
     double freq_sum = 0;
     int freq_count = 0;
@@ -592,6 +578,7 @@ void checkProjectorRunningYet()
         timer_pulses = freq_count;
 
         // Update projector state
+        projector_start_millis = millis();  // we lose the time for 4 frames here
         projector_state = PROJ_RUNNING;
         Serial.print(F("Setting up Timer for "));
         Serial.println(speed.name);
@@ -614,28 +601,6 @@ void selectNextMode(Button2 &btn)
     currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
     Serial.print(F("New Mode: "));
     Serial.println(currently_selected_mode);
-
-    if (false)
-    {
-        // read prev (next?) speed.end_freq
-        // add the error to the timerpulses
-        // calculate timer_correction_factor for currently_selected_mode to next_speed_mode
-
-        /* uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000)); */
-        
-        // timer_correction_factor = new-speed / prev-speed, also zB 24 / 18 oder 18 / 16.666666
-        // memcpy_P(&previous_avg_freq, &s_speed_table[(currently_selected_mode - change + MODES_COUNT) % MODES_COUNT].end_freq, sizeof(float));
-
-        // uint8_t new_index = currently_selected_mode;
-        // uint8_t before_index = previously_selected_mode;
-
-        // Serial.print(F("new-index: "));
-        // Serial.print(new_index);
-        // Serial.print(F(", before-index: "));
-        // Serial.println(before_index);
-
-        // memcpy_P(&previous_avg_freq, &s_speed_table[(previously_selected_mode - change + MODES_COUNT) % MODES_COUNT].end_freq, sizeof(float));
-    } 
 
     if (currently_selected_mode == FPS_AUTO)
     {
@@ -768,8 +733,9 @@ void activateSpeedConfig(byte next_speed)
         {
             // work with ints as long as possible
             uint32_t now = millis();
+            uint32_t shaft_frames_now = shaft_frames;
             unsigned long elapsed_time_ms = now - projector_start_millis;
-            unsigned long frames_per_1000_ms = (unsigned long)shaft_frames * 1000; // inflate shaft_frames to improve acuracy
+            unsigned long frames_per_1000_ms = (unsigned long)shaft_frames_now * 1000; // inflate shaft_frames to improve acuracy
             float previous_avg_freq = (float)frames_per_1000_ms / elapsed_time_ms;
 
             Serial.print(F("Frames * 1000 so far: "));
@@ -946,6 +912,7 @@ ISR(TIMER1_COMPA_vect)
         timer_pulses++;    // Increment timer_pulses
         timer_modulus = 0; // Reset the counter
         timer_pulse_count_updated = true;
+        PIND |= (1 << 7); // Toggle pin 7kica
     }
 
     // Dither logic (fixed-point accumulator)
