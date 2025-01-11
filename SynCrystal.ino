@@ -1,6 +1,6 @@
 /* Todo
 
-- something goes horribly wrong when I call activateSpeedConfig(FPS_AUTO); in Setup()
+- No spped mode activate between 0->1 and 6->0, since the AUTO switch case has no code yet!
 
 - refactor activateNextMode() (If instead of switch)
 - remove unused params in struct: auto_mode, and potentially dac_mode
@@ -150,18 +150,6 @@ Button2 leftButton, rightButton, dropBackButton, catchUpButton;
 // Instantiate the Display
 U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 
-// enum SpeedModes
-// {
-//     XTAL_NONE = 0, /* We use this as array index, too */
-//     XTAL_AUTO,
-//     XTAL_16_2_3,
-//     XTAL_18,
-//     XTAL_23_976,
-//     XTAL_24,
-//     XTAL_25,
-//     MODES_COUNT // Automatically equals the number of entries in the enum
-// };
-
 byte currently_selected_mode;
 float previous_freq = 1.00; // to allow recalculation of timer_frames and timecode
 
@@ -183,8 +171,8 @@ byte blend_mode = BLEND_SEPMAG;
 
 // Name the indices of the speed config struct
 // Make sure these align with the SpeedConfig struct array below.
-#define FPS_AUTO    0
-#define FPS_NONE    1
+#define FPS_NONE    0
+#define FPS_AUTO    1
 #define FPS_16_2_3  2   // => 200 Hz
 #define FPS_18      3   // => 216 Hz
 #define FPS_23_976  4   // => ~287.712 Hz
@@ -206,8 +194,8 @@ struct SpeedConfig
 SpeedConfig speed;
 
 static const SpeedConfig PROGMEM s_speed_table[] = {
-    {"AUTO", 0, 0, 0, 0, 1, 1500},
     {"NONE", 0, 0, 0, 0, 0, 0},
+    {"AUTO", 0, 0, 0, 0, 1, 1500},
     {"16.66", 10000, 0x00000000, 1, 16.666666, 1, 1200},
     {"18.00", 2314, 0xD0BE9C00, 4, 18.000000, 1, 1500},
     {"23.98", 6951, 0x638E38E4, 1, 23.976024, 1, 2000},
@@ -312,7 +300,8 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
         pid_output = speed.dac_init; // This avoids starting with a 0-Output signal
         myPID.SetMode(AUTOMATIC);
 
-        activateSpeedConfig(FPS_AUTO);
+        currently_selected_mode = FPS_AUTO;
+        activateSpeedConfig(currently_selected_mode);
 
         u8x8.begin();
         u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
@@ -620,9 +609,9 @@ void selectNextMode(Button2 &btn)
 
     // Determine if left or right button was pressed
     int8_t change = (btn == leftButton) ? -1 : 1;
-
-    Serial.println((currently_selected_mode + change + MODES_COUNT) % MODES_COUNT);
+    int8_t previously_selected_mode = currently_selected_mode;
     currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
+    Serial.println(currently_selected_mode);
 
     // To keep the sync Sepmag-style, we need to correct the timer to teh new speed
     if (projector_state == PROJ_RUNNING)
@@ -635,11 +624,18 @@ void selectNextMode(Button2 &btn)
         
         // timer_correction_factor = new-speed / prev-speed, also zB 24 / 18 oder 18 / 16.666666
         float previous_end_freq;
-        //memcpy_P(&previous_end_freq, &s_speed_table[(currently_selected_mode + change + MODES_COUNT) % MODES_COUNT].end_freq, sizeof(float));
+        // memcpy_P(&previous_end_freq, &s_speed_table[(currently_selected_mode - change + MODES_COUNT) % MODES_COUNT].end_freq, sizeof(float));
+        memcpy_P(&previous_end_freq, &s_speed_table[(previously_selected_mode - change + MODES_COUNT) % MODES_COUNT].end_freq, sizeof(float));
+
         timer_correction_factor = speed.end_freq / previous_end_freq;
 
-        Serial.print(F("Timer Correction Factor: "));
-        Serial.println(timer_correction_factor);
+        Serial.print(F("speed.end_freq: "));
+        Serial.print(speed.end_freq, 6);
+        Serial.print(F(" / "));
+        Serial.print(F("previous_end_freq: "));
+        Serial.print(previous_end_freq, 6);
+        Serial.print(F(" = "));
+        Serial.println(timer_correction_factor, 6);
     } 
     else
     {
@@ -648,22 +644,26 @@ void selectNextMode(Button2 &btn)
 
     if (currently_selected_mode == FPS_AUTO)
     {
-        switch (projector_speed_switch) {
-            case 0:
-                // switch pos is still unknown for this run
-                // measure the current freq
-                // set projector_speed_switch to 18 or 24
+        Serial.println(F("Im Auto Switch"));
+        switch (projector_speed_switch)
+        {
+        case 0:
+            // switch pos is still unknown for this run
+            // measure the current freq
+            // set projector_speed_switch to 18 or 24
 
-                break;
-            case 18:
-                activateSpeedConfig(FPS_18); // activates the speed struct, inits PID and DAC
-                break;
-            case 24:
-                activateSpeedConfig(FPS_24);
-                break;
-            default:
-                Serial.println(F("invalid value"));
-            }
+            break;
+        case 18:
+            Serial.println(F("Restoring 18"));
+            activateSpeedConfig(FPS_18); // activates the speed struct, inits PID and DAC
+            break;
+        case 24:
+            Serial.println(F("Restoring 24"));
+            activateSpeedConfig(FPS_24);
+            break;
+        default:
+            Serial.println(F("invalid value"));
+        }
     } 
     else 
     {
