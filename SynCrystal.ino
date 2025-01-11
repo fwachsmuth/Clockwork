@@ -1,7 +1,9 @@
 /* Todo
 
+- something goes horribly wrong when I call activateSpeedConfig(FPS_AUTO); in Setup()
+
 - refactor activateNextMode() (If instead of switch)
-- remove unused params in struct: auto_mode, and potentially dac_mode 
+- remove unused params in struct: auto_mode, and potentially dac_mode
 
 - use speed.timer_factor
 - use speed.dac_enable
@@ -295,8 +297,6 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
         // pinMode(P_PIN, INPUT);
         // pinMode(I_PIN, INPUT);
         // pinMode(D_PIN, INPUT);
-
-        // activateSpeedConfig(FPS_AUTO);
 
         attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
         dac.begin(0x60);
