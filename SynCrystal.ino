@@ -4,7 +4,11 @@
 - Is the dithering really deliverin the target frequency? Seems to be slightly below. Use the Oscilloscpe to find out
 
 - flash the DAC just once on very first start
+- Missing Case: Projector started in a manual mode and user than enters Auto.
+- speed.name is probably not really needed
 
+- use shaft_pulses instead of shaft_frames to determine past speed, more precise and omits a multiplication
+- actually apply the timer_factor
 
 - New Bugs:
 - Remaining pid-Errors seem to add up on speed changes?
@@ -192,8 +196,7 @@ float previous_avg_freq;
 /* old struct
 
  static const DitherConfig PROGMEM s_ditherTable[] = {
-
-        
+       
         ---------------------------------------------------------------------------
          Table with Base/Frac/Factor values for each target frequency
            Prescaler=8 => Timer frequency = 2 MHz
@@ -236,7 +239,6 @@ float previous_avg_freq;
         freqActual  = 2147483648000000/7463996984889 ~ 287.712287712283 Hz
         error Hz    = -0.000000000004
         ppm error   = -0.000000
-        
         {6951, 0x638E38E4, 1, 23.976024},
 
         // 5) FPS_24 => 288 Hz = 864 Hz ISR / 3
@@ -248,51 +250,51 @@ float previous_avg_freq;
     };
 */
 
-    void setup()
-    {
-        // Initialize buttons using the helper function
-        initializeButton(leftButton, LEFT_BTTN_PIN);
-        initializeButton(rightButton, RIGHT_BTTN_PIN);
-        initializeButton(dropBackButton, DROP_BACK_BTTN_PIN);
-        initializeButton(catchUpButton, CATCH_UP_BTTN_PIN);
+void setup()
+{
+    // Initialize buttons using the helper function
+    initializeButton(leftButton, LEFT_BTTN_PIN);
+    initializeButton(rightButton, RIGHT_BTTN_PIN);
+    initializeButton(dropBackButton, DROP_BACK_BTTN_PIN);
+    initializeButton(catchUpButton, CATCH_UP_BTTN_PIN);
 
-        Serial.begin(115200);
+    Serial.begin(115200);
 
-        pinMode(SHAFT_PULSE_PIN, INPUT);
-        pinMode(OSCILLOSCOPE_PIN, OUTPUT);
-        pinMode(LED_RED_PIN, OUTPUT);
-        pinMode(ENABLE_PIN, OUTPUT);
-        pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
-        pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
-        pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
-        pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
+    pinMode(SHAFT_PULSE_PIN, INPUT);
+    pinMode(OSCILLOSCOPE_PIN, OUTPUT);
+    pinMode(LED_RED_PIN, OUTPUT);
+    pinMode(ENABLE_PIN, OUTPUT);
+    pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
+    pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
+    pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
+    pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
 
-        // Use this for PID tuning with Pots
-        // pinMode(P_PIN, INPUT);
-        // pinMode(I_PIN, INPUT);
-        // pinMode(D_PIN, INPUT);
+    // Use this for PID tuning with Pots
+    // pinMode(P_PIN, INPUT);
+    // pinMode(I_PIN, INPUT);
+    // pinMode(D_PIN, INPUT);
 
-        attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
-        dac.begin(0x60);
+    attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
+    dac.begin(0x60);
 
-        dac.setVoltage(speed.dac_init, false); // 1537 is petty much 18 fps and 24 fps
+    dac.setVoltage(speed.dac_init, false); // 1537 is petty much 18 fps and 24 fps
 
-        // Init the PID
-        pid_input = 0;
-        pid_setpoint = 0;
-        myPID.SetOutputLimits(0, 4095);
-        myPID.SetSampleTime(100);
-        myPID.SetMode(MANUAL);
-        pid_output = speed.dac_init; // This avoids starting with a 0-Output signal
-        myPID.SetMode(AUTOMATIC);
+    // Init the PID
+    pid_input = 0;
+    pid_setpoint = 0;
+    myPID.SetOutputLimits(0, 4095);
+    myPID.SetSampleTime(100);
+    myPID.SetMode(MANUAL);
+    pid_output = speed.dac_init; // This avoids starting with a 0-Output signal
+    myPID.SetMode(AUTOMATIC);
 
-        currently_selected_mode = FPS_AUTO;
-        activateSpeedConfig(currently_selected_mode);
+    currently_selected_mode = FPS_AUTO;
+    activateSpeedConfig(currently_selected_mode);
 
-        u8x8.begin();
-        u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
+    u8x8.begin();
+    u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
 
-        // FreqMeasure.begin();
+    // FreqMeasure.begin();
 }
 
 void loop()
@@ -359,6 +361,7 @@ void loop()
     }
     else if (projector_state == PROJ_RUNNING)
     {
+        // copy volatile vars that can't be read atomic
         noInterrupts();
         local_timer_pulses = timer_pulses;
         local_shaft_pulses = shaft_pulses;
@@ -366,18 +369,6 @@ void loop()
 
         // Compute Error and feed PID and DAC
         current_pulse_difference = local_timer_pulses - local_shaft_pulses;
-
-        // Disabled: Adaptive PID
-        // double gap = abs(pid_setpoint - pid_input); // distance away from setpoint
-        // if (gap < 10)
-        // { // we're close to setpoint, use conservative tuning parameters
-        //     myPID.SetTunings(cons_Kp, cons_Ki, cons_Kd);
-        // }
-        // else
-        // {
-        //     // we're far from setpoint, use aggressive tuning parameters
-        //     myPID.SetTunings(agg_Kp, agg_Ki, agg_Kd);
-        // }
 
         pid_input = current_pulse_difference;
         myPID.Compute();
@@ -416,18 +407,18 @@ void loop()
                 Serial.println(projector_state);
 
                 /* Add this if PID-Tuning Pots are connected
-            Serial.print(" - P ");
-            Serial.print(p_pot);
-            Serial.print("  I ");
-            Serial.print(i_pot);
-            Serial.print("  D ");
-            Serial.println(d_pot);
-            */
+                Serial.print(" - P ");
+                Serial.print(p_pot);
+                Serial.print("  I ");
+                Serial.print(i_pot);
+                Serial.print("  D ");
+                Serial.println(d_pot);
+                */
             }
         }
 
-            last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
-            last_dac_value = new_dac_value;
+        last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
+        last_dac_value = new_dac_value;
         // }
 
         // Stop detection
@@ -582,7 +573,8 @@ void checkProjectorRunningYet()
         projector_state = PROJ_RUNNING;
         Serial.print(F("Setting up Timer for "));
         Serial.println(speed.name);
-        setupTimer1forFps(currently_selected_mode);
+        //activateSpeedConfig(currently_selected_mode);
+        legacy_setupTimer1forFps();
         digitalWrite(ENABLE_PIN, HIGH);
     }
 
@@ -604,10 +596,12 @@ void selectNextMode(Button2 &btn)
 
     if (currently_selected_mode == FPS_AUTO)
     {
-        Serial.println(F("Im Auto Switch"));
         switch (projector_speed_switch)
         {
         case 0:
+            Serial.println(F("No prev. AUTO Frequency..."));
+            // Missing Case: Projector started in a manual mode and user than enters Auto.
+
             // switch pos is still unknown for this run
             // measure the current freq
             // set projector_speed_switch to 18 or 24
@@ -723,96 +717,56 @@ void selectNextMode(Button2 &btn)
 }
 
 void activateSpeedConfig(byte next_speed)
+{
+    // Copy next config from PROGMEM to struct
+    memcpy_P(&speed, &s_speed_table[next_speed], sizeof(SpeedConfig));
+
+    // To keep the sync Sepmag-style, we need to correct the timer to teh new speed
+    float timer_correction_factor;
+    if (projector_state == PROJ_RUNNING)
     {
-        // Copy next config from PROGMEM to struct
-        memcpy_P(&speed, &s_speed_table[next_speed], sizeof(SpeedConfig));
+        // work with ints as long as possible
+        uint32_t now = millis();
+        uint32_t shaft_frames_now = shaft_frames;
+        unsigned long elapsed_time_ms = now - projector_start_millis;
+        unsigned long frames_per_1000_ms = (unsigned long)shaft_frames_now * 1000; // inflate shaft_frames to improve acuracy
+        float previous_avg_freq = (float)frames_per_1000_ms / elapsed_time_ms;
 
-        // To keep the sync Sepmag-style, we need to correct the timer to teh new speed
-        float timer_correction_factor;
-        if (projector_state == PROJ_RUNNING)
-        {
-            // work with ints as long as possible
-            uint32_t now = millis();
-            uint32_t shaft_frames_now = shaft_frames;
-            unsigned long elapsed_time_ms = now - projector_start_millis;
-            unsigned long frames_per_1000_ms = (unsigned long)shaft_frames_now * 1000; // inflate shaft_frames to improve acuracy
-            float previous_avg_freq = (float)frames_per_1000_ms / elapsed_time_ms;
+        Serial.print(F("Frames * 1000 so far: "));
+        Serial.print(frames_per_1000_ms);
+        Serial.print(F(", seconds running: "));
+        Serial.println((float)elapsed_time_ms / 1000, 6);
 
-            Serial.print(F("Frames * 1000 so far: "));
-            Serial.print(frames_per_1000_ms);
-            Serial.print(F(", seconds running: "));
-            Serial.println((float)elapsed_time_ms / 1000, 6);
+        Serial.print(F("   -> Calcualted prev. Freq: "));
+        Serial.println(previous_avg_freq, 6);
 
-            Serial.print(F("   -> Calcualted prev. Freq: "));
-            Serial.println(previous_avg_freq, 6);
+        timer_correction_factor = speed.end_freq / previous_avg_freq;
 
-            timer_correction_factor = speed.end_freq / previous_avg_freq;
+        Serial.print(F("Timer Factor: "));
+        Serial.print(speed.end_freq, 6);
+        Serial.print(F(" / "));
+        Serial.print(F("before: "));
+        Serial.print(previous_avg_freq, 6);
+        Serial.print(F(" = "));
+        Serial.println(timer_correction_factor, 6);
+    }
+    else
+    {
+        timer_correction_factor = 1;
+    }
 
-            Serial.print(F("Timer Factor: "));
-            Serial.print(speed.end_freq, 6);
-            Serial.print(F(" / "));
-            Serial.print(F("before: "));
-            Serial.print(previous_avg_freq, 6);
-            Serial.print(F(" = "));
-            Serial.println(timer_correction_factor, 6);
-        }
-        else
-        {
-            timer_correction_factor = 1;
-        }
+    Serial.print(F("Mode Name: "));
+    Serial.println(speed.name);
 
-        Serial.print(F("Mode Name: "));
-        Serial.println(speed.name);
+    // Init the PID with a start value to not start at 0
+    myPID.SetMode(MANUAL);
+    pid_output = speed.dac_init;
+    myPID.Compute();
+    myPID.SetMode(AUTOMATIC);
 
-        // Init the PID with a start value to not start at 0
-        myPID.SetMode(MANUAL);
-        pid_output = speed.dac_init;
-        myPID.Compute();
-        myPID.SetMode(AUTOMATIC);
-
-        // Configure DAC
-        dac.setVoltage(speed.dac_init, false);      // false: Do not make this the default value of the DAC
-        digitalWrite(ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
-
-        // old switch case
-        // switch (next_speed)
-        // {
-        // case FPS_NONE:
-        //     break;
-        // case FPS_AUTO:
-        //     // reset the PID Output
-        //     myPID.SetMode(MANUAL);
-        //     pid_output = speed.dac_init;
-        //     myPID.Compute();
-        //     myPID.SetMode(AUTOMATIC);
-        //     // set DAC to initial value
-        //     dac.setVoltage(speed.dac_init, false);
-        //     Serial.println(F("XTAL_AUTO"));
-        //     break;
-        // case FPS_16_2_3:
-        //     Serial.println(F("XTAL_16_2_3"));
-        //     setupTimer1forFps(FPS_16_2_3);
-        //     break;
-        // case FPS_18:
-        //     Serial.println(F("XTAL_18"));
-        //     setupTimer1forFps(FPS_18);
-        //     break;
-        // case FPS_23_976:
-        //     Serial.println(F("XTAL_23_976"));
-        //     setupTimer1forFps(FPS_23_976);
-        //     break;
-        // case FPS_24:
-        //     Serial.println(F("XTAL_24"));
-        //     setupTimer1forFps(FPS_24);
-        //     break;
-        // case FPS_25:
-        //     Serial.println(F("XTAL_25"));
-        //     setupTimer1forFps(FPS_25);
-        //     break;
-        // default:
-        //     Serial.println(F("Unknown Mode"));
-        //     break;
-        // }
+    // Configure DAC
+    dac.setVoltage(speed.dac_init, false);      // false: Do not make this the default value of the DAC
+    digitalWrite(ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
 }
 
 void handleButtonTap(Button2 &btn)
@@ -843,10 +797,7 @@ void handleButtonTap(Button2 &btn)
     }
 }
 
-bool setupTimer1forFps(byte desiredFps)
-// !!!!  Wird nur noch in der speed-detection in checkPorjjectorRunningYet() aufgerufen !!!
-
-
+bool legacy_setupTimer1forFps()
 {
     // Read the required speed config from PROGMEM, this saves RAM
     // loadSpeedConfig(desiredFps);
@@ -862,9 +813,6 @@ bool setupTimer1forFps(byte desiredFps)
         interrupts();
     }
 
-    // DitherConfig cfg;
-    // memcpy_P(&cfg, &s_ditherTable[desiredFps - 2], sizeof(DitherConfig));
-
     dither_accumulator_32 = 0;
 
     // Setup Timer1
@@ -878,7 +826,7 @@ bool setupTimer1forFps(byte desiredFps)
     TIMSK1 |= (1 << OCIE1A);                // enable Compare-A-Interrupt
     interrupts();
 
-    Serial.print(F("*** Timer 1 set up for speed "));
+    Serial.print(F("*** LEGACY Timer 1 set up for speed "));
     Serial.println(speed.end_freq);
 
     return true;
