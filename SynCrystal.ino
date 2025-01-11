@@ -160,7 +160,7 @@ U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 //     MODES_COUNT // Automatically equals the number of entries in the enum
 // };
 
-byte current_speed_mode;
+byte currently_selected_mode;
 float previous_freq = 1.00; // to allow recalculation of timer_frames and timecode
 
 enum ProjectorStates
@@ -296,7 +296,7 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
         // pinMode(I_PIN, INPUT);
         // pinMode(D_PIN, INPUT);
 
-        activateSpeedConfig(FPS_AUTO);
+        // activateSpeedConfig(FPS_AUTO);
 
         attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
         dac.begin(0x60);
@@ -389,13 +389,8 @@ void loop()
         local_shaft_pulses = shaft_pulses;
         interrupts();
 
-
-
         // Compute Error and feed PID and DAC
         current_pulse_difference = local_timer_pulses - local_shaft_pulses;
-
-        // Disabled: reduce the osciallation (and precision)
-        // current_pulse_difference &= ~1;
 
         // Disabled: Adaptive PID
         // double gap = abs(pid_setpoint - pid_input); // distance away from setpoint
@@ -501,7 +496,6 @@ void loop()
     }
 }
 
-
 void measureFrequency()
 {
     static double sum = 0;
@@ -597,7 +591,7 @@ void checkProjectorRunningYet()
         Serial.print(F("Detected freq (FreqMeasure): "));
         Serial.println(detected_frequency / SHAFT_SEGMENT_COUNT);
 
-        if (current_speed_mode == FPS_AUTO)
+        if (currently_selected_mode == FPS_AUTO)
         { // Determine the mode based on the detected frequency
             activateSpeedConfig(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? FPS_18 : FPS_24);
             projector_speed_switch = (detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? 18 : 24);
@@ -609,7 +603,7 @@ void checkProjectorRunningYet()
         projector_state = PROJ_RUNNING;
         Serial.print(F("Setting up Timer for "));
         Serial.println(speed.name);
-        setupTimer1forFps(current_speed_mode);
+        setupTimer1forFps(currently_selected_mode);
         digitalWrite(ENABLE_PIN, HIGH);
     }
 
@@ -626,37 +620,61 @@ void selectNextMode(Button2 &btn)
 
     // Determine if left or right button was pressed
     int8_t change = (btn == leftButton) ? -1 : 1;
-    current_speed_mode = (current_speed_mode + change + MODES_COUNT) % MODES_COUNT;
-    
+
+    Serial.println((currently_selected_mode + change + MODES_COUNT) % MODES_COUNT);
+    currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
+
+    // To keep the sync Sepmag-style, we need to correct the timer to teh new speed
     if (projector_state == PROJ_RUNNING)
     {
-        // read next speed.end_freq
+        // read prev (next?) speed.end_freq
         // add the error to the timerpulses
-        // calculate timer_correction_factor for current_speed_mode to next_speed_mode
+        // calculate timer_correction_factor for currently_selected_mode to next_speed_mode
+
+        /* uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000)); */
+        
+        // timer_correction_factor = new-speed / prev-speed, also zB 24 / 18 oder 18 / 16.666666
+        float previous_end_freq;
+        //memcpy_P(&previous_end_freq, &s_speed_table[(currently_selected_mode + change + MODES_COUNT) % MODES_COUNT].end_freq, sizeof(float));
+        timer_correction_factor = speed.end_freq / previous_end_freq;
+
+        Serial.print(F("Timer Correction Factor: "));
+        Serial.println(timer_correction_factor);
     } 
     else
     {
         timer_correction_factor = 1;
     }
 
-    if (current_speed_mode == FPS_AUTO)
+    if (currently_selected_mode == FPS_AUTO)
     {
-        if (projector_speed_switch == 0)
-        {
-            // measure the current freq 
-            // set projector_speed_switch to 18 or 24
-        }
-        else
-        {
-            // restore timer config for the equivalent speed
-        }
+        switch (projector_speed_switch) {
+            case 0:
+                // switch pos is still unknown for this run
+                // measure the current freq
+                // set projector_speed_switch to 18 or 24
+
+                break;
+            case 18:
+                activateSpeedConfig(FPS_18); // activates the speed struct, inits PID and DAC
+                break;
+            case 24:
+                activateSpeedConfig(FPS_24);
+                break;
+            default:
+                Serial.println(F("invalid value"));
+            }
+    } 
+    else 
+    {
+        activateSpeedConfig(currently_selected_mode); 
     }
 
-    activateSpeedConfig(current_speed_mode);    // sets the PID, registers etc
-
-    // write the timerpulses (+timer_correction_factor) 
-
-
+    // write the timerpulses (+timer_correction_factor)
+    noInterrupts();
+    timer_pulses = timer_pulses * timer_correction_factor;
+    timer_frame_count_updated = true;
+    interrupts();
 
     /* ------------ old code below -----------------------------------------------
     // Prepare for re-calculating the ISR's timer_frames in sepmag mode
@@ -677,7 +695,7 @@ void selectNextMode(Button2 &btn)
 
     // Put an IF instead of the SWITCH here to do the auto measurement
 
-    switch (current_speed_mode) // This is the new current_speed_mode we are about to switch TO
+    switch (currently_selected_mode) // This is the new currently_selected_mode we are about to switch TO
 
     {
         // we pick the right next_freq here.
@@ -695,8 +713,8 @@ void selectNextMode(Button2 &btn)
         case FPS_23_976:
         case FPS_24:
         case FPS_25:
-            // copy the endFreq of the struct wuth current_speed_mode index - 2 (0 and 1 are NONE and AUTO)
-            memcpy_P(&next_freq, &s_speed_table[((current_speed_mode))].end_freq, sizeof(float));
+            // copy the endFreq of the struct wuth currently_selected_mode index - 2 (0 and 1 are NONE and AUTO)
+            memcpy_P(&next_freq, &s_speed_table[((currently_selected_mode))].end_freq, sizeof(float));
             Serial.println(next_freq);
             break;
     }
@@ -724,7 +742,7 @@ void selectNextMode(Button2 &btn)
         // Serial.print(F(")/1000) = "));
         // Serial.println(local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000)));
 
-// These calclulations might belong in activatSpeed?
+
 
         uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000));
 
@@ -740,19 +758,19 @@ void selectNextMode(Button2 &btn)
         interrupts();
     }
 
-    activateSpeedConfig(current_speed_mode);
+    activateSpeedConfig(currently_selected_mode);
  ------------ old code above ----------------------------------------------- */
 }
 
 void activateSpeedConfig(byte next_speed)
     {
+        // Serial.print(F("Activating new Speed. "));
+
         // Copy from PROGMEM to struct
         memcpy_P(&speed, &s_speed_table[next_speed], sizeof(SpeedConfig));
 
+        Serial.print(F("Now running at "));
         Serial.println(speed.name);
-
-        // connect or disconnect the DAC
-        // or: digitalWrite(ENABLE_PIN, (next_speed == XTAL_NONE) ? LOW : HIGH);
 
         // Init the PID with a start value to not start at 0
         myPID.SetMode(MANUAL);
@@ -834,6 +852,9 @@ void handleButtonTap(Button2 &btn)
 }
 
 bool setupTimer1forFps(byte desiredFps)
+// !!!!  Wird nur noch in der speed-detection in checkPorjjectorRunningYet() aufgerufen !!!
+
+
 {
     // Read the required speed config from PROGMEM, this saves RAM
     // loadSpeedConfig(desiredFps);
