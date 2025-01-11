@@ -183,14 +183,13 @@ struct SpeedConfig
 SpeedConfig speed;
 
 static const SpeedConfig PROGMEM s_speed_table[] = {
-    {"NONE", 0, 0, 0, 0, 0, 0},
+    {"NONE", 2314, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
     {"AUTO", 0, 0, 0, 0, 1, 1500},
     {"16.66", 10000, 0x00000000, 1, 16.666666, 1, 1200},
     {"18.00", 2314, 0xD0BE9C00, 4, 18.000000, 1, 1500},
     {"23.98", 6951, 0x638E38E4, 1, 23.976024, 1, 2000},
     {"24.00", 2314, 0xD0BE9C00, 3, 24.000000, 1, 2100},
-    {"25.00", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 2200}   
-};
+    {"25.00", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
 float previous_avg_freq;
 
 /* old struct
@@ -359,7 +358,7 @@ void loop()
     {
         checkProjectorRunningYet();
     }
-    else if (projector_state == PROJ_RUNNING)
+    else if ((projector_state == PROJ_RUNNING) && (speed.dac_enable == 1))
     {
         // copy volatile vars that can't be read atomic
         noInterrupts();
@@ -568,13 +567,12 @@ void checkProjectorRunningYet()
         // Init the pulse timer to not lose those first frames
         timer_pulses = freq_count;
 
-        // Update projector state
+        // Update projector state and init Timer1
         projector_start_millis = millis();  // we lose the time for 4 frames here
         projector_state = PROJ_RUNNING;
         Serial.print(F("Setting up Timer for "));
         Serial.println(speed.name);
-        //activateSpeedConfig(currently_selected_mode);
-        setupTimer1();
+        startTimer1();
         digitalWrite(ENABLE_PIN, HIGH);
     }
 
@@ -629,91 +627,6 @@ void selectNextMode(Button2 &btn)
     // timer_pulses = timer_pulses * timer_correction_factor;
     timer_frame_count_updated = true;
     interrupts();
-
-    /* ------------ old code below -----------------------------------------------
-    // Prepare for re-calculating the ISR's timer_frames in sepmag mode
-    float next_freq;
-
-    noInterrupts();
-    uint32_t local_shaft_pulses = shaft_pulses;
-    uint32_t local_timer_pulses = timer_pulses;
-    interrupts();
-
-    // Debug Code
-    // Serial.print(F("Average fps since start: "));
-    // Serial.print((float)local_shaft_pulses / SHAFT_SEGMENT_COUNT);
-    // Serial.print(F(" / "));
-    // Serial.print((float)(millis() - projector_start_millis) / 1000);
-    // Serial.print(F(" = "));
-    // Serial.println(((float)local_shaft_pulses / SHAFT_SEGMENT_COUNT) / (((float)millis() - projector_start_millis) / 1000), 2);
-
-    // Put an IF instead of the SWITCH here to do the auto measurement
-
-    switch (currently_selected_mode) // This is the new currently_selected_mode we are about to switch TO
-
-    {
-        // we pick the right next_freq here.
-        case FPS_NONE:
-        break;
-        case FPS_AUTO:
-            // Since
-            Serial.print(F("Estimated fps so far (for previous_freq):"));
-            Serial.println((float)(millis() - projector_start_millis) / local_shaft_pulses / SHAFT_SEGMENT_COUNT, 2);
-            Serial.print(F("Proj. Speed Switch (to): "));
-            Serial.println(projector_speed_switch);
-            break;
-        case FPS_16_2_3:
-        case FPS_18:
-        case FPS_23_976:
-        case FPS_24:
-        case FPS_25:
-            // copy the endFreq of the struct wuth currently_selected_mode index - 2 (0 and 1 are NONE and AUTO)
-            memcpy_P(&next_freq, &s_speed_table[((currently_selected_mode))].end_freq, sizeof(float));
-            Serial.println(next_freq);
-            break;
-    }
-
-    if (projector_state == PROJ_RUNNING)  // This is "SEMAPG Mode" where we try to catch up to the new sync point
-    {
-        // Update the timer counter to the new truth
-        // Example: After 10 Sec from 18 to 24 fps: -> 180 / 18 * 24 = 240
-        //                                           = 180 * 24 / 18
-        //                                           so
-
-        // Debug Code
-        // Serial.println(F("timer_pulses * next_freq / (millis() - proojector_start_millis) / 1000))"));
-        // Serial.print(F("From "));
-        // Serial.print(local_timer_pulses);
-        // Serial.print(F(" Pulses to "));
-        // Serial.print(local_timer_pulses);
-        // Serial.print(F(" * "));
-        // Serial.print(next_freq);
-        // Serial.print(F(" / ("));
-        // Serial.print(local_shaft_pulses);
-        // Serial.print(F("/"));
-        // Serial.print(F("12) / ("));
-        // Serial.print(millis() - projector_start_millis);
-        // Serial.print(F(")/1000) = "));
-        // Serial.println(local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000)));
-
-
-
-        uint32_t updated_timer_pulses = local_timer_pulses * next_freq / ((local_shaft_pulses / SHAFT_SEGMENT_COUNT) / ((millis() - projector_start_millis) / 1000));
-
-        // This should be a bit more precise, but actually leads to results that apepar rather off. Not sure yet why
-        // uint32_t fuckdated_timer_pulses = (local_timer_pulses * next_freq * (millis() - projector_start_millis)) / (local_shaft_pulses * 1000 / SHAFT_SEGMENT_COUNT);
-
-        Serial.print(F("My calculation: "));
-        Serial.println(updated_timer_pulses);
-
-        noInterrupts();
-        timer_pulses = updated_timer_pulses;
-        timer_frame_count_updated = true;
-        interrupts();
-    }
-
-    activateSpeedConfig(currently_selected_mode);
- ------------ old code above ----------------------------------------------- */
 }
 
 void activateSpeedConfig(byte next_speed)
@@ -797,25 +710,6 @@ void handleButtonTap(Button2 &btn)
     }
 }
 
-void setupTimer1()
-{
-    dither_accumulator_32 = 0;
-
-    // Setup Timer1
-    noInterrupts();
-    TCCR1A = 0;
-    TCCR1B = 0;
-    TIMSK1 = 0;
-    TCNT1 = 0;
-    OCR1A = speed.dither_base;              // OCR1A start value
-    TCCR1B |= (1 << WGM12) | (1 << CS11);   // CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
-    TIMSK1 |= (1 << OCIE1A);                // enable Compare-A-Interrupt
-    interrupts();
-
-    // Serial.print(F("*** Timer 1 prepared for "));
-    // Serial.println(speed.end_freq);
-}
-
 void onShaftImpulseISR()
 {
     // Expose the news
@@ -854,9 +748,29 @@ ISR(TIMER1_COMPA_vect)
     OCR1A = (dither_accumulator_32 < speed.dither_frac32) ? (speed.dither_base + 1) : speed.dither_base;
 }
 
+void startTimer1()
+{
+    dither_accumulator_32 = 0;
+
+    // Setup and Start Timer1
+    noInterrupts();
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TIMSK1 = 0;
+    TCNT1 = 0;
+    OCR1A = speed.dither_base;            // OCR1A start value
+    TCCR1B |= (1 << WGM12) | (1 << CS11); // CTC-Mode (WGM12=1), Prescaler=8 => CS11=1
+    TIMSK1 |= (1 << OCIE1A);              // enable Compare-A-Interrupt
+    interrupts();
+
+    // Serial.print(F("*** Timer 1 prepared for "));
+    // Serial.println(speed.end_freq);
+
+}
+
 void stopTimer1()
-{ // Stops Timer1, for when we are not in craystal running next_speed
-    // TCCR1B &= ~(1 << CS11);
+{ 
+    // Stops Timer1, for when we are not in crystal mode
     noInterrupts();
     TIMSK1 &= ~(1 << OCIE1A);
     interrupts();
