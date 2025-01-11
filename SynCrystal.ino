@@ -574,7 +574,7 @@ void checkProjectorRunningYet()
         Serial.print(F("Setting up Timer for "));
         Serial.println(speed.name);
         //activateSpeedConfig(currently_selected_mode);
-        legacy_setupTimer1forFps();
+        setupTimer1();
         digitalWrite(ENABLE_PIN, HIGH);
     }
 
@@ -797,22 +797,8 @@ void handleButtonTap(Button2 &btn)
     }
 }
 
-bool legacy_setupTimer1forFps()
+void setupTimer1()
 {
-    // Read the required speed config from PROGMEM, this saves RAM
-    // loadSpeedConfig(desiredFps);
-
-    // start with a new sync point, no need to catch up differences from before 
-    if (projector_state == PROJ_IDLE)
-    {
-        noInterrupts();
-        timer_frames = 0;
-        // shaft_frames = 0;
-        // timer_modulus = 0; // This sees to clear the modulus inbetween ISR calls, whyever?
-        shaft_modulus = 0; 
-        interrupts();
-    }
-
     dither_accumulator_32 = 0;
 
     // Setup Timer1
@@ -826,10 +812,8 @@ bool legacy_setupTimer1forFps()
     TIMSK1 |= (1 << OCIE1A);                // enable Compare-A-Interrupt
     interrupts();
 
-    Serial.print(F("*** LEGACY Timer 1 set up for speed "));
-    Serial.println(speed.end_freq);
-
-    return true;
+    // Serial.print(F("*** Timer 1 prepared for "));
+    // Serial.println(speed.end_freq);
 }
 
 void onShaftImpulseISR()
