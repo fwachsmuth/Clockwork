@@ -17,6 +17,7 @@
 - Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
 - Decrement Shaft Impulses after detected shaft noise!
 
+- Can delete speed.name
 
 Pending Bugs for Sepmag Sync:
 - Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
@@ -90,14 +91,13 @@ const byte CATCH_UP_BTTN_PIN = 12;
 
 const byte ledRed = 5;          //  Out of Sync
 const byte ledGreen = 7;        //  Crystal enabled
-const byte ledSlowerYellow = 6; //  -
-const byte ledFasterYellow = 8; //  +
+// const byte ledSlowerYellow = 6; //  -
+// const byte ledFasterYellow = 8; //  +
 
 // Timer Variables
 volatile uint32_t timer_pulses = 0;
 volatile uint32_t timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
 volatile uint8_t timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
-// int timer_factor = 0;           // this is used for the Timer1 "postscaler", since multiples of 18 and 24 Hz give better accuracy
 volatile uint32_t last_pulse_timestamp; // Timestamp of the last pulse, used to detect a stop
 volatile uint32_t dither_accumulator_32 = 0; // Accumulator for Timer Dithering
 
@@ -108,15 +108,14 @@ volatile uint32_t shaft_frames = 0;   // This is the actually advanced frames (p
 volatile uint8_t shaft_modulus = 0;            // For Modulo in the ISR, to compensate the multiple pulses per revolution
 volatile bool new_shaft_impulse_available = false;
 uint32_t projector_start_millis = 0; // To track the start time of the projector running
-volatile uint32_t last_frame_timestamp;      // Timestamp of the last pulse, used to detect a stop
 
 
 uint8_t projector_speed_switch = 0;  // To track the detected position of the projector's speed switch (18 or 24)
 
 // flags to assure reading only once both ISRs have done their duty
-volatile bool shaft_frame_count_updated;
+// volatile bool shaft_frame_count_updated;
 volatile bool shaft_pulse_count_updated;
-volatile bool timer_frame_count_updated;
+// volatile bool timer_frame_count_updated;
 volatile bool timer_pulse_count_updated;
 
 // PID stuff
@@ -190,7 +189,6 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
     {"23.98", 6951, 0x638E38E4, 1, 23.976024, 1, 2000},
     {"24.00", 2314, 0xD0BE9C00, 3, 24.000000, 1, 2100},
     {"25.00", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
-float previous_avg_freq;
 
 /* old struct
 
@@ -358,7 +356,7 @@ void loop()
     {
         checkProjectorRunningYet();
     }
-    else if ((projector_state == PROJ_RUNNING) && (speed.dac_enable == 1))
+    else if ((projector_state == PROJ_RUNNING) /* && (speed.dac_enable == 1)*/)
     {
         // copy volatile vars that can't be read atomic
         noInterrupts();
@@ -389,7 +387,7 @@ void loop()
         if (current_pulse_difference != last_pulse_difference)
         {
             // Uncomment to throttle the Console Output
-            if (millis() % 10000 == 1) {
+            if (millis() % 100 == 1) {
                 Serial.print(F("Mode: "));
                 Serial.print(speed.name);
                 Serial.print(F(", Error: "));
@@ -430,7 +428,7 @@ void loop()
             Serial.println(F("[DEBUG] Projector stopped."));
             stopTimer1();
             // Todo: This might be obsolete, wince the ISR would just reset them. Do we need these flags at all?
-            timer_frame_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
+            // timer_frame_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
             timer_pulse_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
             shaft_pulses = 0;
             shaft_frames = 0;
@@ -625,12 +623,14 @@ void selectNextMode(Button2 &btn)
     // write the timerpulses (+timer_correction_factor)
     noInterrupts();
     // timer_pulses = timer_pulses * timer_correction_factor;
-    timer_frame_count_updated = true;
+    // timer_frame_count_updated = true;
     interrupts();
 }
 
 void activateSpeedConfig(byte next_speed)
 {
+    float previous_avg_freq;
+    
     // Copy next config from PROGMEM to struct
     memcpy_P(&speed, &s_speed_table[next_speed], sizeof(SpeedConfig));
 
@@ -721,7 +721,7 @@ void onShaftImpulseISR()
     if (shaft_modulus == 0)
     {
         shaft_frames++;
-        shaft_frame_count_updated = true;
+        // shaft_frame_count_updated = true;
     }
     shaft_modulus++;
     shaft_modulus %= (SHAFT_SEGMENT_COUNT);
