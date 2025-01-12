@@ -67,14 +67,13 @@ Irgendwann
 // projector specific constants
 // const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
 const unsigned long STOP_THRESHOLD = 25000; // microseconds until a stop will be detected
-const unsigned long SAVE_THRESHOLD = 10000; // ms until a stable DAC value will be considered as new EPROM default
 constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Window. We use 12 to capture one entire shaft revolution
 
 
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
-const byte LED_RED_PIN = 5;
-const byte OSCILLOSCOPE_PIN = 7;
+const byte LED_RED_PIN = 5; //  Out of Sync
+const byte OSCILLOSCOPE_PIN = 7; //  Crystal enabled
 const byte ENABLE_PIN = 9;
 
 // Use this for PID tuning with Pots
@@ -91,14 +90,9 @@ const byte CATCH_UP_BTTN_PIN = 12;
 #define BTTN_LEFT 1
 #define BTTN_RIGHT 2
 
-const byte ledRed = 5;          //  Out of Sync
-const byte ledGreen = 7;        //  Crystal enabled
-// const byte ledSlowerYellow = 6; //  -
-// const byte ledFasterYellow = 8; //  +
 
 // Timer Variables
 volatile uint32_t timer_pulses = 0;
-volatile uint32_t timer_frames = 0; // This is the timer1 (frequency / timer_factor) — equalling actual desired fps (no multiples)
 volatile uint8_t timer_modulus = 0; // For Modulo in the ISR, to compensate the timer_factor
 volatile uint32_t last_pulse_timestamp; // Timestamp of the last pulse, used to detect a stop
 volatile uint32_t dither_accumulator_32 = 0; // Accumulator for Timer Dithering
@@ -115,18 +109,11 @@ uint32_t projector_start_millis = 0; // To track the start time of the projector
 uint8_t projector_speed_switch = 0;  // To track the detected position of the projector's speed switch (18 or 24)
 
 // flags to assure reading only once both ISRs have done their duty
-// volatile bool shaft_frame_count_updated;
 volatile bool shaft_pulse_count_updated;
-// volatile bool timer_frame_count_updated;
-volatile bool timer_pulse_count_updated;
 
 // PID stuff
 double pid_setpoint, pid_input, pid_output;
 double pid_Kp = 30, pid_Ki = 50, pid_Kd = 0; // old PID values for frame based controlling
-
-// Adaptive PID — not worth it.
-// double cons_Kp = 20, cons_Ki = 8, cons_Kd = 0; // old PID values for frame based controlling
-// double agg_Kp = 50, agg_Ki = 10, agg_Kd = 0; // old PID values for frame based controlling
 
 // PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
@@ -141,7 +128,6 @@ Button2 leftButton, rightButton, dropBackButton, catchUpButton;
 U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);
 
 byte currently_selected_mode;
-float previous_freq = 1.00; // to allow recalculation of timer_frames and timecode
 
 enum ProjectorStates
 {
@@ -292,14 +278,13 @@ void setup()
 
     u8x8.begin();
     u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
-
-    // FreqMeasure.begin();
 }
 
 void loop()
 {
     // Atomic reads for volatile variables
-    long local_timer_pulses = 0, local_shaft_pulses = 0;
+    long local_timer_pulses = 0;
+    long local_shaft_pulses = 0;
     long current_pulse_difference = 0;
 
     // Copy volatile variables
@@ -328,75 +313,6 @@ void loop()
     dropBackButton.loop();
     catchUpButton.loop();
 }
-
-// void loop()
-// {
-//     static long local_timer_frames = 0;    // for atomic reads
-//     static long local_shaft_frames = 0;    // for atomic reads
-//     static long local_timer_pulses = 0;    // for atomic reads
-//     static long local_shaft_pulses = 0;    // for atomic reads
-//     static long last_pulse_difference = 0; // Stores the last output difference. (Just used to limit the printf output)
-
-//     static long last_dac_value = 1500; // also just used to limit the printf output
-
-//     static long current_frame_difference = 0;
-//     static long current_pulse_difference = 0;
-//     uint16_t new_dac_value = 0;
-//     static uint8_t button, last_button = BTTN_NONE;
-//     static long last_pid_update_millis;
-//     static long current_pid_update_millis;
-
-//     /* Use the below to tune the PID with Pots connected to Analog in
-
-//     // Read the potentiometer values
-//     uint16_t p_pot = analogRead(P_PIN) >> 1;
-//     // delayMicroseconds(10); // Short delay (adjust if needed)
-//     uint16_t i_pot = analogRead(I_PIN) >> 1;
-//     // delayMicroseconds(10); // Short delay (adjust if needed)
-//     uint16_t d_pot = analogRead(D_PIN) >> 6;
-//     // delayMicroseconds(10); // Short delay (adjust if needed)
-
-//     // Variables to track previous values
-//     static uint16_t last_p_pot = 0;
-//     static uint16_t last_i_pot = 0;
-//     static uint16_t last_d_pot = 0;
-
-//     // Check for changes and print if any of the values have changed
-//     if (p_pot != last_p_pot || i_pot != last_i_pot || d_pot != last_d_pot)
-//     {
-//         Serial.print("P: ");
-//         Serial.print(p_pot);
-//         Serial.print("   I: ");
-//         Serial.print(i_pot);
-//         Serial.print("   D: ");
-//         Serial.println(d_pot);
-
-//         // Update the last values
-//         last_p_pot = p_pot;
-//         last_i_pot = i_pot;
-//         last_d_pot = d_pot;
-    
-//         // Update the PID with new values
-//         myPID.SetTunings((double)p_pot, (double)i_pot, (double)d_pot);
-//     }
-//     */
-
-//     // Poll the buttons
-//     leftButton.loop();
-//     rightButton.loop();
-//     dropBackButton.loop();
-//     catchUpButton.loop();
-
-//     if (projector_state == PROJ_IDLE)
-//     {
-//         checkProjectorRunningYet();
-//     }
-//     else if ((projector_state == PROJ_RUNNING) /* && (speed.dac_enable == 1)*/)
-//     {
-//         controlSpeed();
-//         checkForStop();
-//     }
-// }
 
 void controlSpeed(long current_pulse_difference)
 {
@@ -463,11 +379,9 @@ void checkForStop()
         projector_state = PROJ_IDLE; // Projector is stopped
         Serial.println(F("[DEBUG] Projector stopped."));
         stopTimer1();
-        timer_pulse_count_updated = false; // Just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
         shaft_pulses = 0;
         shaft_frames = 0;
         timer_pulses = 0;
-        timer_frames = 0;
 
         current_pulse_difference = 0;
         local_timer_pulses = 0;
@@ -494,7 +408,7 @@ void checkForStop()
     }
 }
 
-void measureFrequency()
+void unused_measureFrequency()
 {
     static double sum = 0;
     static int count = 48;
@@ -532,12 +446,6 @@ void initializeButton(Button2 &button, byte pin)
 
 bool hasStoppedSince(unsigned long start, unsigned long duration)
 {
-    // Serial.print(micros());
-    // Serial.print(" - ");
-    // Serial.print(start);
-    // Serial.print(" = ");
-    // Serial.println(micros() - start);
-
     return (micros() - start) > duration;
 }
 
@@ -547,9 +455,6 @@ void checkProjectorRunningYet()
         return; // Skip processing if no new data
 
     new_shaft_impulse_available = false; // Reset the ISR's "new data available" flag
-
-    // This is so early that it pulls the average down
-    // projector_start_millis = millis(); // Track the start time of the projector running. This might be a little early
 
     double freq_sum = 0;
     int freq_count = 0;
@@ -656,7 +561,6 @@ void selectNextMode(Button2 &btn)
     // write the timerpulses (+timer_correction_factor)
     noInterrupts();
     // timer_pulses = timer_pulses * timer_correction_factor;
-    // timer_frame_count_updated = true;
     interrupts();
 }
 
@@ -754,7 +658,6 @@ void onShaftImpulseISR()
     if (shaft_modulus == 0)
     {
         shaft_frames++;
-        // shaft_frame_count_updated = true;
     }
     shaft_modulus++;
     shaft_modulus %= (SHAFT_SEGMENT_COUNT);
@@ -770,7 +673,6 @@ ISR(TIMER1_COMPA_vect)
     {
         timer_pulses++;    // Increment timer_pulses
         timer_modulus = 0; // Reset the counter
-        timer_pulse_count_updated = true;
         PIND |= (1 << 7); // Toggle pin 7kica
     }
 
