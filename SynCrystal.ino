@@ -202,7 +202,7 @@ struct SpeedConfig
     Check dither-conf.py to generate more tuples.
 
     */
-    char name[6];           // short name for debugging
+    char name[8];           // short name for debugging
     volatile uint16_t dither_base;   // Grundwert für OCR1A
     volatile uint32_t dither_frac32; // fractional part (UQ0.32), 0..(2^32-1)
     uint8_t timer_factor;   // a frequency multiplier for each timer config (some multiples give better accuracy)
@@ -217,13 +217,13 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
 This is a table of values needed to generate a certain speed. To save memory, copy one just struct of values
 to memory when needed.
 */
-    {"NONE", 2314, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
-    {"AUTO", 0, 0, 0, 0, 1, 1500},
-    {"16.66", 10000, 0x00000000, 1, 16.666666, 1, 1200},
-    {"18.00", 2314, 0xD0BE9C00, 4, 18.000000, 1, 1500},
-    {"23.98", 6951, 0x638E38E4, 1, 23.976024, 1, 2000},
-    {"24.00", 2314, 0xD0BE9C00, 3, 24.000000, 1, 2100},
-    {"25.00", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
+    {"Off", 2314, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
+    {"Auto", 0, 0, 0, 0, 1, 1500},
+    {"16  fps", 10000, 0x00000000, 1, 16.666666, 1, 1200},
+    {"18 fps", 2314, 0xD0BE9C00, 4, 18.000000, 1, 1500},
+    {"23.976", 6951, 0x638E38E4, 1, 23.976024, 1, 2000},
+    {"24 fps", 2314, 0xD0BE9C00, 3, 24.000000, 1, 2100},
+    {"25 fps", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
 
 void setup()
 {
@@ -268,6 +268,7 @@ void setup()
 
     u8x8.begin();
     u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
+    drawCurrentTime(0, 0, true); // Init the Display
 }
 
 void loop()
@@ -305,6 +306,7 @@ void loop()
 
     // Update display
     drawCurrentTime(shaft_frames, speed.end_freq, false);
+    drawCurrentMode();
 }
 
 void controlSpeed(long current_pulse_difference)
@@ -781,9 +783,22 @@ void stopTimer1()
 //     prevPaintedState = state;
 // }
 
+void drawCurrentMode()
+{
+    static uint8_t prev_selected_mode = 99;
+    if (currently_selected_mode != prev_selected_mode)
+    {
+        prev_selected_mode = currently_selected_mode;
+
+        u8x8.setFont(/*u8x8_font_inr21_2x4_r*/ u8x8_font_profont29_2x3_r);
+        u8x8.setCursor(0, 0);
+        printCentered(u8x8, speed.name, 8);
+    }
+}
+
 void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
 {
-    static uint32_t prev_shaft_frames;
+    static uint32_t prev_shaft_frames = -1; // need to differ from actual frames early to allow an initial call
 
     uint8_t hours = 0;
     uint8_t minutes = 0;
@@ -808,7 +823,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
     if (shaft_frames != prev_shaft_frames) {
         prev_shaft_frames = shaft_frames;
 
-        u8x8.setFont(u8x8_font_courB18_2x3_n);
+        u8x8.setFont(u8x8_font_inr21_2x4_n /*u8x8_font_courR18_2x3_n*/);
 
         if (fps_rn != 50 / 3.0)
         {
@@ -914,11 +929,28 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         //
         if (frame_count >= 0)
         {
-            u8x8.setFont(u8x8_font_7x14B_1x2_n);
+            u8x8.setFont(u8x8_font_7x14_1x2_n);
             u8x8.setCursor(14, 3);
             if (current_sub_frame < 10 && fps_rn != 9)
                 u8x8.print(0);
             u8x8.print(current_sub_frame);
         }
     }
+}
+
+void printCentered(U8X8 &u8x8, const char *text, uint8_t lineWidth)
+{
+    size_t textLength = strlen(text); // Get the length of the text
+    if (textLength >= lineWidth)
+    {
+        u8x8.print(text); // If the text is longer than the line, print as is
+        return;
+    }
+
+    uint8_t padding = (lineWidth - textLength) / 2; // Calculate the padding
+    for (uint8_t i = 0; i < padding; i++)
+    {
+        u8x8.print(' '); // Add spaces before the text
+    }
+    u8x8.print(text); // Print the text
 }
