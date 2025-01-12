@@ -1,57 +1,38 @@
 /* Todo
 
-- No spped mode activate between 0->1 and 6->0, since the AUTO switch case has no code yet!
-- Is the dithering really deliverin the target frequency? Seems to be slightly below. Use the Oscilloscpe to find out
-
-- flash the DAC just once on very first start
+Bugs:
 - Missing Case: Projector started in a manual mode and user than enters Auto.
-- speed.name is probably not really needed
+- Starting in NONE does not work yet, DAC stays connected
 
-- use shaft_pulses instead of shaft_frames to determine past speed, more precise and omits a multiplication
+Todo: 
+- Use the display
 - actually apply the timer_factor
-
-- STarting in NONE does not work yet
-
-- New Bugs:
-- Remaining pid-Errors seem to add up on speed changes?
-- updated_time_pulses not written back yet since they cause a "stop" deetcted !?
-- Not sure if entering Auto/None works correctly... pretzel brain
-- Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
+- speed.name is probably not really needed
+- use shaft_pulses instead of shaft_frames to determine past speed, more precise and omits a multiplication
+- flash the DAC just once on very first start
 - Decrement Shaft Impulses after detected shaft noise!
-
-- Can delete speed.name
-
-Pending Bugs for Sepmag Sync:
-- Changing form 25 fps back to Auto does not retain a previous 18fps-Auto
-- rundetection does not kick in when starting after manual mode selection
-
-
-Hardware
-- add IR emitter
-- 74LVC2G14
-- Strobe Output
-- Reconfigure OpAmp offset to allow tha DAC to halt the motor
-
-Code
-- Remove dead vars
-- Move controller and stop detection from loop into functions
-    - B:  Forget any previous errors and start fresh
-        + allws for quick speed changes
+- Reset Counters? (long press both buttons?)
+- Implement non-sepmag mode — on speed change when running, 
+        - Forget any previous errors and start fresh
+        + allows for quick speed changes
         + ideal mode for use as "Peaceman's Box" (ESS out mode)
         + good for telecine (which could also just restartm though)
         - loses sync with any sepmag audio
     Timecode would restart at 0:00:00.00
-- Use the display
-- Review volatile vars (only for variables modified inside ISRs and used outside)
-- Reset Counters? (long press both buttons?)
 - Rangieren (langsam)
 - "start the audio" IR
 - Clamp the PID output to avoid halting the motor
+- ESS in
 
-Irgendwann
-- Fernstart/stop support
-- ESS support
-- Add Realtime Timecode
+Hardware:
+- add IR emitter to start a device
+- 74LVC2G14 is smaller Schmitt Trigger
+- Reconfigure OpAmp offset to allow tha DAC to halt the motor
+- Strobe Output to check other projector's speed
+- ESS Out
+
+Notes:
+- Is the dithering really delivering the target frequency? Seems to be slightly below. This might be diluted due to run up and breaking.
 
 */
 
