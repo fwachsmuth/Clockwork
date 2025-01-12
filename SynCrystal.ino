@@ -7,7 +7,7 @@ Bugs:
 Todo: 
 - Use the display
 - actually apply the timer_factor
-- speed.name is probably not really needed
+- speed.name is probably not really needed, saves 42 Bytes PROGMEM and 6 Bytes RAM
 - use shaft_pulses instead of shaft_frames to determine past speed, more precise and omits a multiplication
 - flash the DAC just once on very first start
 - Decrement Shaft Impulses after detected shaft noise!
@@ -32,7 +32,8 @@ Hardware:
 - ESS Out
 
 Notes:
-- Is the dithering really delivering the target frequency? Seems to be slightly below. This might be diluted due to run up and breaking.
+- Is the dithering really delivering the target frequency? Seems to be slightly below. 
+  This might be diluted due to run up and breaking. Cross-validate the frac32!
 
 */
 
@@ -140,6 +141,42 @@ byte blend_mode = BLEND_SEPMAG;
 // Struct with all the information we need to configure the controller for a speed:
 struct SpeedConfig
 {
+    /*
+
+    The dither pair is used to approximate an impossible speed that the Timer1 could not precisely generate at 16 MHz.
+    They are all claculated for prescaler 8 (2 MHz) to achieve high precision at manageable CPU load.
+    The values are tailored for “fps * 12” = final frequency, since the Bauer's shaft has 12 segments per revolution.
+    Explanation:
+        - base = floor( (2000000 / (target freq)) ) or floor( (2000000 / (a multiple)) )
+        - frac32 = (decimal point * 2^32) (UQ0.32 fixed decimal point)
+        - timerFactor => Software divider in the ISR, some multiples of the target frq give higher precision.
+
+    Examples:
+        - FPS_9 => 108 Hz = 864 Hz ISR / 8
+            => idealDiv = 2314.8148148..., base=2314, fraction=~0.8148148
+            => frac32 = round(0.8148148 * 2^32) = 0xD0BE9C00
+            => Endfreq ~ 108.000000 => 0 ppm
+            {name, 2314, 0xD0BE9C00, 8, 9.000000, dac, dac-init}
+        - FPS_16_2_3 => 200 Hz => idealDiv=10000 => fraction=0 => no dithering => 0 ppm
+        - FPS_18 => 216 Hz = 864 Hz ISR / 4
+        - FPS_23_976 => fraction = 288000/1001 ~ 287.712287712288 Hz
+            => best base   = 6951
+            => best frac32 = 0x638E38E4  (decimal 1670265060)
+            => freqActual  = 2147483648000000/7463996984889 ~ 287.712287712283 Hz
+            => error Hz    = -0.0000000000004
+        - FPS_25 => 300 Hz => idealDiv=6666.666..., fraction=0.666..., frac32=0xAAAAAAAB => 0 ppm
+
+    To get the fraction in a readable form, do frac/2^32.
+    So for NTSC: 0x638E38E4/2^32 = 0.388888888992369174957275390625, then add the base. To derive the achieved freq:
+
+    Clock        Frac                 Base     Blades
+    (2000000 / ((0x638E38E4 / 2^32) + 6951)) / 12       = 23.976023976023 61911029165406179609278975693918589246146597964225857607403057768128024783617845662574...
+                              Actually needed 24/1001:  = 23.976023976023 97602397602397602397602397602397602397602397602397602397602397602397602397602397602397...
+    ... close enough!
+
+    Check dither-conf.py to generate more tuples.
+
+    */
     char name[6];           // short name for debugging
     volatile uint16_t dither_base;   // Grundwert für OCR1A
     volatile uint32_t dither_frac32; // fractional part (UQ0.32), 0..(2^32-1)
@@ -151,6 +188,10 @@ struct SpeedConfig
 SpeedConfig speed;
 
 static const SpeedConfig PROGMEM s_speed_table[] = {
+/*
+This is a table of values needed to generate a certain speed. To save memory, copy one just struct of values
+to memory when needed.
+*/
     {"NONE", 2314, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
     {"AUTO", 0, 0, 0, 0, 1, 1500},
     {"16.66", 10000, 0x00000000, 1, 16.666666, 1, 1200},
@@ -158,63 +199,6 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
     {"23.98", 6951, 0x638E38E4, 1, 23.976024, 1, 2000},
     {"24.00", 2314, 0xD0BE9C00, 3, 24.000000, 1, 2100},
     {"25.00", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
-
-/* old struct
-
- static const DitherConfig PROGMEM s_ditherTable[] = {
-       
-        ---------------------------------------------------------------------------
-         Table with Base/Frac/Factor values for each target frequency
-           Prescaler=8 => Timer frequency = 2 MHz
-           The values are tailored for “fps * 12” = final frequency.
-
-           Explanation:
-             - base = floor( (2000000 / (target freq)) ) or floor( (2000000 / (a multiple)) )
-             - frac32 = (decimal point * 2^32) (UQ0.32 fixed decimal point)
-             - timerFactor => Software divider in the ISR
-
-           Examples:
-             * FPS_9 => 108 Hz = 864 / 8 => Timer-ISR=864 Hz => base=2314.8 => 2314 + frac~0.8148 => frac32~0xD0E14710
-             * FPS_16_2_3 => 200 Hz => exact divider=10,000 => OCR1A=9999 => fraction=0 => no dither
-             * etc.
-
-         Note: All frac32 values here rounded to ~ <5 ppm.
-        ---------------------------------------------------------------------------
-        
-
-        // 1) FPS_9 => 108 Hz = 864 Hz ISR / 8
-        //    => idealDiv = 2314.8148148..., base=2314, fraction=~0.8148148
-        //    => frac32 = round(0.8148148 * 2^32) = 0xD0BE9C00
-        //    => Endfreq ~ 108.000000 => 0 ppm
-        // {2314, 0xD0BE9C00, 8, 9.000000},
-
-        // 2) FPS_16_2_3 => 200 Hz => idealDiv=10000 => fraction=0 => no dithering
-        //    => base=9999, frac32=0
-        //    => Endfreq=200 => 0 ppm
-        {10000, 0x00000000, 1, 16.666666},
-
-        // 3) FPS_18 => 216 Hz = 864 Hz ISR / 4
-        //    => same as 108 Hz example but factor=4 => 0 ppm
-        {2314, 0xD0BE9C00, 4, 18.000000},
-
-        // 4) FPS_23_976
-        /*  => fraction = 288000/1001 ~ 287.712287712288 Hz
-        timer_factor= 1
-        best base   = 6951
-        best frac32 = 0x638E38E4  (decimal 1670265060)
-        freqActual  = 2147483648000000/7463996984889 ~ 287.712287712283 Hz
-        error Hz    = -0.000000000004
-        ppm error   = -0.000000
-        {6951, 0x638E38E4, 1, 23.976024},
-
-        // 5) FPS_24 => 288 Hz = 864 Hz ISR / 3
-        //    => same base/fraction as 108 Hz, factor=3 => 0 ppm
-        {2314, 0xD0BE9C00, 3, 24.000000},
-
-        // 6) FPS_25 => 300 Hz => idealDiv=6666.666..., fraction=0.666..., frac32=0xAAAAAAAB => 0 ppm
-        {6666, 0xAAAAAAAB, 1, 25.000000},
-    };
-*/
 
 void setup()
 {
@@ -656,12 +640,13 @@ ISR(TIMER1_COMPA_vect)
         timer_modulus = 0; // Reset the counter
         PIND |= (1 << 7); // Toggle pin 7kica
     }
-
     // Dither logic (fixed-point accumulator)
     dither_accumulator_32 += speed.dither_frac32;
 
-    // If overflow => dither_accumulator_32 < ditherFrac32
-    OCR1A = (dither_accumulator_32 < speed.dither_frac32) ? (speed.dither_base + 1) : speed.dither_base;
+    // Check for accumulator overflow (dithering decision)
+    OCR1A = (dither_accumulator_32 < speed.dither_frac32)
+                ? (speed.dither_base + 1)
+                : speed.dither_base;
 }
 
 void startTimer1()
