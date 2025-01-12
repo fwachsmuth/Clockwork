@@ -6,6 +6,7 @@ Bugs:
 
 Todo: 
 - Use the display
+    - make fps_rn an int 
 - actually apply the timer_factor
 - speed.name is probably not really needed, saves 42 Bytes PROGMEM and 6 Bytes RAM
 - use shaft_pulses instead of shaft_frames to determine past speed, more precise and omits a multiplication
@@ -72,6 +73,30 @@ const byte CATCH_UP_BTTN_PIN = 12;
 #define BTTN_LEFT 1
 #define BTTN_RIGHT 2
 
+// ---- Define useful time constants and macros ------------------------------------
+#define SECS_PER_MIN (60UL)
+#define SECS_PER_HOUR (3600UL)
+#define SECS_PER_DAY (SECS_PER_HOUR * 24L)
+#define numberOfSeconds(_time_) (_time_ % SECS_PER_MIN)
+#define numberOfMinutes(_time_) ((_time_ / SECS_PER_MIN) % SECS_PER_MIN)
+#define numberOfHours(_time_) ((_time_ % SECS_PER_DAY) / SECS_PER_HOUR)
+
+// --- some custome gfx fro the display
+const uint8_t unlockedLockTop[24] = {
+    0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000,
+    0b10000000, 0b10000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b00000110, 0b00000110,
+    0b00000110, 0b00000110, 0b00001100, 0b11111000, 0b11100000, 0b00000000, 0b00000000, 0b00000000};
+const uint8_t lockedLockTop[16] = {
+    0b00000000, 0b00000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b10000110, 0b10000110,
+    0b10000110, 0b10000110, 0b10001100, 0b11111000, 0b11100000, 0b10000000, 0b00000000, 0b00000000};
+const uint8_t lockBottom[16] = {
+    0b00000000, 0b00000000, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b01011001, 0b01000000,
+    0b01000000, 0b01011001, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b00000000, 0b00000000};
+const uint8_t twoThirdsTop[8] = {
+    0b01000010, 0b01100001, 0b01010001, 0b01001110, 0b10000000, 0b01000000, 0b00100000, 0b00010000};
+const uint8_t twoThirdsBottom[8] = {
+    0b00001000, 0b00000100, 0b00000010, 0b00000001, 0b00100010, 0b01001001, 0b01001001, 0b00110110};
+const uint8_t emptyTile[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // Timer Variables
 volatile uint32_t timer_pulses = 0;
@@ -277,6 +302,9 @@ void loop()
     rightButton.loop();
     dropBackButton.loop();
     catchUpButton.loop();
+
+    // Update display
+    drawCurrentTime(shaft_frames, speed.end_freq, false);
 }
 
 void controlSpeed(long current_pulse_difference)
@@ -677,3 +705,220 @@ void stopTimer1()
     interrupts();
 }
 
+// void drawState()
+// {
+//     Serial.print("Drew state ");
+//     Serial.println(state);
+//     checkRequiredMillisInLoop = false;
+//     if (wasCounterVisible != isCounterVisible)
+//     {
+//         u8x8.clearDisplay();
+//         if (isCounterVisible)
+//             drawCurrentTime(true);
+//     }
+//     switch (state)
+//     {
+//     default:
+//         notFound();
+//         break;
+//     case STATE_STOPPED:
+//         if (prevPaintedState == STATE_RESET)
+//             ignoreNextButtonRelease = true;
+//         Serial.println(F("Freq-Measurer OFF, but do NOT start the Timer1!"));
+//         FreqMeasure.end();
+//         u8x8.setFont(u8x8_font_7x14B_1x2_r);
+//         u8x8.setCursor(0, 6);
+//         u8x8.print(F("shot @       fps"));
+//         fpsState = getFpsState(fps_rn);
+//         drawCurrentFps(false, false);
+//         if (checkWriteToEEPROMInLoop)
+//         {
+//             checkWriteToEEPROMInLoop = false;
+//             Serial.println(F("Writing to EEPROM"));
+//             EEPROM.write(1, playbackFps);
+//         }
+//         break;
+//     case STATE_RESET:
+//         u8x8.clearDisplay();
+//         u8x8.setFont(u8x8_font_courB18_2x3_r);
+//         u8x8.setCursor(3, 0);
+//         u8x8.print(F("Reset"));
+//         u8x8.setCursor(0, 3);
+//         u8x8.print(F("counter?"));
+//         u8x8.setFont(u8x8_font_7x14B_1x2_r);
+//         u8x8.setCursor(1, 6);
+//         u8x8.print(F("push = confirm"));
+//         requiredMillis = millis() + 4000;
+//         checkRequiredMillisInLoop = true;
+//         break;
+//     case STATE_RUNNING:
+//         checkRequiredMillisInLoop = false;
+//         u8x8.setFont(u8x8_font_7x14B_1x2_r);
+//         u8x8.setCursor(7, 6);
+//         u8x8.print(" fps     ");
+//         u8x8.setCursor(0, 6);
+//         u8x8.print("  ");
+//         u8x8.drawTile(14, 7, 1, emptyTile);
+//         u8x8.drawTile(12, 7, 2, lockBottom);
+//         u8x8.drawTile(12, 6, 3, unlockedLockTop);
+//         fpsState = FPS_UNLOCKED;
+
+//         Serial.println(F("Freq-Measurer ON, Timer1 STOP"));
+//         stopTimer1();
+//         detachInterrupt(digitalPinToInterrupt(impDetectorPin));
+//         Serial.println(F("Crystal Control OFF"));
+//         digitalWrite(ssrPin, LOW);
+//         FreqMeasure.begin();
+
+//         drawCurrentCustomFrequency();
+//         if (checkWriteToEEPROMInLoop)
+//         {
+//             checkWriteToEEPROMInLoop = false;
+//             Serial.println(F("Writing to EEPROM"));
+//             EEPROM.write(0, fps_rn);
+//         }
+//     }
+//     prevPaintedState = state;
+// }
+
+void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
+{
+    static uint32_t prev_shaft_frames;
+
+    uint8_t hours = 0;
+    uint8_t minutes = 0;
+    uint8_t seconds = 0;
+    uint8_t current_sub_frame = 0;
+    uint32_t current_film_second = 0;
+    
+    uint8_t right_sec_digit = 0;
+    uint8_t left_sec_digit = 0;
+    uint8_t right_min_digit = 0;
+    uint8_t leftMinDigit = 0;
+    uint8_t hour_digit = 0;
+    bool sign = false;
+
+    uint8_t prev_right_sec_digit = 99;
+    uint8_t prev_left_sec_digit = 99;
+    uint8_t prev_right_min_digit = 99;
+    uint8_t prev_left_min_digit = 99;
+    uint8_t prev_hour_digit = 99;
+    bool prev_sign = false;
+
+    if (shaft_frames != prev_shaft_frames) {
+        prev_shaft_frames = shaft_frames;
+
+        u8x8.setFont(u8x8_font_courB18_2x3_n);
+
+        if (fps_rn != 50 / 3.0)
+        {
+            current_sub_frame = frame_count % int(fps_rn);
+            current_film_second = abs(frame_count) / fps_rn;
+        }
+        else
+        { // for 16 2/3 fps 
+            current_sub_frame = frame_count % 50;
+            current_film_second = (abs(frame_count) - current_sub_frame) * 3 / 50;
+            if (frame_count % 50 >= 16)
+            {
+                current_sub_frame = (current_sub_frame - 16) % 17;
+                current_film_second++;
+                if (frame_count % 50 > 32)
+                    current_film_second++;
+            }
+        }
+
+        hours = numberOfHours(current_film_second);
+        minutes = numberOfMinutes(current_film_second);
+        seconds = numberOfSeconds(current_film_second);
+        right_sec_digit = seconds % 10;
+
+        // Handle negative frame counts and time nicely
+        //
+        if (right_sec_digit == 0 || force_redraw)
+        {
+            if (frame_count < 0)
+                sign = true;
+            else
+                sign = false;
+            if (sign != prev_sign || force_redraw)
+            {
+                force_redraw = true;
+                prev_sign = sign;
+                u8x8.setCursor(((sign) ? 4 : 2), 3);
+                u8x8.print(F(":  :  -")); // when tc is negative, do not render sub frame count, but a leading minus sign
+                if (!sign && fps_rn == 9)
+                {
+                    u8x8.drawTile(15, 3, 1, emptyTile);
+                    u8x8.drawTile(15, 4, 1, emptyTile);
+                }
+            }
+        }
+
+        // Only paint the glyphs that have changed, this improves the display framerate a lot
+        // Precompute offset for sign to avoid multiple ternary evaluations
+        uint8_t sign_offset = sign ? 2 : 0;
+
+        // Check if we need to update right seconds digit
+        if (right_sec_digit != prev_right_sec_digit || force_redraw)
+        {
+            prev_right_sec_digit = right_sec_digit;
+            u8x8.setCursor(12 + sign_offset, 3);
+            u8x8.print(right_sec_digit);
+        }
+
+        // Compute left seconds digit
+        uint8_t new_left_sec_digit = seconds / 10;
+        if (new_left_sec_digit != prev_left_sec_digit || force_redraw)
+        {
+            prev_left_sec_digit = new_left_sec_digit;
+            u8x8.setCursor(10 + sign_offset, 3);
+            u8x8.print(new_left_sec_digit);
+        }
+
+        // Check if we need to update right minutes digit
+        uint8_t new_right_min_digit = minutes % 10;
+        if (new_right_min_digit != prev_right_min_digit || force_redraw)
+        {
+            prev_right_min_digit = new_right_min_digit;
+            u8x8.setCursor(6 + sign_offset, 3);
+            u8x8.print(new_right_min_digit);
+        }
+
+        // Compute left minutes digit
+        uint8_t new_left_min_digit = minutes / 10;
+        if (new_left_min_digit != prev_left_min_digit || force_redraw)
+        {
+            prev_left_min_digit = new_left_min_digit;
+            u8x8.setCursor(4 + sign_offset, 3);
+            u8x8.print(new_left_min_digit);
+        }
+
+        // Check if we need to update hour digit
+        uint8_t new_hour_digit = hours % 10;
+        if (new_hour_digit != prev_hour_digit || force_redraw)
+        {
+            prev_hour_digit = new_hour_digit;
+            u8x8.setCursor(0 + sign_offset, 3);
+            u8x8.print(new_hour_digit);
+        }
+
+        // if (frame_count != 0)
+        //     u8x8.setCursor(16 - (int(log10(abs(frame_count)) + (sign ? 3 : 2)) << 1), 0); 
+        // else
+        //     u8x8.setCursor(12, 0);
+        // u8x8.print(" ");
+        // u8x8.print(frame_count);
+
+        // Print current Subframe, SMPTE style
+        //
+        if (frame_count >= 0)
+        {
+            u8x8.setFont(u8x8_font_7x14B_1x2_n);
+            u8x8.setCursor(14, 3);
+            if (current_sub_frame < 10 && fps_rn != 9)
+                u8x8.print(0);
+            u8x8.print(current_sub_frame);
+        }
+    }
+}
