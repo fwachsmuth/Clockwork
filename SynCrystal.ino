@@ -10,6 +10,8 @@
 - use shaft_pulses instead of shaft_frames to determine past speed, more precise and omits a multiplication
 - actually apply the timer_factor
 
+- STarting in NONE does not work yet
+
 - New Bugs:
 - Remaining pid-Errors seem to add up on speed changes?
 - updated_time_pulses not written back yet since they cause a "stop" deetcted !?
@@ -296,168 +298,199 @@ void setup()
 
 void loop()
 {
-    static long local_timer_frames = 0;    // for atomic reads
-    static long local_shaft_frames = 0;    // for atomic reads
-    static long local_timer_pulses = 0;    // for atomic reads
-    static long local_shaft_pulses = 0;    // for atomic reads
-    static long last_pulse_difference = 0; // Stores the last output difference. (Just used to limit the printf output)
+    // Atomic reads for volatile variables
+    long local_timer_pulses = 0, local_shaft_pulses = 0;
+    long current_pulse_difference = 0;
 
-    static long last_dac_value = 1500; // also just used to limit the printf output
+    // Copy volatile variables
+    noInterrupts();
+    local_timer_pulses = timer_pulses;
+    local_shaft_pulses = shaft_pulses;
+    interrupts();
 
-    static long current_frame_difference = 0;
-    static long current_pulse_difference = 0;
-    uint16_t new_dac_value = 0;
-    static uint8_t button, last_button = BTTN_NONE;
-    static long last_pid_update_millis;
-    static long current_pid_update_millis;
+    // Compute current pulse difference
+    current_pulse_difference = local_timer_pulses - local_shaft_pulses;
 
-    /* Use the below to tune the PID with Pots connected to Analog in
-
-    // Read the potentiometer values
-    uint16_t p_pot = analogRead(P_PIN) >> 1;
-    // delayMicroseconds(10); // Short delay (adjust if needed)
-    uint16_t i_pot = analogRead(I_PIN) >> 1;
-    // delayMicroseconds(10); // Short delay (adjust if needed)
-    uint16_t d_pot = analogRead(D_PIN) >> 6;
-    // delayMicroseconds(10); // Short delay (adjust if needed)
-
-    // Variables to track previous values
-    static uint16_t last_p_pot = 0;
-    static uint16_t last_i_pot = 0;
-    static uint16_t last_d_pot = 0;
-
-    // Check for changes and print if any of the values have changed
-    if (p_pot != last_p_pot || i_pot != last_i_pot || d_pot != last_d_pot)
+    // Speed control logic (refactored)
+    if (projector_state == PROJ_RUNNING)
     {
-        Serial.print("P: ");
-        Serial.print(p_pot);
-        Serial.print("   I: ");
-        Serial.print(i_pot);
-        Serial.print("   D: ");
-        Serial.println(d_pot);
-
-        // Update the last values
-        last_p_pot = p_pot;
-        last_i_pot = i_pot;
-        last_d_pot = d_pot;
-    
-        // Update the PID with new values
-        myPID.SetTunings((double)p_pot, (double)i_pot, (double)d_pot);
+        controlSpeed(current_pulse_difference);
+        checkForStop();
     }
-    */
+    else if (projector_state == PROJ_IDLE)
+    {
+        checkProjectorRunningYet();
+    }
 
-    // Poll the buttons
+    // Handle button actions
     leftButton.loop();
     rightButton.loop();
     dropBackButton.loop();
     catchUpButton.loop();
+}
 
-    if (projector_state == PROJ_IDLE)
+// void loop()
+// {
+//     static long local_timer_frames = 0;    // for atomic reads
+//     static long local_shaft_frames = 0;    // for atomic reads
+//     static long local_timer_pulses = 0;    // for atomic reads
+//     static long local_shaft_pulses = 0;    // for atomic reads
+//     static long last_pulse_difference = 0; // Stores the last output difference. (Just used to limit the printf output)
+
+//     static long last_dac_value = 1500; // also just used to limit the printf output
+
+//     static long current_frame_difference = 0;
+//     static long current_pulse_difference = 0;
+//     uint16_t new_dac_value = 0;
+//     static uint8_t button, last_button = BTTN_NONE;
+//     static long last_pid_update_millis;
+//     static long current_pid_update_millis;
+
+//     /* Use the below to tune the PID with Pots connected to Analog in
+
+//     // Read the potentiometer values
+//     uint16_t p_pot = analogRead(P_PIN) >> 1;
+//     // delayMicroseconds(10); // Short delay (adjust if needed)
+//     uint16_t i_pot = analogRead(I_PIN) >> 1;
+//     // delayMicroseconds(10); // Short delay (adjust if needed)
+//     uint16_t d_pot = analogRead(D_PIN) >> 6;
+//     // delayMicroseconds(10); // Short delay (adjust if needed)
+
+//     // Variables to track previous values
+//     static uint16_t last_p_pot = 0;
+//     static uint16_t last_i_pot = 0;
+//     static uint16_t last_d_pot = 0;
+
+//     // Check for changes and print if any of the values have changed
+//     if (p_pot != last_p_pot || i_pot != last_i_pot || d_pot != last_d_pot)
+//     {
+//         Serial.print("P: ");
+//         Serial.print(p_pot);
+//         Serial.print("   I: ");
+//         Serial.print(i_pot);
+//         Serial.print("   D: ");
+//         Serial.println(d_pot);
+
+//         // Update the last values
+//         last_p_pot = p_pot;
+//         last_i_pot = i_pot;
+//         last_d_pot = d_pot;
+    
+//         // Update the PID with new values
+//         myPID.SetTunings((double)p_pot, (double)i_pot, (double)d_pot);
+//     }
+//     */
+
+//     // Poll the buttons
+//     leftButton.loop();
+//     rightButton.loop();
+//     dropBackButton.loop();
+//     catchUpButton.loop();
+
+//     if (projector_state == PROJ_IDLE)
+//     {
+//         checkProjectorRunningYet();
+//     }
+//     else if ((projector_state == PROJ_RUNNING) /* && (speed.dac_enable == 1)*/)
+//     {
+//         controlSpeed();
+//         checkForStop();
+//     }
+// }
+
+void controlSpeed(long current_pulse_difference)
+{
+    static long last_pulse_difference = 0;
+    static long last_dac_value = 1500;
+    uint16_t new_dac_value = 0;
+    long local_timer_pulses = timer_pulses;
+    long local_shaft_pulses = shaft_pulses;
+
+    // Feed PID and compute DAC output
+    pid_input = current_pulse_difference;
+    myPID.Compute();
+    new_dac_value = pid_output;
+    dac.setVoltage(new_dac_value, false);
+
+    // Detect if error is more than half a frame and light the red LED
+    if (current_pulse_difference < -6 || current_pulse_difference > 6)
     {
-        checkProjectorRunningYet();
+        digitalWrite(LED_RED_PIN, HIGH);
     }
-    else if ((projector_state == PROJ_RUNNING) /* && (speed.dac_enable == 1)*/)
+    else
     {
-        // copy volatile vars that can't be read atomic
-        noInterrupts();
-        local_timer_pulses = timer_pulses;
-        local_shaft_pulses = shaft_pulses;
-        interrupts();
+        digitalWrite(LED_RED_PIN, LOW);
+    }
 
-        // Compute Error and feed PID and DAC
-        current_pulse_difference = local_timer_pulses - local_shaft_pulses;
+    // Debug output
+    if (current_pulse_difference != last_pulse_difference)
+    {
+        if (millis() % 100 == 1)
+        {
+            Serial.print(F("Mode: "));
+            Serial.print(speed.name);
+            Serial.print(F(", Error: "));
+            Serial.print(current_pulse_difference);
+            Serial.print(F(", DAC: "));
+            Serial.print(new_dac_value);
+            Serial.print(F(", timer: "));
+            Serial.print(local_timer_pulses);
+            Serial.print(F(", shaft: "));
+            Serial.print(local_shaft_pulses);
+            Serial.print(F(", Enable: "));
+            Serial.print(digitalRead(ENABLE_PIN));
+            Serial.print(F(", Running: "));
+            Serial.println(projector_state);
+        }
+    }
 
-        pid_input = current_pulse_difference;
+    // Update last values
+    last_pulse_difference = current_pulse_difference;
+    last_dac_value = new_dac_value;
+}
+
+void checkForStop()
+{
+    unsigned long current_pulse_difference = 0; // Adjust type if necessary
+    unsigned long local_timer_pulses = 0;       // Adjust type if necessary
+    unsigned long local_shaft_pulses = 0;       // Adjust type if necessary
+
+    if (shaft_pulse_count_updated)              // This is set in the shaft ISR
+        last_pulse_timestamp = micros();
+
+    if (hasStoppedSince(last_pulse_timestamp, STOP_THRESHOLD))
+    {
+        projector_state = PROJ_IDLE; // Projector is stopped
+        Serial.println(F("[DEBUG] Projector stopped."));
+        stopTimer1();
+        timer_pulse_count_updated = false; // Just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
+        shaft_pulses = 0;
+        shaft_frames = 0;
+        timer_pulses = 0;
+        timer_frames = 0;
+
+        current_pulse_difference = 0;
+        local_timer_pulses = 0;
+        local_shaft_pulses = 0;
+
+        // Reset DAC and PID
+        dac.setVoltage(speed.dac_init, false); // Reset the DAC to compensate for wound-up break corrections
+        myPID.SetMode(MANUAL);
+        pid_output = speed.dac_init;
+        pid_input = 0;
         myPID.Compute();
-        new_dac_value = pid_output;
-        dac.setVoltage(new_dac_value, false);
+        Serial.print(F("PID Reset to initial DAC value: "));
+        Serial.println(pid_output);
+        myPID.SetMode(AUTOMATIC);
+        digitalWrite(ENABLE_PIN, LOW);
+        digitalWrite(LED_RED_PIN, LOW);
 
-        // Detect if we have are > half a frame off and light the red LED
-        if (current_pulse_difference < -6 || current_pulse_difference > 6)
-        {
-            digitalWrite(LED_RED_PIN, HIGH);
-        }
-        else
-        {
-            digitalWrite(LED_RED_PIN, LOW);
-        }
-
-        // Debug output
-     // if (new_dac_value != last_dac_value)
-        if (current_pulse_difference != last_pulse_difference)
-        {
-            // Uncomment to throttle the Console Output
-            if (millis() % 100 == 1) {
-                Serial.print(F("Mode: "));
-                Serial.print(speed.name);
-                Serial.print(F(", Error: "));
-                Serial.print(current_pulse_difference);
-                Serial.print(F(", DAC: "));
-                Serial.print(new_dac_value);
-                Serial.print(F(", timer: "));
-                Serial.print(timer_pulses);
-                Serial.print(F(", shaft: "));
-                Serial.print(shaft_pulses);
-                Serial.print(F(", Enable: "));
-                Serial.print(digitalRead(ENABLE_PIN));
-                Serial.print(F(", Running: "));
-                Serial.println(projector_state);
-
-                /* Add this if PID-Tuning Pots are connected
-                Serial.print(" - P ");
-                Serial.print(p_pot);
-                Serial.print("  I ");
-                Serial.print(i_pot);
-                Serial.print("  D ");
-                Serial.println(d_pot);
-                */
-            }
-        }
-
-        last_pulse_difference = current_pulse_difference; // Update the last_pulse_differencees);
-        last_dac_value = new_dac_value;
-        // }
-
-        // Stop detection
-        if (shaft_pulse_count_updated) // This is set in the shaft ISR
-            last_pulse_timestamp = micros();
- 
-         if (hasStoppedSince(last_pulse_timestamp, STOP_THRESHOLD))
-        {
-            projector_state = PROJ_IDLE; // Projector is stopped
-            Serial.println(F("[DEBUG] Projector stopped."));
-            stopTimer1();
-            // Todo: This might be obsolete, wince the ISR would just reset them. Do we need these flags at all?
-            // timer_frame_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
-            timer_pulse_count_updated = false; // just in case the ISR fired again AND the shaft was still breaking. This could cause false PID computations.
-            shaft_pulses = 0;
-            shaft_frames = 0;
-            timer_pulses = 0;
-            timer_frames = 0;
-
-            current_pulse_difference = 0;
-            local_timer_pulses = 0;
-            local_shaft_pulses = 0;
-
-            // Reset DAC and PID
-            dac.setVoltage(speed.dac_init, false); // reset the DAc to compensate for wound-up break corrections
-            myPID.SetMode(MANUAL);
-            pid_output = speed.dac_init;
-            pid_input = 0;
-            myPID.Compute();
-            Serial.print(F("PID Reset to initial DAC value: "));
-            Serial.println(pid_output);
-            myPID.SetMode(AUTOMATIC);
-            digitalWrite(ENABLE_PIN, LOW);
-            digitalWrite(LED_RED_PIN, LOW);
-
-            FreqMeasure.end();
-        }
-        else 
-        // reset the flag and be ready for another incoming pulse
-        {
-            shaft_pulse_count_updated = false;
-        }
+        FreqMeasure.end();
+    }
+    else
+    {
+        // Reset the flag and be ready for another incoming pulse
+        shaft_pulse_count_updated = false;
     }
 }
 
