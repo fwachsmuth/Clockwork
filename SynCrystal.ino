@@ -7,6 +7,7 @@ Bugs:
 Todo: 
 - Use the display
     - make fps_rn an int 
+    - create "fps", "Auto" and "Off" tiles to save some mem (_r font is 6KB bigger than _n)
 - actually apply the timer_factor
 - Make Auto Mode actually switch the mode, and then disappear, until next stop
 - speed.name is probably not really needed, saves 42 Bytes PROGMEM and 6 Bytes RAM
@@ -82,21 +83,44 @@ const byte CATCH_UP_BTTN_PIN = 12;
 #define numberOfMinutes(_time_) ((_time_ / SECS_PER_MIN) % SECS_PER_MIN)
 #define numberOfHours(_time_) ((_time_ % SECS_PER_DAY) / SECS_PER_HOUR)
 
-// --- some custome gfx fro the display
-// const uint8_t unlockedLockTop[24] = {
-//     0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000,
-//     0b10000000, 0b10000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b00000110, 0b00000110,
-//     0b00000110, 0b00000110, 0b00001100, 0b11111000, 0b11100000, 0b00000000, 0b00000000, 0b00000000};
-// const uint8_t lockedLockTop[16] = {
-//     0b00000000, 0b00000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b10000110, 0b10000110,
-//     0b10000110, 0b10000110, 0b10001100, 0b11111000, 0b11100000, 0b10000000, 0b00000000, 0b00000000};
-// const uint8_t lockBottom[16] = {
-//     0b00000000, 0b00000000, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b01011001, 0b01000000,
-//     0b01000000, 0b01011001, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b00000000, 0b00000000};
-// const uint8_t twoThirdsTop[8] = {
-//     0b01000010, 0b01100001, 0b01010001, 0b01001110, 0b10000000, 0b01000000, 0b00100000, 0b00010000};
-// const uint8_t twoThirdsBottom[8] = {
-//     0b00001000, 0b00000100, 0b00000010, 0b00000001, 0b00100010, 0b01001001, 0b01001001, 0b00110110};
+// --- some custome gfx fro the display 
+/*
+const uint8_t unlockedLockTop[24] = {
+    0b00000000, 
+    0b00000000, 
+    0b10000000, 
+    0b10000000, 
+    0b10000000, 
+    0b10000000, 
+    0b10000000, 
+    0b10000000,
+    0b10000000, 
+    0b10000000, 
+    0b10000000, 
+    0b11100000, 
+    0b11111000, 
+    0b10001100, 
+    0b00000110, 
+    0b00000110,
+    0b00000110, 
+    0b00000110, 
+    0b00001100, 
+    0b11111000, 
+    0b11100000, 
+    0b00000000, 
+    0b00000000, 
+    0b00000000};
+const uint8_t lockedLockTop[16] = {
+    0b00000000, 0b00000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b10000110, 0b10000110,
+    0b10000110, 0b10000110, 0b10001100, 0b11111000, 0b11100000, 0b10000000, 0b00000000, 0b00000000};
+const uint8_t lockBottom[16] = {
+    0b00000000, 0b00000000, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b01011001, 0b01000000,
+    0b01000000, 0b01011001, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b00000000, 0b00000000};
+const uint8_t twoThirdsTop[8] = {
+    0b01000010, 0b01100001, 0b01010001, 0b01001110, 0b10000000, 0b01000000, 0b00100000, 0b00010000};
+const uint8_t twoThirdsBottom[8] = {
+    0b00001000, 0b00000100, 0b00000010, 0b00000001, 0b00100010, 0b01001001, 0b01001001, 0b00110110};
+*/
 const uint8_t emptyTile[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // Timer Variables
@@ -799,7 +823,7 @@ void drawCurrentMode()
     {
         prev_selected_mode = currently_selected_mode;
 
-        u8x8.setFont(/*u8x8_font_inr21_2x4_r*/ u8x8_font_profont29_2x3_r);
+        u8x8.setFont(u8x8_font_inr21_2x4_r/*u8x8_font_profont29_2x3_r*/);
         u8x8.setCursor(0, 0);
         printCentered(u8x8, speed.name, 8);
     }
@@ -832,7 +856,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
     if (shaft_frames != prev_shaft_frames) {
         prev_shaft_frames = shaft_frames;
 
-        u8x8.setFont(u8x8_font_inr21_2x4_n /*u8x8_font_courR18_2x3_n*/);
+        u8x8.setFont(u8x8_font_inr21_2x4_r /*u8x8_font_courR18_2x3_n*/);
 
         if (fps_rn != 50 / 3.0)
         {
@@ -869,7 +893,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
             {
                 force_redraw = true;
                 prev_sign = sign;
-                u8x8.setCursor(((sign) ? 4 : 2), 3);
+                u8x8.setCursor(((sign) ? 4 : 2), 4);
                 u8x8.print(F(":  :  -")); // when tc is negative, do not render sub frame count, but a leading minus sign
                 if (!sign && fps_rn == 9)
                 {
@@ -887,7 +911,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         if (right_sec_digit != prev_right_sec_digit || force_redraw)
         {
             prev_right_sec_digit = right_sec_digit;
-            u8x8.setCursor(12 + sign_offset, 3);
+            u8x8.setCursor(12 + sign_offset, 4);
             u8x8.print(right_sec_digit);
         }
 
@@ -896,7 +920,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         if (new_left_sec_digit != prev_left_sec_digit || force_redraw)
         {
             prev_left_sec_digit = new_left_sec_digit;
-            u8x8.setCursor(10 + sign_offset, 3);
+            u8x8.setCursor(10 + sign_offset, 4);
             u8x8.print(new_left_sec_digit);
         }
 
@@ -905,7 +929,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         if (new_right_min_digit != prev_right_min_digit || force_redraw)
         {
             prev_right_min_digit = new_right_min_digit;
-            u8x8.setCursor(6 + sign_offset, 3);
+            u8x8.setCursor(6 + sign_offset, 4);
             u8x8.print(new_right_min_digit);
         }
 
@@ -914,7 +938,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         if (new_left_min_digit != prev_left_min_digit || force_redraw)
         {
             prev_left_min_digit = new_left_min_digit;
-            u8x8.setCursor(4 + sign_offset, 3);
+            u8x8.setCursor(4 + sign_offset, 4);
             u8x8.print(new_left_min_digit);
         }
 
@@ -923,7 +947,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         if (new_hour_digit != prev_hour_digit || force_redraw)
         {
             prev_hour_digit = new_hour_digit;
-            u8x8.setCursor(0 + sign_offset, 3);
+            u8x8.setCursor(0 + sign_offset, 4);
             u8x8.print(new_hour_digit);
         }
 
@@ -940,7 +964,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         {
             u8x8.setFont(u8x8_font_7x14_1x2_n);    // just numbers
             // u8x8.setFont(u8x8_font_7x14_1x2_r); // full charset
-            u8x8.setCursor(14, 3);
+            u8x8.setCursor(14, 4);
             if (current_sub_frame < 10 && fps_rn != 9)
                 u8x8.print(0);
             u8x8.print(current_sub_frame);
