@@ -8,6 +8,7 @@ Todo:
 - Use the display
     - make fps_rn an int 
 - actually apply the timer_factor
+- Make Auto Mode actually switch the mode, and then disappear, until next stop
 - speed.name is probably not really needed, saves 42 Bytes PROGMEM and 6 Bytes RAM
 - use shaft_pulses instead of shaft_frames to determine past speed, more precise and omits a multiplication
 - flash the DAC just once on very first start
@@ -82,20 +83,20 @@ const byte CATCH_UP_BTTN_PIN = 12;
 #define numberOfHours(_time_) ((_time_ % SECS_PER_DAY) / SECS_PER_HOUR)
 
 // --- some custome gfx fro the display
-const uint8_t unlockedLockTop[24] = {
-    0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000,
-    0b10000000, 0b10000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b00000110, 0b00000110,
-    0b00000110, 0b00000110, 0b00001100, 0b11111000, 0b11100000, 0b00000000, 0b00000000, 0b00000000};
-const uint8_t lockedLockTop[16] = {
-    0b00000000, 0b00000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b10000110, 0b10000110,
-    0b10000110, 0b10000110, 0b10001100, 0b11111000, 0b11100000, 0b10000000, 0b00000000, 0b00000000};
-const uint8_t lockBottom[16] = {
-    0b00000000, 0b00000000, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b01011001, 0b01000000,
-    0b01000000, 0b01011001, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b00000000, 0b00000000};
-const uint8_t twoThirdsTop[8] = {
-    0b01000010, 0b01100001, 0b01010001, 0b01001110, 0b10000000, 0b01000000, 0b00100000, 0b00010000};
-const uint8_t twoThirdsBottom[8] = {
-    0b00001000, 0b00000100, 0b00000010, 0b00000001, 0b00100010, 0b01001001, 0b01001001, 0b00110110};
+// const uint8_t unlockedLockTop[24] = {
+//     0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000,
+//     0b10000000, 0b10000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b00000110, 0b00000110,
+//     0b00000110, 0b00000110, 0b00001100, 0b11111000, 0b11100000, 0b00000000, 0b00000000, 0b00000000};
+// const uint8_t lockedLockTop[16] = {
+//     0b00000000, 0b00000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b10000110, 0b10000110,
+//     0b10000110, 0b10000110, 0b10001100, 0b11111000, 0b11100000, 0b10000000, 0b00000000, 0b00000000};
+// const uint8_t lockBottom[16] = {
+//     0b00000000, 0b00000000, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b01011001, 0b01000000,
+//     0b01000000, 0b01011001, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b00000000, 0b00000000};
+// const uint8_t twoThirdsTop[8] = {
+//     0b01000010, 0b01100001, 0b01010001, 0b01001110, 0b10000000, 0b01000000, 0b00100000, 0b00010000};
+// const uint8_t twoThirdsBottom[8] = {
+//     0b00001000, 0b00000100, 0b00000010, 0b00000001, 0b00100010, 0b01001001, 0b01001001, 0b00110110};
 const uint8_t emptyTile[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // Timer Variables
@@ -269,6 +270,14 @@ void setup()
     u8x8.begin();
     u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
     drawCurrentTime(0, 0, true); // Init the Display
+
+    // u8x8.setFont(u8x8_font_5x8_r);
+    // u8x8.setCursor(3, 7);
+    // u8x8.print("|''''|'O''|");
+
+    // open_iconic_arrow_4x // O or S for arrows,
+    // profont for scale? |''''|''''|''''|''''|
+    // u8x8_font_7x14_1x2_n (small): (r is 900B more)
 }
 
 void loop()
@@ -929,7 +938,8 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         //
         if (frame_count >= 0)
         {
-            u8x8.setFont(u8x8_font_7x14_1x2_n);
+            u8x8.setFont(u8x8_font_7x14_1x2_n);    // just numbers
+            // u8x8.setFont(u8x8_font_7x14_1x2_r); // full charset
             u8x8.setCursor(14, 3);
             if (current_sub_frame < 10 && fps_rn != 9)
                 u8x8.print(0);
