@@ -7,7 +7,7 @@ Bugs:
 Todo: 
 - Use the display
     - make fps_rn an int 
-    - create "fps", "Auto" and "Off" tiles to save some mem (_r font is 6KB bigger than _n)
+    - create "fps", "Auto" and "Off" tiles to save some mem (_r font is 4KB bigger than _n)
 - actually apply the timer_factor
 - Make Auto Mode actually switch the mode, and then disappear, until next stop
 - speed.name is probably not really needed, saves 42 Bytes PROGMEM and 6 Bytes RAM
@@ -19,7 +19,7 @@ Todo:
         - Forget any previous errors and start fresh
         + allows for quick speed changes
         + ideal mode for use as "Peaceman's Box" (ESS out mode)
-        + good for telecine (which could also just restartm though)
+        + good for telecine (which could also just restart though)
         - loses sync with any sepmag audio
     Timecode would restart at 0:00:00.00
 - Rangieren (langsam)
@@ -905,6 +905,30 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
 
         // Only paint the glyphs that have changed, this improves the display framerate a lot
         // Precompute offset for sign to avoid multiple ternary evaluations
+
+/*
+uint8_t sign_offset = sign ? 2 : 0;
+
+void updateDigit(uint8_t new_digit, uint8_t &prev_digit, uint8_t cursor_pos) {
+    if (new_digit != prev_digit || force_redraw) {
+        prev_digit = new_digit;
+        u8x8.setCursor(cursor_pos + sign_offset, 4);
+        u8x8.print(new_digit);
+    }
+}
+
+// Update seconds digits
+updateDigit(right_sec_digit, prev_right_sec_digit, 12);
+updateDigit(seconds / 10, prev_left_sec_digit, 10);
+
+// Update minutes digits
+updateDigit(minutes % 10, prev_right_min_digit, 6);
+updateDigit(minutes / 10, prev_left_min_digit, 4);
+
+// Update hour digit
+updateDigit(hours % 10, prev_hour_digit, 0);
+*/
+
         uint8_t sign_offset = sign ? 2 : 0;
 
         // Check if we need to update right seconds digit
@@ -982,9 +1006,16 @@ void printCentered(U8X8 &u8x8, const char *text, uint8_t lineWidth)
     }
 
     uint8_t padding = (lineWidth - textLength) / 2; // Calculate the padding
+    uint8_t extraSpace = (lineWidth - textLength) % 2; // Handle uneven padding
+    
     for (uint8_t i = 0; i < padding; i++)
     {
         u8x8.print(' '); // Add spaces before the text
     }
     u8x8.print(text); // Print the text
+    // Add spaces after the text
+    for (uint8_t i = 0; i < padding + extraSpace; i++)
+    {
+        u8x8.print(' ');
+    }
 }
