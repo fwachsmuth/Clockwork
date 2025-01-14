@@ -1,15 +1,14 @@
 /* Todo
 
 Bugs:
-- Missing Case: Projector started in a manual mode and user than enters Auto.
 - Starting in NONE does not work yet, DAC stays connected
 
 Todo: 
 - Use the display
     - make fps_rn an int 
-    - create "fps", "Auto" and "Off" tiles to save some mem (_r font is 4KB bigger than _n)
+    - create "fps", "Auto" and "Off" tiles to save some progmem (_r font is 4KB bigger than _n)
+- Use FreqMeasure in FPS_NONE
 - actually apply the timer_factor
-- Make Auto Mode actually switch the mode, and then disappear, until next stop
 - speed.name is probably not really needed, saves 42 Bytes PROGMEM and 6 Bytes RAM
 - use shaft_pulses instead of shaft_frames to determine past speed, more precise and omits a multiplication
 - flash the DAC just once on very first start
@@ -22,7 +21,7 @@ Todo:
         + good for telecine (which could also just restart though)
         - loses sync with any sepmag audio
     Timecode would restart at 0:00:00.00
-- Rangieren (langsam)
+- Rangieren (slow) (idea: could get enabled by pressing +/- buttons while turning the projector tho "thread" pos)
 - "start the audio" IR
 - Clamp the PID output to avoid halting the motor
 - ESS in
@@ -557,44 +556,16 @@ void selectNextMode(Button2 &btn)
 
     // Determine if left or right button was pressed
     currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
-    // Skip mode 1 if projector is running, Auto Mode is only selctable when idling
-    if (projector_state == PROJ_RUNNING && currently_selected_mode == 1)
+    // Skip mode FPS_AUTO if projector is running, Auto Mode is only selctable when idling
+    if (projector_state == PROJ_RUNNING && currently_selected_mode == FPS_AUTO)
     {
+        // select next adjacent mode
         currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
     }
     Serial.print(F("New Mode: "));
     Serial.println(currently_selected_mode);
 
-    // if (currently_selected_mode == FPS_AUTO)
-    // {
-    //     // This might be obsolete as we won't re-enter Auto Mode once it found the correct speed
-    //     switch (projector_speed_switch)
-    //     {
-    //     case 0:
-    //         Serial.println(F("No prev. AUTO Frequency..."));
-    //         // Missing Case: Projector started in a manual mode and user than enters Auto.
-
-    //         // switch pos is still unknown for this run
-    //         // measure the current freq
-    //         // set projector_speed_switch to 18 or 24
-
-    //         break;
-    //     case 18:
-    //         Serial.println(F("Restoring 18"));
-    //         activateSpeedConfig(FPS_18); // activates the speed struct, inits PID and DAC
-    //         break;
-    //     case 24:
-    //         Serial.println(F("Restoring 24"));
-    //         activateSpeedConfig(FPS_24);
-    //         break;
-    //     default:
-    //         Serial.println(F("invalid value"));
-    //     }
-    // } 
-    // else 
-    // {
-        activateSpeedConfig(currently_selected_mode); 
-    // }
+    activateSpeedConfig(currently_selected_mode); 
 
     // write the timerpulses (+timer_correction_factor)
     noInterrupts();
@@ -750,82 +721,6 @@ void stopTimer1()
     interrupts();
 }
 
-// void drawState()
-// {
-//     Serial.print("Drew state ");
-//     Serial.println(state);
-//     checkRequiredMillisInLoop = false;
-//     if (wasCounterVisible != isCounterVisible)
-//     {
-//         u8x8.clearDisplay();
-//         if (isCounterVisible)
-//             drawCurrentTime(true);
-//     }
-//     switch (state)
-//     {
-//     default:
-//         notFound();
-//         break;
-//     case STATE_STOPPED:
-//         if (prevPaintedState == STATE_RESET)
-//             ignoreNextButtonRelease = true;
-//         Serial.println(F("Freq-Measurer OFF, but do NOT start the Timer1!"));
-//         FreqMeasure.end();
-//         u8x8.setFont(u8x8_font_7x14B_1x2_r);
-//         u8x8.setCursor(0, 6);
-//         u8x8.print(F("shot @       fps"));
-//         fpsState = getFpsState(fps_rn);
-//         drawCurrentFps(false, false);
-//         if (checkWriteToEEPROMInLoop)
-//         {
-//             checkWriteToEEPROMInLoop = false;
-//             Serial.println(F("Writing to EEPROM"));
-//             EEPROM.write(1, playbackFps);
-//         }
-//         break;
-//     case STATE_RESET:
-//         u8x8.clearDisplay();
-//         u8x8.setFont(u8x8_font_courB18_2x3_r);
-//         u8x8.setCursor(3, 0);
-//         u8x8.print(F("Reset"));
-//         u8x8.setCursor(0, 3);
-//         u8x8.print(F("counter?"));
-//         u8x8.setFont(u8x8_font_7x14B_1x2_r);
-//         u8x8.setCursor(1, 6);
-//         u8x8.print(F("push = confirm"));
-//         requiredMillis = millis() + 4000;
-//         checkRequiredMillisInLoop = true;
-//         break;
-//     case STATE_RUNNING:
-//         checkRequiredMillisInLoop = false;
-//         u8x8.setFont(u8x8_font_7x14B_1x2_r);
-//         u8x8.setCursor(7, 6);
-//         u8x8.print(" fps     ");
-//         u8x8.setCursor(0, 6);
-//         u8x8.print("  ");
-//         u8x8.drawTile(14, 7, 1, emptyTile);
-//         u8x8.drawTile(12, 7, 2, lockBottom);
-//         u8x8.drawTile(12, 6, 3, unlockedLockTop);
-//         fpsState = FPS_UNLOCKED;
-
-//         Serial.println(F("Freq-Measurer ON, Timer1 STOP"));
-//         stopTimer1();
-//         detachInterrupt(digitalPinToInterrupt(impDetectorPin));
-//         Serial.println(F("Crystal Control OFF"));
-//         digitalWrite(ssrPin, LOW);
-//         FreqMeasure.begin();
-
-//         drawCurrentCustomFrequency();
-//         if (checkWriteToEEPROMInLoop)
-//         {
-//             checkWriteToEEPROMInLoop = false;
-//             Serial.println(F("Writing to EEPROM"));
-//             EEPROM.write(0, fps_rn);
-//         }
-//     }
-//     prevPaintedState = state;
-// }
-
 void drawCurrentMode()
 {
     static uint8_t prev_selected_mode = 99;
@@ -902,6 +797,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
             if (sign != prev_sign || force_redraw)
             {
                 force_redraw = true;
+                Serial.println(F("Force Redraw."));
                 prev_sign = sign;
                 u8x8.setCursor(((sign) ? 4 : 2), 4);
                 u8x8.print(F(":  :  -")); // when tc is negative, do not render sub frame count, but a leading minus sign
@@ -940,50 +836,60 @@ updateDigit(hours % 10, prev_hour_digit, 0);
 */
 
         uint8_t sign_offset = sign ? 2 : 0;
+        updateDigit(right_sec_digit, prev_right_sec_digit, 12, sign_offset, force_redraw);
+        updateDigit(seconds / 10, prev_left_sec_digit, 10, sign_offset, force_redraw);
+        updateDigit(minutes % 10, prev_right_min_digit, 6, sign_offset, force_redraw);
+        updateDigit(minutes / 10, prev_left_min_digit, 4, sign_offset, force_redraw);
+        updateDigit(hours % 10, prev_hour_digit, 0, sign_offset, force_redraw);
 
-        // Check if we need to update right seconds digit
-        if (right_sec_digit != prev_right_sec_digit || force_redraw)
-        {
-            prev_right_sec_digit = right_sec_digit;
-            u8x8.setCursor(12 + sign_offset, 4);
-            u8x8.print(right_sec_digit);
-        }
 
-        // Compute left seconds digit
-        uint8_t new_left_sec_digit = seconds / 10;
-        if (new_left_sec_digit != prev_left_sec_digit || force_redraw)
-        {
-            prev_left_sec_digit = new_left_sec_digit;
-            u8x8.setCursor(10 + sign_offset, 4);
-            u8x8.print(new_left_sec_digit);
-        }
+        /*
+                uint8_t sign_offset = sign ? 2 : 0;
 
-        // Check if we need to update right minutes digit
-        uint8_t new_right_min_digit = minutes % 10;
-        if (new_right_min_digit != prev_right_min_digit || force_redraw)
-        {
-            prev_right_min_digit = new_right_min_digit;
-            u8x8.setCursor(6 + sign_offset, 4);
-            u8x8.print(new_right_min_digit);
-        }
+                // Check if we need to update right seconds digit
+                if (right_sec_digit != prev_right_sec_digit || force_redraw)
+                {
+                    prev_right_sec_digit = right_sec_digit;
+                    u8x8.setCursor(12 + sign_offset, 4);
+                    u8x8.print(right_sec_digit);
+                }
 
-        // Compute left minutes digit
-        uint8_t new_left_min_digit = minutes / 10;
-        if (new_left_min_digit != prev_left_min_digit || force_redraw)
-        {
-            prev_left_min_digit = new_left_min_digit;
-            u8x8.setCursor(4 + sign_offset, 4);
-            u8x8.print(new_left_min_digit);
-        }
+                // Compute left seconds digit
+                uint8_t new_left_sec_digit = seconds / 10;
+                if (new_left_sec_digit != prev_left_sec_digit || force_redraw)
+                {
+                    prev_left_sec_digit = new_left_sec_digit;
+                    u8x8.setCursor(10 + sign_offset, 4);
+                    u8x8.print(new_left_sec_digit);
+                }
 
-        // Check if we need to update hour digit
-        uint8_t new_hour_digit = hours % 10;
-        if (new_hour_digit != prev_hour_digit || force_redraw)
-        {
-            prev_hour_digit = new_hour_digit;
-            u8x8.setCursor(0 + sign_offset, 4);
-            u8x8.print(new_hour_digit);
-        }
+                // Check if we need to update right minutes digit
+                uint8_t new_right_min_digit = minutes % 10;
+                if (new_right_min_digit != prev_right_min_digit || force_redraw)
+                {
+                    prev_right_min_digit = new_right_min_digit;
+                    u8x8.setCursor(6 + sign_offset, 4);
+                    u8x8.print(new_right_min_digit);
+                }
+
+                // Compute left minutes digit
+                uint8_t new_left_min_digit = minutes / 10;
+                if (new_left_min_digit != prev_left_min_digit || force_redraw)
+                {
+                    prev_left_min_digit = new_left_min_digit;
+                    u8x8.setCursor(4 + sign_offset, 4);
+                    u8x8.print(new_left_min_digit);
+                }
+
+                // Check if we need to update hour digit
+                uint8_t new_hour_digit = hours % 10;
+                if (new_hour_digit != prev_hour_digit || force_redraw)
+                {
+                    prev_hour_digit = new_hour_digit;
+                    u8x8.setCursor(0 + sign_offset, 4);
+                    u8x8.print(new_hour_digit);
+                }
+                */
 
         // if (frame_count != 0)
         //     u8x8.setCursor(16 - (int(log10(abs(frame_count)) + (sign ? 3 : 2)) << 1), 0); 
@@ -1027,5 +933,15 @@ void printCentered(U8X8 &u8x8, const char *text, uint8_t lineWidth)
     for (uint8_t i = 0; i < padding + extraSpace; i++)
     {
         u8x8.print(' ');
+    }
+}
+
+void updateDigit(uint8_t new_digit, uint8_t &prev_digit, uint8_t cursor_pos, uint8_t sign_offset, bool force_redraw)
+{
+    if (new_digit != prev_digit || force_redraw)
+    {
+        prev_digit = new_digit;
+        u8x8.setCursor(cursor_pos + sign_offset, 4);
+        u8x8.print(new_digit);
     }
 }
