@@ -426,6 +426,8 @@ void checkForStop()
         myPID.SetMode(AUTOMATIC);
         digitalWrite(ENABLE_PIN, LOW);
         digitalWrite(LED_RED_PIN, LOW);
+        currently_selected_mode = FPS_AUTO;
+        activateSpeedConfig(FPS_AUTO);
 
         FreqMeasure.end();
     }
@@ -525,8 +527,10 @@ void checkProjectorRunningYet()
 
         if (currently_selected_mode == FPS_AUTO)
         { // Determine the mode based on the detected frequency
-            activateSpeedConfig(detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? FPS_18 : FPS_24);
-            projector_speed_switch = (detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? 18 : 24);
+            uint8_t target_mode = (detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? FPS_18 : FPS_24);
+            activateSpeedConfig(target_mode);
+            projector_speed_switch = (target_mode == FPS_18 ? 18 : 24);
+            currently_selected_mode = (target_mode);
         }
         // Init the pulse timer to not lose those first frames
         timer_pulses = freq_count;
@@ -553,38 +557,44 @@ void selectNextMode(Button2 &btn)
 
     // Determine if left or right button was pressed
     currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
+    // Skip mode 1 if projector is running, Auto Mode is only selctable when idling
+    if (projector_state == PROJ_RUNNING && currently_selected_mode == 1)
+    {
+        currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
+    }
     Serial.print(F("New Mode: "));
     Serial.println(currently_selected_mode);
 
-    if (currently_selected_mode == FPS_AUTO)
-    {
-        switch (projector_speed_switch)
-        {
-        case 0:
-            Serial.println(F("No prev. AUTO Frequency..."));
-            // Missing Case: Projector started in a manual mode and user than enters Auto.
+    // if (currently_selected_mode == FPS_AUTO)
+    // {
+    //     // This might be obsolete as we won't re-enter Auto Mode once it found the correct speed
+    //     switch (projector_speed_switch)
+    //     {
+    //     case 0:
+    //         Serial.println(F("No prev. AUTO Frequency..."));
+    //         // Missing Case: Projector started in a manual mode and user than enters Auto.
 
-            // switch pos is still unknown for this run
-            // measure the current freq
-            // set projector_speed_switch to 18 or 24
+    //         // switch pos is still unknown for this run
+    //         // measure the current freq
+    //         // set projector_speed_switch to 18 or 24
 
-            break;
-        case 18:
-            Serial.println(F("Restoring 18"));
-            activateSpeedConfig(FPS_18); // activates the speed struct, inits PID and DAC
-            break;
-        case 24:
-            Serial.println(F("Restoring 24"));
-            activateSpeedConfig(FPS_24);
-            break;
-        default:
-            Serial.println(F("invalid value"));
-        }
-    } 
-    else 
-    {
+    //         break;
+    //     case 18:
+    //         Serial.println(F("Restoring 18"));
+    //         activateSpeedConfig(FPS_18); // activates the speed struct, inits PID and DAC
+    //         break;
+    //     case 24:
+    //         Serial.println(F("Restoring 24"));
+    //         activateSpeedConfig(FPS_24);
+    //         break;
+    //     default:
+    //         Serial.println(F("invalid value"));
+    //     }
+    // } 
+    // else 
+    // {
         activateSpeedConfig(currently_selected_mode); 
-    }
+    // }
 
     // write the timerpulses (+timer_correction_factor)
     noInterrupts();
