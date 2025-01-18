@@ -4,6 +4,9 @@ Bugs:
 - Starting in NONE does not work yet, DAC stays connected
 
 Todo: 
+- Do I still ned force_redraw? 
+make the 5 call of updateDigit more efficient: stop calculating if a digit did not need to beupdated.
+
 - Use the display
     - make fps_rn an int 
     - create "fps", "Auto" and "Off" tiles to save some progmem (_r font is 4KB bigger than _n)
@@ -213,6 +216,7 @@ struct SpeedConfig
             => best frac32 = 0x638E38E4  (decimal 1670265060)
             => freqActual  = 2147483648000000/7463996984889 ~ 287.712287712283 Hz
             => error Hz    = -0.0000000000004
+        - FPS_24 => 288 Hz = 864 / 3
         - FPS_25 => 300 Hz => idealDiv=6666.666..., fraction=0.666..., frac32=0xAAAAAAAB => 0 ppm
 
     To get the fraction in a readable form, do frac/2^32.
@@ -241,13 +245,15 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
 This is a table of values needed to generate a certain speed. To save memory, copy one just struct of values
 to memory when needed.
 */
-    {"Off", 2314, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
+    {"Off", 2313, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
     {"Auto", 0, 0, 0, 0, 1, 1500},
-    {"16  fps", 10000, 0x00000000, 1, 16.666666, 1, 1200},
-    {"18 fps", 2314, 0xD0BE9C00, 4, 18.000000, 1, 1500},
-    {"23.976", 6951, 0x638E38E4, 1, 23.976024, 1, 2000},
-    {"24 fps", 2314, 0xD0BE9C00, 3, 24.000000, 1, 2100},
-    {"25 fps", 6666, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
+    {"16  fps", 9999, 0x00000000, 1, 16.666666, 1, 1200},
+    {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1, 1500},
+    {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1, 2000},
+    {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1, 2100},
+    {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
+
+// !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
 
 void setup()
 {
@@ -682,7 +688,7 @@ ISR(TIMER1_COMPA_vect)
     {
         timer_pulses++;    // Increment timer_pulses
         timer_modulus = 0; // Reset the counter
-        PIND |= (1 << 7); // Toggle pin 7kica
+        PIND |= (1 << 7); // Toggle pin 7
     }
     // Dither logic (fixed-point accumulator)
     dither_accumulator_32 += speed.dither_frac32;
@@ -797,7 +803,6 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
             if (sign != prev_sign || force_redraw)
             {
                 force_redraw = true;
-                Serial.println(F("Force Redraw."));
                 prev_sign = sign;
                 u8x8.setCursor(((sign) ? 4 : 2), 4);
                 u8x8.print(F(":  :  -")); // when tc is negative, do not render sub frame count, but a leading minus sign
@@ -812,91 +817,12 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         // Only paint the glyphs that have changed, this improves the display framerate a lot
         // Precompute offset for sign to avoid multiple ternary evaluations
 
-/*
-uint8_t sign_offset = sign ? 2 : 0;
-
-void updateDigit(uint8_t new_digit, uint8_t &prev_digit, uint8_t cursor_pos) {
-    if (new_digit != prev_digit || force_redraw) {
-        prev_digit = new_digit;
-        u8x8.setCursor(cursor_pos + sign_offset, 4);
-        u8x8.print(new_digit);
-    }
-}
-
-// Update seconds digits
-updateDigit(right_sec_digit, prev_right_sec_digit, 12);
-updateDigit(seconds / 10, prev_left_sec_digit, 10);
-
-// Update minutes digits
-updateDigit(minutes % 10, prev_right_min_digit, 6);
-updateDigit(minutes / 10, prev_left_min_digit, 4);
-
-// Update hour digit
-updateDigit(hours % 10, prev_hour_digit, 0);
-*/
-
         uint8_t sign_offset = sign ? 2 : 0;
         updateDigit(right_sec_digit, prev_right_sec_digit, 12, sign_offset, force_redraw);
         updateDigit(seconds / 10, prev_left_sec_digit, 10, sign_offset, force_redraw);
         updateDigit(minutes % 10, prev_right_min_digit, 6, sign_offset, force_redraw);
         updateDigit(minutes / 10, prev_left_min_digit, 4, sign_offset, force_redraw);
         updateDigit(hours % 10, prev_hour_digit, 0, sign_offset, force_redraw);
-
-
-        /*
-                uint8_t sign_offset = sign ? 2 : 0;
-
-                // Check if we need to update right seconds digit
-                if (right_sec_digit != prev_right_sec_digit || force_redraw)
-                {
-                    prev_right_sec_digit = right_sec_digit;
-                    u8x8.setCursor(12 + sign_offset, 4);
-                    u8x8.print(right_sec_digit);
-                }
-
-                // Compute left seconds digit
-                uint8_t new_left_sec_digit = seconds / 10;
-                if (new_left_sec_digit != prev_left_sec_digit || force_redraw)
-                {
-                    prev_left_sec_digit = new_left_sec_digit;
-                    u8x8.setCursor(10 + sign_offset, 4);
-                    u8x8.print(new_left_sec_digit);
-                }
-
-                // Check if we need to update right minutes digit
-                uint8_t new_right_min_digit = minutes % 10;
-                if (new_right_min_digit != prev_right_min_digit || force_redraw)
-                {
-                    prev_right_min_digit = new_right_min_digit;
-                    u8x8.setCursor(6 + sign_offset, 4);
-                    u8x8.print(new_right_min_digit);
-                }
-
-                // Compute left minutes digit
-                uint8_t new_left_min_digit = minutes / 10;
-                if (new_left_min_digit != prev_left_min_digit || force_redraw)
-                {
-                    prev_left_min_digit = new_left_min_digit;
-                    u8x8.setCursor(4 + sign_offset, 4);
-                    u8x8.print(new_left_min_digit);
-                }
-
-                // Check if we need to update hour digit
-                uint8_t new_hour_digit = hours % 10;
-                if (new_hour_digit != prev_hour_digit || force_redraw)
-                {
-                    prev_hour_digit = new_hour_digit;
-                    u8x8.setCursor(0 + sign_offset, 4);
-                    u8x8.print(new_hour_digit);
-                }
-                */
-
-        // if (frame_count != 0)
-        //     u8x8.setCursor(16 - (int(log10(abs(frame_count)) + (sign ? 3 : 2)) << 1), 0); 
-        // else
-        //     u8x8.setCursor(12, 0);
-        // u8x8.print(" ");
-        // u8x8.print(frame_count);
 
         // Print current Subframe, SMPTE style
         //
