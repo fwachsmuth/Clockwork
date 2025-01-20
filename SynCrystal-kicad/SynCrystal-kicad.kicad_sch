@@ -5533,12 +5533,6 @@
 		(uuid "9e66345e-1c66-4bbc-ba81-60a0c76816e4")
 	)
 	(junction
-		(at 27.94 31.75)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "9f14fa84-7ace-4d9e-b144-98b948ed82ac")
-	)
-	(junction
 		(at 172.72 130.81)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5549,6 +5543,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b4526cf4-830c-456b-858b-b38ad592a3f2")
+	)
+	(junction
+		(at 34.29 31.75)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "bbaa340f-3628-43dc-ac46-f1df6181deb1")
 	)
 	(junction
 		(at 139.7 24.13)
@@ -5567,6 +5567,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "cb1f82b7-5c81-4c90-abe5-43971560ef30")
+	)
+	(junction
+		(at 27.94 31.75)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d629583f-77bb-4920-925f-e57940bb3502")
 	)
 	(junction
 		(at 82.55 41.91)
@@ -6001,6 +6007,16 @@
 			(type default)
 		)
 		(uuid "337e1b00-6ea8-4c05-8df7-dae7cfb2eba8")
+	)
+	(wire
+		(pts
+			(xy 34.29 31.75) (xy 36.83 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "36b0e6c6-dd25-4338-a416-5e86d589137e")
 	)
 	(wire
 		(pts
@@ -7004,7 +7020,7 @@
 	)
 	(wire
 		(pts
-			(xy 27.94 31.75) (xy 36.83 31.75)
+			(xy 27.94 31.75) (xy 34.29 31.75)
 		)
 		(stroke
 			(width 0)
@@ -7031,16 +7047,6 @@
 			(type default)
 		)
 		(uuid "b9f00558-606f-4624-b7dd-d274e49bd6f1")
-	)
-	(wire
-		(pts
-			(xy 27.94 29.21) (xy 27.94 31.75)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bad1ea03-918d-4122-bca2-e35eb7727fbe")
 	)
 	(wire
 		(pts
@@ -7504,6 +7510,16 @@
 	)
 	(wire
 		(pts
+			(xy 27.94 24.13) (xy 27.94 26.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f092d49b-398e-48c8-bcdf-99f22f97f774")
+	)
+	(wire
+		(pts
 			(xy 189.23 134.62) (xy 172.72 134.62)
 		)
 		(stroke
@@ -7692,7 +7708,7 @@
 		)
 		(uuid "72b08bf2-606f-47c3-aca3-bd8ef2467bfe")
 	)
-	(text "Revers protection diode\nDumb Mode w/o Display\n"
+	(text "Dumb Mode w/o Display\nIR send\n"
 		(exclude_from_sim no)
 		(at 257.048 18.034 0)
 		(effects
@@ -7872,7 +7888,7 @@
 		(uuid "3c50b5f7-1fdc-4daf-ab36-639006b0cf26")
 	)
 	(label "Proj_Vcc"
-		(at 27.94 29.21 180)
+		(at 27.94 24.13 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -8396,7 +8412,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 57.15 120.65 0)
 			(effects
 				(font
@@ -8470,7 +8486,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 139.7 29.21 0)
 			(effects
 				(font
@@ -8605,7 +8621,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
 			(at 52.07 182.88 0)
 			(effects
 				(font
@@ -8775,7 +8791,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 146.05 31.75 0)
 			(effects
 				(font
@@ -8907,7 +8923,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 146.05 80.01 0)
 			(effects
 				(font
@@ -9041,7 +9057,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 130.81 82.55 0)
 			(effects
 				(font
@@ -9114,7 +9130,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm"
 			(at 91.44 125.73 0)
 			(effects
 				(font
@@ -9355,7 +9371,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm"
 			(at 243.84 31.75 0)
 			(effects
 				(font
@@ -9637,7 +9653,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 135.89 38.1 0)
 			(effects
 				(font
@@ -9704,7 +9720,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 160.02 72.39 0)
 			(effects
 				(font
@@ -10005,7 +10021,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "easyEDA:IND-SMD_L5.8-W5.2"
 			(at 64.77 29.21 0)
 			(effects
 				(font
@@ -10074,7 +10090,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 69.85 62.23 0)
 			(effects
 				(font
@@ -10432,7 +10448,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Jumper:SolderJumper-3_P1.3mm_Bridged2Bar12_RoundedPad1.0x1.5mm"
 			(at 123.19 139.7 0)
 			(effects
 				(font
@@ -10567,7 +10583,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 163.83 153.67 0)
 			(effects
 				(font
@@ -10655,7 +10671,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 57.15 102.87 0)
 			(effects
 				(font
@@ -10794,7 +10810,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 173.99 72.39 0)
 			(effects
 				(font
@@ -10854,7 +10870,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "BC847"
+		(property "Value" "SS8050"
 			(at 153.4414 39.243 0)
 			(effects
 				(font
@@ -10938,7 +10954,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 82.55 33.02 0)
 			(effects
 				(font
@@ -11088,7 +11104,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 156.21 123.19 0)
 			(effects
 				(font
@@ -11155,7 +11171,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 204.47 125.73 0)
 			(effects
 				(font
@@ -11225,7 +11241,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Jumper:SolderJumper-3_P1.3mm_Bridged2Bar12_RoundedPad1.0x1.5mm"
 			(at 115.57 139.7 0)
 			(effects
 				(font
@@ -11296,7 +11312,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm"
 			(at 243.84 58.42 0)
 			(effects
 				(font
@@ -11500,7 +11516,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 57.15 118.11 0)
 			(effects
 				(font
@@ -11565,7 +11581,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1N5819"
+		(property "Value" "SL14D"
 			(at 163.322 119.634 90)
 			(effects
 				(font
@@ -11574,7 +11590,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 161.29 119.38 90)
 			(effects
 				(font
@@ -11641,7 +11657,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 135.89 74.93 0)
 			(effects
 				(font
@@ -11709,7 +11725,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm"
 			(at 243.84 49.53 0)
 			(effects
 				(font
@@ -12168,7 +12184,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
 			(at 232.41 125.73 0)
 			(effects
 				(font
@@ -12468,7 +12484,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 247.65 130.81 0)
 			(effects
 				(font
@@ -12555,7 +12571,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "easyEDA:RES-TH_RK09K1110A0J_short"
 			(at 199.39 129.54 0)
 			(effects
 				(font
@@ -12628,7 +12644,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 57.15 100.33 0)
 			(effects
 				(font
@@ -13044,7 +13060,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 191.77 125.73 0)
 			(effects
 				(font
@@ -13129,7 +13145,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 191.77 134.62 0)
 			(effects
 				(font
@@ -13197,7 +13213,7 @@
 				)
 			)
 		)
-		(property "Footprint" "easyeda2kicad:SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR"
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-3"
 			(at 116.84 33.02 0)
 			(effects
 				(font
@@ -13252,6 +13268,75 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:D_Schottky_Small")
+		(at 27.94 29.21 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "7f62d247-3994-404c-b728-3483ec4606c5")
+		(property "Reference" "D8"
+			(at 25.908 31.496 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "SL14D"
+			(at 25.908 28.956 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SMA"
+			(at 27.94 29.21 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 27.94 29.21 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Schottky diode, small symbol"
+			(at 27.94 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "bec995bb-0a6a-47b8-8e43-7ba5355e2440")
+		)
+		(pin "1"
+			(uuid "5db54441-50e0-4c1d-8133-263f0fdbdadc")
+		)
+		(instances
+			(project "SynCrystal-kicad"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "D8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Peacemans Teile:TestPoint_named")
 		(at 87.63 25.4 90)
 		(unit 1)
@@ -13279,7 +13364,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 87.63 20.32 0)
 			(effects
 				(font
@@ -13392,6 +13477,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:PWR_FLAG")
+		(at 34.29 31.75 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8d15cead-a2fc-49ad-a253-3a975aff4e85")
+		(property "Reference" "#FLG05"
+			(at 34.29 29.845 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "PWR_FLAG"
+			(at 34.29 26.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 34.29 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 34.29 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Special symbol for telling ERC where power comes from"
+			(at 34.29 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4db68aa9-1ce9-4424-a4f7-9ee69d1eea69")
+		)
+		(instances
+			(project "SynCrystal-kicad"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "#FLG05")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Peacemans Teile:74HCT14")
 		(at 217.17 125.73 0)
 		(unit 6)
@@ -13417,7 +13568,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
 			(at 217.17 125.73 0)
 			(effects
 				(font
@@ -13656,7 +13807,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 151.13 27.94 0)
 			(effects
 				(font
@@ -13839,22 +13990,22 @@
 			)
 		)
 		(pin "5"
-			(uuid "f2d1d0d4-3128-4daf-bc32-6f42ac70b94c")
+			(uuid "f2d1d0d4-3128-4daf-bc32-6f42ac70b94d")
 		)
 		(pin "3"
-			(uuid "32aa3471-103b-427b-bfa1-4ac897716674")
+			(uuid "32aa3471-103b-427b-bfa1-4ac897716675")
 		)
 		(pin "2"
-			(uuid "4f04fad3-d5d9-4325-aa1c-2fef3a6339f1")
+			(uuid "4f04fad3-d5d9-4325-aa1c-2fef3a6339f2")
 		)
 		(pin "1"
-			(uuid "e2fca17e-c7f4-42e7-8020-193ee884ce12")
+			(uuid "e2fca17e-c7f4-42e7-8020-193ee884ce13")
 		)
 		(pin "6"
-			(uuid "fbb1f59a-5f6a-4223-904d-a36e4a24af38")
+			(uuid "fbb1f59a-5f6a-4223-904d-a36e4a24af39")
 		)
 		(pin "4"
-			(uuid "6a422727-43e5-4341-97fc-63312a9666fa")
+			(uuid "6a422727-43e5-4341-97fc-63312a9666fb")
 		)
 		(instances
 			(project "SynCrystal-kicad"
@@ -14020,7 +14171,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 73.66 103.632 90)
 			(effects
 				(font
@@ -14080,8 +14231,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "Ext. Imp."
-			(at 232.918 137.922 90)
+		(property "Value" "Imp cln"
+			(at 225.806 136.144 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14089,7 +14240,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 229.87 130.81 0)
 			(effects
 				(font
@@ -14163,7 +14314,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
 			(at 36.83 182.88 0)
 			(effects
 				(font
@@ -14477,7 +14628,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 73.66 101.092 90)
 			(effects
 				(font
@@ -14546,7 +14697,7 @@
 				)
 			)
 		)
-		(property "Footprint" "easyeda2kicad:OSC-SMD_4P-L3.2-W2.5-BL"
+		(property "Footprint" "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm"
 			(at 77.47 186.69 0)
 			(effects
 				(font
@@ -14629,7 +14780,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
 			(at 121.92 184.15 0)
 			(effects
 				(font
@@ -14734,7 +14885,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Horizontal_shorter"
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
 			(at 127 116.84 90)
 			(effects
 				(font
@@ -14874,7 +15025,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 52.07 130.81 0)
 			(effects
 				(font
@@ -14948,7 +15099,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 260.35 120.65 0)
 			(effects
 				(font
@@ -15320,7 +15471,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Horizontal"
 			(at 156.21 179.07 0)
 			(effects
 				(font
@@ -15458,7 +15609,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 73.66 106.172 90)
 			(effects
 				(font
@@ -15725,7 +15876,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm"
 			(at 243.84 40.64 0)
 			(effects
 				(font
@@ -15859,7 +16010,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 172.72 31.75 0)
 			(effects
 				(font
@@ -16114,7 +16265,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "Ext. Imp."
+		(property "Value" "Imp IN"
 			(at 148.082 125.73 90)
 			(effects
 				(font
@@ -16123,7 +16274,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 153.67 118.11 0)
 			(effects
 				(font
@@ -16330,7 +16481,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 165.1 83.82 0)
 			(effects
 				(font
@@ -16500,7 +16651,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 181.61 127 0)
 			(effects
 				(font
@@ -16569,7 +16720,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 69.85 137.16 0)
 			(effects
 				(font
@@ -17024,7 +17175,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 57.15 97.79 0)
 			(effects
 				(font
@@ -17154,7 +17305,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1N5819"
+		(property "Value" "SL14D"
 			(at 162.306 134.874 90)
 			(effects
 				(font
@@ -17163,7 +17314,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 161.29 129.54 90)
 			(effects
 				(font
@@ -17230,7 +17381,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 146.05 64.77 0)
 			(effects
 				(font
@@ -17507,7 +17658,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "BC847"
+		(property "Value" "SS8050"
 			(at 256.54 131.318 0)
 			(effects
 				(font
@@ -17592,7 +17743,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
 			(at 111.76 30.48 0)
 			(effects
 				(font
@@ -17664,7 +17815,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 172.72 127 0)
 			(effects
 				(font
@@ -17796,7 +17947,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 156.21 83.82 0)
 			(effects
 				(font
