@@ -69,9 +69,9 @@ const byte ENABLE_PIN = 9;
 // const byte D_PIN = A3;
 
 const byte LEFT_BTTN_PIN = 10;
-const byte RIGHT_BTTN_PIN = 13;
-const byte DROP_BACK_BTTN_PIN = 11;
-const byte CATCH_UP_BTTN_PIN = 12;
+const byte RIGHT_BTTN_PIN = 13;     //A3 on final PCB
+const byte DROP_BACK_BTTN_PIN = 11; // 4 on final PCB
+const byte CATCH_UP_BTTN_PIN = 12;  // 6 on final PCB
 
 #define BTTN_NONE 0
 #define BTTN_LEFT 1
