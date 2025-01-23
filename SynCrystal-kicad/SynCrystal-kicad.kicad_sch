@@ -5437,6 +5437,12 @@
 		(uuid "3206a3ef-64bc-4769-9df2-e65c269d4a66")
 	)
 	(junction
+		(at 240.03 125.73)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "3c050027-1f14-4c4c-91c2-e5b43bedc0e9")
+	)
+	(junction
 		(at 92.71 41.91)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5447,6 +5453,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "496f16e2-b487-44a9-8d66-2aae656548d8")
+	)
+	(junction
+		(at 27.94 31.75)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "4f0db655-3e94-4216-b6de-7b154842e98f")
 	)
 	(junction
 		(at 38.1 62.23)
@@ -5569,12 +5581,6 @@
 		(uuid "cb1f82b7-5c81-4c90-abe5-43971560ef30")
 	)
 	(junction
-		(at 27.94 31.75)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d629583f-77bb-4920-925f-e57940bb3502")
-	)
-	(junction
 		(at 82.55 41.91)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5585,12 +5591,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "db66762c-1716-4858-b79c-22ea1266c1be")
-	)
-	(junction
-		(at 240.03 125.73)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "dc21f345-b5eb-4aa2-9a94-4eea8c3ca268")
 	)
 	(junction
 		(at 115.57 133.35)
@@ -5609,12 +5609,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "dedd6cd7-8c79-4914-a08a-ed97d7af7941")
-	)
-	(junction
-		(at 54.61 41.91)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "e726325c-89f9-40b0-a879-b7c2ced3a7cd")
 	)
 	(junction
 		(at 151.13 74.93)
@@ -5727,16 +5721,6 @@
 			(type default)
 		)
 		(uuid "0d063f39-0f8c-49d9-9484-d01d93d7254c")
-	)
-	(wire
-		(pts
-			(xy 27.94 38.1) (xy 27.94 41.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0f418f16-abbe-4c07-b01e-44a09cd3227a")
 	)
 	(wire
 		(pts
@@ -5920,7 +5904,7 @@
 	)
 	(wire
 		(pts
-			(xy 54.61 41.91) (xy 72.39 41.91)
+			(xy 46.99 41.91) (xy 72.39 41.91)
 		)
 		(stroke
 			(width 0)
@@ -6370,6 +6354,16 @@
 	)
 	(wire
 		(pts
+			(xy 27.94 31.75) (xy 34.29 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5d99c9e1-2373-4ac5-9310-126dcf1258c1")
+	)
+	(wire
+		(pts
 			(xy 77.47 137.16) (xy 78.74 137.16)
 		)
 		(stroke
@@ -6530,16 +6524,6 @@
 	)
 	(wire
 		(pts
-			(xy 27.94 33.02) (xy 27.94 31.75)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7a229062-1010-469d-84d5-c68f5e3a75af")
-	)
-	(wire
-		(pts
 			(xy 92.71 33.02) (xy 93.98 33.02)
 		)
 		(stroke
@@ -6657,6 +6641,16 @@
 			(type default)
 		)
 		(uuid "8db10e1f-3a41-461a-8f01-553d933ab436")
+	)
+	(wire
+		(pts
+			(xy 27.94 31.75) (xy 27.94 33.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8f1fabc8-24ef-4395-b4f3-785b92da225c")
 	)
 	(wire
 		(pts
@@ -7010,6 +7004,16 @@
 	)
 	(wire
 		(pts
+			(xy 27.94 38.1) (xy 27.94 41.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b09c9af7-40d4-44d5-9696-18616769c7d7")
+	)
+	(wire
+		(pts
 			(xy 146.05 69.85) (xy 146.05 77.47)
 		)
 		(stroke
@@ -7017,16 +7021,6 @@
 			(type default)
 		)
 		(uuid "b4ea881d-1922-44e4-8172-101c1aac9579")
-	)
-	(wire
-		(pts
-			(xy 27.94 31.75) (xy 34.29 31.75)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b52af07c-d9f4-44bb-b523-3ea1a19b7312")
 	)
 	(wire
 		(pts
@@ -7277,16 +7271,6 @@
 			(type default)
 		)
 		(uuid "d87d3611-0bf0-43e4-bae3-c92932ae3a06")
-	)
-	(wire
-		(pts
-			(xy 46.99 41.91) (xy 54.61 41.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d88d71b6-986e-47cc-97c7-6965ceb13a8c")
 	)
 	(wire
 		(pts
@@ -8275,7 +8259,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 60.96 31.75 0)
 			(effects
 				(font
@@ -8342,7 +8326,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 92.71 36.83 0)
 			(effects
 				(font
@@ -8412,7 +8396,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 57.15 120.65 0)
 			(effects
 				(font
@@ -8596,8 +8580,7 @@
 	)
 	(symbol
 		(lib_id "Peacemans Teile:74HCT14")
-		(at 52.07 182.88 0)
-		(mirror y)
+		(at 36.83 182.88 180)
 		(unit 3)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -8606,7 +8589,7 @@
 		(fields_autoplaced yes)
 		(uuid "04e45ff1-cb8a-44bc-9c65-07543c557f81")
 		(property "Reference" "U1"
-			(at 52.07 173.99 0)
+			(at 36.83 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8614,15 +8597,15 @@
 			)
 		)
 		(property "Value" "74HCT14"
-			(at 52.07 176.53 0)
+			(at 36.83 176.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
-			(at 52.07 182.88 0)
+		(property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm"
+			(at 36.83 182.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8631,7 +8614,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/sn74hct14.pdf"
-			(at 52.07 191.77 0)
+			(at 36.83 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8640,7 +8623,16 @@
 			)
 		)
 		(property "Description" "Hex inverter schmitt trigger"
-			(at 53.34 189.23 0)
+			(at 38.1 176.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C5968"
+			(at 36.83 182.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8724,7 +8716,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 77.47 31.75 0)
 			(effects
 				(font
@@ -9057,7 +9049,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 130.81 82.55 0)
 			(effects
 				(font
@@ -9130,7 +9122,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm"
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical_displaced+"
 			(at 91.44 125.73 0)
 			(effects
 				(font
@@ -9720,7 +9712,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
 			(at 160.02 72.39 0)
 			(effects
 				(font
@@ -10021,7 +10013,7 @@
 				)
 			)
 		)
-		(property "Footprint" "easyEDA:IND-SMD_L5.8-W5.2"
+		(property "Footprint" "easyEDA:IND-SMD_L3.0-W3.0"
 			(at 64.77 29.21 0)
 			(effects
 				(font
@@ -10030,7 +10022,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2410121924_Murata-Electronics-LQH3NPZ4R7MMEL_C527613.pdf"
 			(at 64.77 29.21 0)
 			(effects
 				(font
@@ -10040,6 +10032,24 @@
 			)
 		)
 		(property "Description" "Inductor, small symbol"
+			(at 64.77 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C527613"
+			(at 64.77 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part" "C2929429"
 			(at 64.77 29.21 0)
 			(effects
 				(font
@@ -10308,7 +10318,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 208.28 130.81 0)
 			(effects
 				(font
@@ -10377,7 +10387,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 20.32 72.39 0)
 			(effects
 				(font
@@ -10583,7 +10593,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
 			(at 163.83 153.67 0)
 			(effects
 				(font
@@ -10671,7 +10681,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 57.15 102.87 0)
 			(effects
 				(font
@@ -10743,7 +10753,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 72.39 31.75 0)
 			(effects
 				(font
@@ -11446,7 +11456,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 177.8 123.19 0)
 			(effects
 				(font
@@ -11516,7 +11526,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 57.15 118.11 0)
 			(effects
 				(font
@@ -11842,7 +11852,7 @@
 		(dnp no)
 		(uuid "59d4dcd4-b4f3-4667-b917-c4c55af71361")
 		(property "Reference" "C5"
-			(at 32.512 34.544 0)
+			(at 31.496 34.544 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11850,14 +11860,14 @@
 			)
 		)
 		(property "Value" "10u"
-			(at 33.274 36.83 0)
+			(at 32.258 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 27.94 35.56 0)
 			(effects
 				(font
@@ -12161,7 +12171,7 @@
 	)
 	(symbol
 		(lib_id "Peacemans Teile:74HCT14")
-		(at 232.41 125.73 0)
+		(at 185.42 31.75 0)
 		(unit 5)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12169,7 +12179,7 @@
 		(dnp no)
 		(uuid "61abf976-2318-4901-b9fb-9bea67e072c9")
 		(property "Reference" "U1"
-			(at 234.696 117.856 0)
+			(at 187.706 23.876 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12177,15 +12187,15 @@
 			)
 		)
 		(property "Value" "74HCT14"
-			(at 234.696 120.396 0)
+			(at 187.706 26.416 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
-			(at 232.41 125.73 0)
+		(property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm"
+			(at 185.42 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12194,7 +12204,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/sn74hct14.pdf"
-			(at 232.41 134.62 0)
+			(at 185.42 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12203,7 +12213,16 @@
 			)
 		)
 		(property "Description" "Hex inverter schmitt trigger"
-			(at 231.14 132.08 0)
+			(at 184.15 38.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C5968"
+			(at 185.42 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12644,7 +12663,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 57.15 100.33 0)
 			(effects
 				(font
@@ -13060,7 +13079,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
 			(at 191.77 125.73 0)
 			(effects
 				(font
@@ -13364,7 +13383,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 87.63 20.32 0)
 			(effects
 				(font
@@ -13544,7 +13563,7 @@
 	)
 	(symbol
 		(lib_id "Peacemans Teile:74HCT14")
-		(at 217.17 125.73 0)
+		(at 161.29 31.75 0)
 		(unit 6)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -13553,7 +13572,7 @@
 		(fields_autoplaced yes)
 		(uuid "900965eb-0809-4fea-9e6b-ab9d592cf2db")
 		(property "Reference" "U1"
-			(at 217.17 116.84 0)
+			(at 161.29 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13561,15 +13580,15 @@
 			)
 		)
 		(property "Value" "74HCT14"
-			(at 217.17 119.38 0)
+			(at 161.29 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
-			(at 217.17 125.73 0)
+		(property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm"
+			(at 161.29 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13578,7 +13597,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/sn74hct14.pdf"
-			(at 217.17 134.62 0)
+			(at 161.29 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13587,7 +13606,16 @@
 			)
 		)
 		(property "Description" "Hex inverter schmitt trigger"
-			(at 215.9 132.08 0)
+			(at 160.02 38.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C5968"
+			(at 161.29 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13738,7 +13766,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 123.19 66.04 0)
 			(effects
 				(font
@@ -14153,7 +14181,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "a38951f5-c2b3-4ae8-943a-d4858dafbfbc")
 		(property "Reference" "R15"
 			(at 78.74 104.14 90)
@@ -14240,7 +14268,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 229.87 130.81 0)
 			(effects
 				(font
@@ -14289,8 +14317,7 @@
 	)
 	(symbol
 		(lib_id "Peacemans Teile:74HCT14")
-		(at 36.83 182.88 0)
-		(mirror y)
+		(at 232.41 125.73 0)
 		(unit 4)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -14299,7 +14326,7 @@
 		(fields_autoplaced yes)
 		(uuid "a52e7289-11c9-427b-a8ee-60f5d649824b")
 		(property "Reference" "U1"
-			(at 36.83 173.99 0)
+			(at 232.41 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14307,15 +14334,15 @@
 			)
 		)
 		(property "Value" "74HCT14"
-			(at 36.83 176.53 0)
+			(at 232.41 119.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
-			(at 36.83 182.88 0)
+		(property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm"
+			(at 232.41 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14324,7 +14351,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/sn74hct14.pdf"
-			(at 36.83 191.77 0)
+			(at 232.41 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14333,7 +14360,16 @@
 			)
 		)
 		(property "Description" "Hex inverter schmitt trigger"
-			(at 38.1 189.23 0)
+			(at 231.14 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C5968"
+			(at 232.41 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14605,15 +14641,16 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 73.66 102.87 270)
+		(at 73.66 102.87 90)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "ac21d1d2-2030-468f-a87c-7c5ce3a72744")
 		(property "Reference" "R14"
-			(at 78.74 101.6 90)
+			(at 78.486 101.6 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14780,7 +14817,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
+		(property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm"
 			(at 121.92 184.15 0)
 			(effects
 				(font
@@ -14800,6 +14837,15 @@
 		)
 		(property "Description" "Hex inverter schmitt trigger"
 			(at 128.27 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C5968"
+			(at 121.92 184.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15025,7 +15071,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 52.07 130.81 0)
 			(effects
 				(font
@@ -15186,7 +15232,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 176.53 35.56 0)
 			(effects
 				(font
@@ -15321,7 +15367,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 151.13 62.23 0)
 			(effects
 				(font
@@ -15743,7 +15789,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 243.84 125.73 0)
 			(effects
 				(font
@@ -16274,7 +16320,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 153.67 118.11 0)
 			(effects
 				(font
@@ -16349,7 +16395,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 63.5 177.8 0)
 			(effects
 				(font
@@ -16525,7 +16571,8 @@
 	)
 	(symbol
 		(lib_id "Peacemans Teile:74HCT14")
-		(at 185.42 31.75 0)
+		(at 52.07 182.88 0)
+		(mirror y)
 		(unit 2)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -16533,7 +16580,7 @@
 		(dnp no)
 		(uuid "de262749-dce3-4d6a-9ca4-09817cfe0490")
 		(property "Reference" "U1"
-			(at 185.42 23.6982 0)
+			(at 52.07 174.8282 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16541,15 +16588,15 @@
 			)
 		)
 		(property "Value" "74HCT14"
-			(at 185.42 26.0096 0)
+			(at 52.07 177.1396 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
-			(at 185.42 31.75 0)
+		(property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm"
+			(at 52.07 182.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16558,7 +16605,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/sn74hct14.pdf"
-			(at 185.42 40.64 0)
+			(at 52.07 191.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16567,7 +16614,16 @@
 			)
 		)
 		(property "Description" "Hex inverter schmitt trigger"
-			(at 184.15 38.1 0)
+			(at 53.34 189.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C5968"
+			(at 52.07 182.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16847,7 +16903,8 @@
 	)
 	(symbol
 		(lib_id "Peacemans Teile:74HCT14")
-		(at 161.29 31.75 0)
+		(at 217.17 125.73 0)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -16855,7 +16912,7 @@
 		(dnp no)
 		(uuid "e716940f-21e6-4501-a1c2-f8348a28847e")
 		(property "Reference" "U1"
-			(at 161.29 23.6982 0)
+			(at 217.17 133.7818 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16863,15 +16920,15 @@
 			)
 		)
 		(property "Value" "74HCT14"
-			(at 161.29 26.0096 0)
+			(at 217.17 131.4704 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm"
-			(at 161.29 31.75 0)
+		(property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm"
+			(at 217.17 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16880,7 +16937,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/sn74hct14.pdf"
-			(at 161.29 40.64 0)
+			(at 217.17 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16889,7 +16946,16 @@
 			)
 		)
 		(property "Description" "Hex inverter schmitt trigger"
-			(at 160.02 38.1 0)
+			(at 215.9 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C5968"
+			(at 217.17 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17040,7 +17106,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 109.22 186.69 0)
 			(effects
 				(font
@@ -17175,7 +17241,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 57.15 97.79 0)
 			(effects
 				(font
@@ -17448,7 +17514,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 111.76 33.02 0)
 			(effects
 				(font
@@ -17743,7 +17809,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 111.76 30.48 0)
 			(effects
 				(font
@@ -17984,81 +18050,6 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "R12")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GNDD")
-		(at 54.61 41.91 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "fbfdb72b-dbed-499d-bc2b-23da4d365380")
-		(property "Reference" "#TP01"
-			(at 54.61 48.768 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 54.61 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
-			(at 54.61 41.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 54.61 41.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
-			(at 54.61 41.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TP_Label" ""
-			(at 54.61 41.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "46a92866-3dbf-4217-9be7-b62b3bc829d3")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#TP01")
 					(unit 1)
 				)
 			)
