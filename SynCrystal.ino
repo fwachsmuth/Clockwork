@@ -1,5 +1,16 @@
 /* Todo
 
+D7 will stop the engines. 
+Logic Table:
+DAC ENG COM-
+lo  lo  -   NC
+hi  lo  no0 DAC
+lo  hi  no1 STOP
+hi  hi  no2 NC
+So make sure DAC and STOP are not both high!
+
+An A0 das Teilerverhältnis auslesen
+
 Bugs:
 - Starting in NONE does not work yet, DAC stays connected
 
@@ -60,13 +71,13 @@ constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Win
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
 const byte LED_RED_PIN = 5; //  Out of Sync
-const byte OSCILLOSCOPE_PIN = 7; //  Crystal enabled
+const byte FPS_PULSE_OUT_PIN = 12; //  When Crystal is enabled. Todo: This still needs to be coded
 const byte ENABLE_PIN = 9;
 
 // Use this for PID tuning with Pots
 // const byte P_PIN = A6;
 // const byte I_PIN = A7;
-// const byte D_PIN = A3;
+// const byte D_PIN = A2;
 
 const byte LEFT_BTTN_PIN = 10;
 const byte RIGHT_BTTN_PIN = 13;     //A3 on final PCB
@@ -266,7 +277,7 @@ void setup()
     Serial.begin(115200);
 
     pinMode(SHAFT_PULSE_PIN, INPUT);
-    pinMode(OSCILLOSCOPE_PIN, OUTPUT);
+    pinMode(FPS_PULSE_OUT_PIN, OUTPUT);
     pinMode(LED_RED_PIN, OUTPUT);
     pinMode(ENABLE_PIN, OUTPUT);
     pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);

@@ -19315,7 +19315,7 @@
 		(layer "Edge.Cuts")
 		(uuid "f9a03706-5148-406a-95fc-ff70463bbf4a")
 	)
-	(gr_text "UI Anordnen\nElektronik drumrum\nLED an Bus\nEss an Bus?\n"
+	(gr_text "UI Anordnen\nESS an Bus?\n"
 		(at 132.842 40.132 0)
 		(layer "F.Cu")
 		(uuid "92097223-3038-436f-ac46-16981a164d29")

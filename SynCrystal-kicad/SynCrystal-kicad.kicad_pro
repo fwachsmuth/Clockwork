@@ -662,6 +662,34 @@
     [
       "904e3c46-2ed3-4778-9ca9-733b218304b0",
       "Root"
+    ],
+    [
+      "b4ac20a2-eea5-4dd0-b1b6-8c6de2e0011b",
+      "Projector_PCB"
+    ],
+    [
+      "02557cc7-fd3f-446d-a77c-212816d66f0c",
+      "Frontpanel UI"
+    ],
+    [
+      "7d325d77-aeec-4c94-9c84-cc50e38ee9ac",
+      "ESS in"
+    ],
+    [
+      "dbbd1505-7649-4218-add0-57fe64ba3603",
+      "PSU"
+    ],
+    [
+      "40700653-630a-4ab1-96d5-8f870bfb2566",
+      "Projector Impulse Cleaning"
+    ],
+    [
+      "c7c1d309-2c22-437c-b7c3-6ae7e0806726",
+      "DAC"
+    ],
+    [
+      "cfb66357-85cb-4431-acd0-6576a1c31ceb",
+      "TCXO"
     ]
   ],
   "text_variables": {}
