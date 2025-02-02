@@ -1617,6 +1617,19 @@
 		)
 		(uuid "fde655d1-d4a7-461b-b453-91c31fdf13e2")
 	)
+	(text "Make this a separate PCB & Project"
+		(exclude_from_sim no)
+		(at 35.56 23.622 0)
+		(effects
+			(font
+				(size 3.81 3.81)
+				(thickness 0.762)
+				(bold yes)
+			)
+			(justify left)
+		)
+		(uuid "fb5a2a8f-d116-46db-8f3e-6887c9a8f865")
+	)
 	(global_label "SDA"
 		(shape input)
 		(at 100.33 60.96 270)

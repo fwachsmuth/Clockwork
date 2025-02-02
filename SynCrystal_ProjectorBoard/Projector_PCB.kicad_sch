@@ -4701,7 +4701,7 @@
 		)
 		(uuid "b3c79825-b7cf-4f1e-ae1f-460d26777e2b")
 	)
-	(text "Delete this copy!"
+	(text "This is a separate PCB"
 		(exclude_from_sim no)
 		(at 54.102 21.59 0)
 		(effects

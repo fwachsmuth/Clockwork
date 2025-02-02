@@ -2381,16 +2381,6 @@
 		)
 		(uuid "6a07bbbd-4a87-4049-ac27-296f2cec9179")
 	)
-	(label "INT1"
-		(at 173.99 91.44 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "1cc31fb7-04b7-438c-a503-e3ed166db1d0")
-	)
 	(hierarchical_label "Ext_Imp_LED"
 		(shape output)
 		(at 191.77 77.47 0)
@@ -2412,6 +2402,17 @@
 			(justify right)
 		)
 		(uuid "70a9c1c6-4458-4d16-b454-f5b2c76d08eb")
+	)
+	(hierarchical_label "INT1"
+		(shape output)
+		(at 173.99 91.44 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "8b1b3cbd-7cdb-4bb0-b913-878fc7298bd9")
 	)
 	(symbol
 		(lib_id "Device:C_Small")

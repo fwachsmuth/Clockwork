@@ -11,6 +11,8 @@ So make sure DAC and STOP are not both high!
 
 An A0 das Teilerverhältnis auslesen
 
+Test D7 for a connected Lamp Relais Board
+
 Bugs:
 - Starting in NONE does not work yet, DAC stays connected
 
