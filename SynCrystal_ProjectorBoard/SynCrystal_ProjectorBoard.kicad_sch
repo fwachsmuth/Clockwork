@@ -1192,7 +1192,7 @@
 				)
 			)
 		)
-		(symbol "Connector:Screw_Terminal_01x02"
+		(symbol "Connector_Generic:Conn_01x02"
 			(pin_names
 				(offset 1.016) hide)
 			(exclude_from_sim no)
@@ -1206,7 +1206,7 @@
 					)
 				)
 			)
-			(property "Value" "Screw_Terminal_01x02"
+			(property "Value" "Conn_01x02"
 				(at 0 -5.08 0)
 				(effects
 					(font
@@ -1232,7 +1232,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1241,7 +1241,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "screw terminal"
+			(property "ki_keywords" "connector"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1250,7 +1250,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "TerminalBlock*:*"
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1259,7 +1259,29 @@
 					(hide yes)
 				)
 			)
-			(symbol "Screw_Terminal_01x02_1_1"
+			(symbol "Conn_01x02_1_1"
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
 				(rectangle
 					(start -1.27 1.27)
 					(end 1.27 -3.81)
@@ -1269,76 +1291,6 @@
 					)
 					(fill
 						(type background)
-					)
-				)
-				(circle
-					(center 0 -2.54)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 -2.2098) (xy 0.3302 -3.048)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 0.3302) (xy 0.3302 -0.508)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 -2.032) (xy 0.508 -2.8702)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 0.508) (xy 0.508 -0.3302)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 0)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
 					)
 				)
 				(pin passive line
@@ -1379,7 +1331,7 @@
 				)
 			)
 		)
-		(symbol "Connector:Screw_Terminal_01x03"
+		(symbol "Connector_Generic:Conn_01x03"
 			(pin_names
 				(offset 1.016) hide)
 			(exclude_from_sim no)
@@ -1393,7 +1345,7 @@
 					)
 				)
 			)
-			(property "Value" "Screw_Terminal_01x03"
+			(property "Value" "Conn_01x03"
 				(at 0 -5.08 0)
 				(effects
 					(font
@@ -1419,7 +1371,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Generic screw terminal, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1428,7 +1380,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "screw terminal"
+			(property "ki_keywords" "connector"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1437,7 +1389,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "TerminalBlock*:*"
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1446,7 +1398,40 @@
 					(hide yes)
 				)
 			)
-			(symbol "Screw_Terminal_01x03_1_1"
+			(symbol "Conn_01x03_1_1"
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
 				(rectangle
 					(start -1.27 3.81)
 					(end 1.27 -3.81)
@@ -1456,111 +1441,6 @@
 					)
 					(fill
 						(type background)
-					)
-				)
-				(circle
-					(center 0 -2.54)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 -2.2098) (xy 0.3302 -3.048)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 0.3302) (xy 0.3302 -0.508)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 2.8702) (xy 0.3302 2.032)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 -2.032) (xy 0.508 -2.8702)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 0.508) (xy 0.508 -0.3302)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 3.048) (xy 0.508 2.2098)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 0)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 2.54)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
 					)
 				)
 				(pin passive line
@@ -2261,23 +2141,23 @@
 				)
 			)
 		)
-		(symbol "Jumper:SolderJumper_2_Open"
-			(pin_numbers hide)
+		(symbol "Mechanical:MountingHole"
 			(pin_names
-				(offset 0) hide)
+				(offset 1.016)
+			)
 			(exclude_from_sim yes)
 			(in_bom no)
 			(on_board yes)
-			(property "Reference" "JP"
-				(at 0 2.032 0)
+			(property "Reference" "H"
+				(at 0 5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Value" "SolderJumper_2_Open"
-				(at 0 -2.54 0)
+			(property "Value" "MountingHole"
+				(at 0 3.175 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -2302,7 +2182,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Solder Jumper, 2-pole, open"
+			(property "Description" "Mounting Hole without connection"
 				(at 0 0 0)
 				(effects
 					(font
@@ -2311,7 +2191,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "solder jumper SPST"
+			(property "ki_keywords" "mounting hole"
 				(at 0 0 0)
 				(effects
 					(font
@@ -2320,7 +2200,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "SolderJumper*Open*"
+			(property "ki_fp_filters" "MountingHole*"
 				(at 0 0 0)
 				(effects
 					(font
@@ -2329,115 +2209,16 @@
 					(hide yes)
 				)
 			)
-			(symbol "SolderJumper_2_Open_0_1"
-				(arc
-					(start -0.254 1.016)
-					(mid -1.2656 0)
-					(end -0.254 -1.016)
+			(symbol "MountingHole_0_1"
+				(circle
+					(center 0 0)
+					(radius 1.27)
 					(stroke
-						(width 0)
+						(width 1.27)
 						(type default)
 					)
 					(fill
 						(type none)
-					)
-				)
-				(arc
-					(start -0.254 1.016)
-					(mid -1.2656 0)
-					(end -0.254 -1.016)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.254 1.016) (xy -0.254 -1.016)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.254 1.016) (xy 0.254 -1.016)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0.254 -1.016)
-					(mid 1.2656 0)
-					(end 0.254 1.016)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0.254 -1.016)
-					(mid 1.2656 0)
-					(end 0.254 1.016)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-			)
-			(symbol "SolderJumper_2_Open_1_1"
-				(pin passive line
-					(at -3.81 0 0)
-					(length 2.54)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 3.81 0 180)
-					(length 2.54)
-					(name "B"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
 					)
 				)
 			)
@@ -3456,12 +3237,6 @@
 		(uuid "98b81518-3b9c-43ab-9806-bfbf28b95d4a")
 	)
 	(junction
-		(at 41.91 118.11)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "9b4d7129-dfd7-4589-ab29-95fd53cd1acd")
-	)
-	(junction
 		(at 172.72 82.55)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3490,6 +3265,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "e87c267d-59c1-456d-9fea-c6e50b24f024")
+	)
+	(junction
+		(at 67.31 116.84)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "edbb89f7-fbb4-46f3-a623-dc2e082508e2")
 	)
 	(junction
 		(at 111.76 31.75)
@@ -3530,16 +3311,6 @@
 			(type default)
 		)
 		(uuid "1534a22f-aba0-4587-906b-3069faf0aa2f")
-	)
-	(wire
-		(pts
-			(xy 40.64 118.11) (xy 41.91 118.11)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "18f83701-313a-4e66-9ce2-70fd0867d763")
 	)
 	(wire
 		(pts
@@ -3593,16 +3364,6 @@
 	)
 	(wire
 		(pts
-			(xy 33.02 134.62) (xy 41.91 134.62)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1f818198-0959-4861-8006-67dd9859e2fc")
-	)
-	(wire
-		(pts
 			(xy 144.78 29.21) (xy 146.05 29.21)
 		)
 		(stroke
@@ -3623,7 +3384,7 @@
 	)
 	(wire
 		(pts
-			(xy 67.31 115.57) (xy 67.31 132.08)
+			(xy 67.31 115.57) (xy 67.31 116.84)
 		)
 		(stroke
 			(width 0)
@@ -3640,16 +3401,6 @@
 			(type default)
 		)
 		(uuid "2d1735c0-1e68-4d1c-afba-8a45f7b84609")
-	)
-	(wire
-		(pts
-			(xy 33.02 118.11) (xy 33.02 121.92)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "31b5a636-0a75-4a27-9eb4-f2dd66684b73")
 	)
 	(wire
 		(pts
@@ -3763,16 +3514,6 @@
 	)
 	(wire
 		(pts
-			(xy 33.02 127) (xy 33.02 134.62)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4e71165d-4054-4286-8ad3-453c87c58d37")
-	)
-	(wire
-		(pts
 			(xy 157.48 101.6) (xy 154.94 101.6)
 		)
 		(stroke
@@ -3820,6 +3561,16 @@
 			(type default)
 		)
 		(uuid "56f38047-a5e3-4822-9bd5-f9a7d981fc3d")
+	)
+	(wire
+		(pts
+			(xy 67.31 116.84) (xy 41.91 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5daa18ff-5b28-4818-9af3-4cb348e70dd2")
 	)
 	(wire
 		(pts
@@ -3953,16 +3704,6 @@
 	)
 	(wire
 		(pts
-			(xy 41.91 121.92) (xy 41.91 118.11)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7ce7b402-4f5c-43eb-a003-21698ab09d84")
-	)
-	(wire
-		(pts
 			(xy 52.07 30.48) (xy 52.07 26.67)
 		)
 		(stroke
@@ -3980,16 +3721,6 @@
 			(type default)
 		)
 		(uuid "81eb2191-baea-466b-b823-9893e082496e")
-	)
-	(wire
-		(pts
-			(xy 41.91 115.57) (xy 41.91 118.11)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "82576cd6-ac5d-415e-8260-56716e2c81cd")
 	)
 	(wire
 		(pts
@@ -4030,6 +3761,16 @@
 			(type default)
 		)
 		(uuid "8b6ffca3-f698-4a3a-9141-96b965a8ca41")
+	)
+	(wire
+		(pts
+			(xy 67.31 116.84) (xy 67.31 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8ce505b7-e64a-415e-9a3f-aaf934c6130a")
 	)
 	(wire
 		(pts
@@ -4180,6 +3921,16 @@
 			(type default)
 		)
 		(uuid "b1022702-22b8-479f-9cf0-f12b58effa72")
+	)
+	(wire
+		(pts
+			(xy 41.91 116.84) (xy 41.91 121.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b2b562c0-0612-466b-9acb-6de03c14d010")
 	)
 	(wire
 		(pts
@@ -4603,16 +4354,15 @@
 		)
 		(uuid "c9bf9a98-3ad8-4cb9-ad6f-514716eb4856")
 	)
-	(text "12V"
+	(text "Testen: 6k8 und 2k7 an 5V -> hinter 5k6 messen!"
 		(exclude_from_sim no)
-		(at 35.052 120.65 0)
+		(at 67.564 94.742 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
 		)
-		(uuid "fb93fcb6-20c9-4bf0-bda9-e4c422084bf0")
+		(uuid "ed3cd04a-7495-4d36-8eb2-e65006a0ade1")
 	)
 	(label "M-Pin"
 		(at 45.72 29.21 180)
@@ -4897,79 +4647,6 @@
 			(project "SynCrystal_ProjectorBoard"
 				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
 					(reference "#PWR07")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R_Small")
-		(at 33.02 124.46 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "0f98018c-150b-40ea-b375-52591b3c4d2e")
-		(property "Reference" "R1"
-			(at 36.068 123.444 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "16k5"
-			(at 36.322 125.476 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 33.02 124.46 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 33.02 124.46 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 33.02 124.46 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "91a1e4b5-0ac1-415f-83a8-5cec523a5ffa")
-		)
-		(pin "2"
-			(uuid "6b59c7d5-e759-45a4-8255-5e69e66c1357")
-		)
-		(instances
-			(project "SynCrystal_ProjectorBoard"
-				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "R1")
-					(unit 1)
-				)
-			)
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/b4ac20a2-eea5-4dd0-b1b6-8c6de2e0011b"
-					(reference "R17")
 					(unit 1)
 				)
 			)
@@ -5600,7 +5277,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x03")
+		(lib_id "Connector_Generic:Conn_01x03")
 		(at 40.64 53.34 0)
 		(mirror y)
 		(unit 1)
@@ -5608,27 +5285,24 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "333d8e35-99e8-4003-a76d-4c329e75dde3")
 		(property "Reference" "J4"
-			(at 38.1 52.0699 0)
+			(at 36.83 51.308 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Value" "to DIN Socket"
-			(at 38.1 54.6099 0)
+			(at 31.242 53.848 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Footprint" "easyEDA:CONN-TH_3P-P2.54_MX128-2.54-03P-GN01-CU-Y-A"
+		(property "Footprint" "easyEDA:CONN-TH_ZX-XH2.54-3PZZ-Y"
 			(at 40.64 53.34 0)
 			(effects
 				(font
@@ -5637,7 +5311,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2410121306_Megastar-ZX-XH2-54-3PZZ-Y_C22388685.pdf"
 			(at 40.64 53.34 0)
 			(effects
 				(font
@@ -5655,7 +5329,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C5188443"
+		(property "LCSC" "C22388685"
 			(at 40.64 53.34 0)
 			(effects
 				(font
@@ -6112,7 +5786,7 @@
 				)
 			)
 		)
-		(property "Value" "1k6"
+		(property "Value" "2k7"
 			(at 38.608 141.478 0)
 			(effects
 				(font
@@ -6315,6 +5989,134 @@
 		)
 	)
 	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 160.02 179.07 0)
+		(unit 1)
+		(exclude_from_sim yes)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "68c40cab-415b-49c1-8978-5e17bb717162")
+		(property "Reference" "H2"
+			(at 162.56 177.7999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 162.56 180.3399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Peacemans Teile:MountingHole_2.1mm_just_hole"
+			(at 160.02 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 160.02 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 160.02 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "SynCrystal_ProjectorBoard"
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "H2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 160.02 172.72 0)
+		(unit 1)
+		(exclude_from_sim yes)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "7e2a4adb-9059-4024-88a5-e6a343f9034b")
+		(property "Reference" "H1"
+			(at 162.56 171.4499 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 162.56 173.9899 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Peacemans Teile:MountingHole_2.1mm_just_hole"
+			(at 160.02 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 160.02 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 160.02 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project ""
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "H1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector:Conn_01x10_Pin")
 		(at 172.72 118.11 270)
 		(mirror x)
@@ -6413,78 +6215,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+15V")
-		(at 41.91 115.57 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "982819bc-95f6-48a9-a4b0-3fd1f2e4befc")
-		(property "Reference" "#PWR012"
-			(at 41.91 119.38 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+15V"
-			(at 41.91 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+15V\""
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "654d7d32-e1e2-49c3-90e0-2cd90d0d75a4")
-		)
-		(instances
-			(project "SynCrystal_ProjectorBoard"
-				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "#PWR012")
-					(unit 1)
-				)
-			)
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/b4ac20a2-eea5-4dd0-b1b6-8c6de2e0011b"
-					(reference "#PWR044")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:+5V")
 		(at 67.31 115.57 0)
 		(unit 1)
@@ -6556,79 +6286,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Jumper:SolderJumper_2_Open")
-		(at 36.83 118.11 0)
-		(unit 1)
-		(exclude_from_sim yes)
-		(in_bom no)
-		(on_board no)
-		(dnp yes)
-		(uuid "a008e986-30ca-4492-95c3-82fc5f9a9854")
-		(property "Reference" "JP1"
-			(at 34.29 112.776 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "T502/510"
-			(at 34.29 115.316 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm"
-			(at 36.83 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 36.83 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Solder Jumper, 2-pole, open"
-			(at 36.83 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "d2939c3d-646d-461f-8b26-2a7ce80bd35c")
-		)
-		(pin "2"
-			(uuid "f89de623-efd4-42a8-a1ae-981d064a2563")
-		)
-		(instances
-			(project "SynCrystal_ProjectorBoard"
-				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "JP1")
-					(unit 1)
-				)
-			)
-			(project ""
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/b4ac20a2-eea5-4dd0-b1b6-8c6de2e0011b"
-					(reference "JP3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R_Small")
 		(at 41.91 124.46 180)
 		(unit 1)
@@ -6645,7 +6302,7 @@
 				)
 			)
 		)
-		(property "Value" "5k1"
+		(property "Value" "6k8"
 			(at 45.212 125.476 0)
 			(effects
 				(font
@@ -7382,7 +7039,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x02")
+		(lib_id "Connector_Generic:Conn_01x02")
 		(at 40.64 33.02 0)
 		(mirror y)
 		(unit 1)
@@ -7409,7 +7066,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "easyEDA:CONN-TH_2P-P2.54_MX128-2.54-GN01-02P-CU-Y-A"
+		(property "Footprint" "easyEDA:CONN-TH_2P-P2.54_ZX-XH2.54-2PZZ-Y"
 			(at 40.64 33.02 0)
 			(effects
 				(font
@@ -7418,7 +7075,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2411272110_MAX-MX128-2-54-02P-GN01-Cu-Y-A_C5188442.pdf"
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2410121306_Megastar-ZX-XH2-54-2PZZ-Y_C22388684.pdf"
 			(at 40.64 33.02 0)
 			(effects
 				(font
@@ -7436,7 +7093,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C5188442"
+		(property "LCSC" "C22388684"
 			(at 40.64 33.02 0)
 			(effects
 				(font
