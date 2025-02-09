@@ -39,19 +39,17 @@ make the 5 call of updateDigit more efficient: stop calculating if a digit did n
     Timecode would restart at 0:00:00.00
 - Rangieren (slow) (idea: could get enabled by pressing +/- buttons while turning the projector tho "thread" pos)
 - "start the audio" IR
-- Clamp the PID output to avoid halting the motor
 - ESS in
 
 Hardware:
-- add IR emitter to start a device
-- 74LVC2G14 is smaller Schmitt Trigger
-- Reconfigure OpAmp offset to allow tha DAC to halt the motor
-- Strobe Output to check other projector's speed
-- ESS Out
+- add IR emitter to start a device: Send o A1, Rcv on A2
+- (Strobe Output to check other projector's speed)
+- (ESS Out)
 
 Notes:
 - Is the dithering really delivering the target frequency? Seems to be slightly below. 
   This might be diluted due to run up and breaking. Cross-validate the frac32!
+
 
 */
 
@@ -73,7 +71,7 @@ constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Win
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
 const byte LED_RED_PIN = 5; //  Out of Sync
-const byte FPS_PULSE_OUT_PIN = 12; //  When Crystal is enabled. Todo: This still needs to be coded
+const byte FPS_PULSE_OUT_PIN = 12; //  11 on final PCB. Pulse when Crystal is enabled. Todo: This still needs to be coded
 const byte ENABLE_PIN = 9;
 
 // Use this for PID tuning with Pots

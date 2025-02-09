@@ -686,6 +686,10 @@
     [
       "cfb66357-85cb-4431-acd0-6576a1c31ceb",
       "TCXO"
+    ],
+    [
+      "4d44c744-5ff6-4975-91d0-5528c16efb75",
+      "GuideStart"
     ]
   ],
   "text_variables": {}

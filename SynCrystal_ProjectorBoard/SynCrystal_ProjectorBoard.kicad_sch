@@ -2141,88 +2141,6 @@
 				)
 			)
 		)
-		(symbol "Mechanical:MountingHole"
-			(pin_names
-				(offset 1.016)
-			)
-			(exclude_from_sim yes)
-			(in_bom no)
-			(on_board yes)
-			(property "Reference" "H"
-				(at 0 5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "MountingHole"
-				(at 0 3.175 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Mounting Hole without connection"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "mounting hole"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "MountingHole*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "MountingHole_0_1"
-				(circle
-					(center 0 0)
-					(radius 1.27)
-					(stroke
-						(width 1.27)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-		)
 		(symbol "Regulator_Switching:AP63205WU"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -2403,6 +2321,301 @@
 						)
 					)
 					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "Transistor_FET:AO3400A"
+			(pin_names hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "Q"
+				(at 5.08 1.905 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "AO3400A"
+				(at 5.08 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+				(at 5.08 -1.905 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(justify left)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "http://www.aosmd.com/pdfs/datasheet/AO3400A.pdf"
+				(at 5.08 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+					(hide yes)
+				)
+			)
+			(property "Description" "30V Vds, 5.7A Id, N-Channel MOSFET, SOT-23"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "N-Channel MOSFET"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "SOT?23*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "AO3400A_0_1"
+				(polyline
+					(pts
+						(xy 0.254 0) (xy -2.54 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.254 1.905) (xy 0.254 -1.905)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 -1.27) (xy 0.762 -2.286)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 0.508) (xy 0.762 -0.508)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 2.286) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 2.54) (xy 2.54 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 -2.54) (xy 2.54 0) (xy 0.762 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 -1.778) (xy 3.302 -1.778) (xy 3.302 1.778) (xy 0.762 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 0) (xy 2.032 0.381) (xy 2.032 -0.381) (xy 1.016 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 0.508) (xy 2.921 0.381) (xy 3.683 0.381) (xy 3.81 0.254)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.302 0.381) (xy 2.921 -0.254) (xy 3.683 -0.254) (xy 3.302 0.381)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 1.651 0)
+					(radius 2.794)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.54 -1.778)
+					(radius 0.254)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 2.54 1.778)
+					(radius 0.254)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(symbol "AO3400A_1_1"
+				(pin input line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "G"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "S"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "D"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3171,6 +3384,12 @@
 		(uuid "181ec65a-3602-4c63-8efc-9f995fb962ac")
 	)
 	(junction
+		(at 165.1 93.98)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2780be0a-682b-4441-a0d5-b39b6efe944d")
+	)
+	(junction
 		(at 152.4 29.21)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3243,12 +3462,6 @@
 		(uuid "aa2fcf35-817b-4799-b2e1-7ac3ecc2536e")
 	)
 	(junction
-		(at 137.16 104.14)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "ac09da8f-9250-42a1-8187-c02b3925b41e")
-	)
-	(junction
 		(at 130.81 41.91)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3267,10 +3480,22 @@
 		(uuid "e87c267d-59c1-456d-9fea-c6e50b24f024")
 	)
 	(junction
+		(at 153.67 107.95)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "e8f6aa90-2bed-4937-a5ab-2eaf5860644e")
+	)
+	(junction
 		(at 67.31 116.84)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "edbb89f7-fbb4-46f3-a623-dc2e082508e2")
+	)
+	(junction
+		(at 146.05 99.06)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f433ab2e-8cee-4ba7-8ad1-9d7c9c378c16")
 	)
 	(junction
 		(at 111.76 31.75)
@@ -3284,23 +3509,13 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 101.6) (xy 137.16 104.14)
+			(xy 165.1 93.98) (xy 165.1 101.6)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "00a8dd8b-7615-43b3-862d-3245ae9f1f0d")
-	)
-	(wire
-		(pts
-			(xy 157.48 91.44) (xy 157.48 101.6)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "07ffbbf0-2960-4947-93c7-d25e1ba2634c")
+		(uuid "10a423be-700c-483a-89b0-39f073ecba12")
 	)
 	(wire
 		(pts
@@ -3334,33 +3549,13 @@
 	)
 	(wire
 		(pts
-			(xy 133.35 110.49) (xy 154.94 110.49)
+			(xy 144.78 99.06) (xy 146.05 99.06)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "1bbe09eb-fae0-4029-830a-f0098633a6ec")
-	)
-	(wire
-		(pts
-			(xy 143.51 76.2) (xy 143.51 91.44)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1bcc1910-89f3-47c6-be8d-b1658103cc99")
-	)
-	(wire
-		(pts
-			(xy 165.1 76.2) (xy 165.1 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1c3efaf5-dd04-4470-8f4e-e1bfadc30c14")
+		(uuid "2113d6b2-362b-48f6-a4f2-6e73dfc38d4c")
 	)
 	(wire
 		(pts
@@ -3394,13 +3589,13 @@
 	)
 	(wire
 		(pts
-			(xy 165.1 107.95) (xy 165.1 113.03)
+			(xy 165.1 106.68) (xy 165.1 113.03)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "2d1735c0-1e68-4d1c-afba-8a45f7b84609")
+		(uuid "281dfd8a-6b4c-420b-aae3-6e3d3d4d1044")
 	)
 	(wire
 		(pts
@@ -3474,16 +3669,6 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 99.06) (xy 134.62 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4556365d-37c0-4e61-a5d3-b443b7f4bb04")
-	)
-	(wire
-		(pts
 			(xy 177.8 76.2) (xy 177.8 113.03)
 		)
 		(stroke
@@ -3501,26 +3686,6 @@
 			(type default)
 		)
 		(uuid "48dcf99b-7b2a-4676-b33d-30cec06229f0")
-	)
-	(wire
-		(pts
-			(xy 154.94 99.06) (xy 165.1 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4d8c0507-63f9-481b-939c-95d7a84aedfb")
-	)
-	(wire
-		(pts
-			(xy 157.48 101.6) (xy 154.94 101.6)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4f0c825c-c796-48e5-add6-efbe2b3113be")
 	)
 	(wire
 		(pts
@@ -3551,6 +3716,16 @@
 			(type default)
 		)
 		(uuid "55670120-7671-4ba4-8fba-7cb49d9efe15")
+	)
+	(wire
+		(pts
+			(xy 146.05 99.06) (xy 146.05 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5652cda4-0774-4837-ae01-fd57dbdc85b9")
 	)
 	(wire
 		(pts
@@ -3674,6 +3849,16 @@
 	)
 	(wire
 		(pts
+			(xy 146.05 107.95) (xy 146.05 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "713ef7ef-4b2a-4411-8689-822b9b4b9cba")
+	)
+	(wire
+		(pts
 			(xy 152.4 76.2) (xy 152.4 77.47)
 		)
 		(stroke
@@ -3744,16 +3929,6 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 104.14) (xy 137.16 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8a2d7d3f-1b1e-432d-bb22-8e184c7354b1")
-	)
-	(wire
-		(pts
 			(xy 140.97 31.75) (xy 140.97 29.21)
 		)
 		(stroke
@@ -3761,6 +3936,16 @@
 			(type default)
 		)
 		(uuid "8b6ffca3-f698-4a3a-9141-96b965a8ca41")
+	)
+	(wire
+		(pts
+			(xy 138.43 99.06) (xy 139.7 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8c37389a-11ec-4d2f-bf32-b55ef71c176d")
 	)
 	(wire
 		(pts
@@ -3851,16 +4036,6 @@
 			(type default)
 		)
 		(uuid "a28cdd90-87d2-4f1a-adf1-141cb8a6031c")
-	)
-	(wire
-		(pts
-			(xy 143.51 91.44) (xy 157.48 91.44)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a300aeb6-6545-42af-8ae0-56d9b177bc02")
 	)
 	(wire
 		(pts
@@ -4014,6 +4189,16 @@
 	)
 	(wire
 		(pts
+			(xy 153.67 107.95) (xy 146.05 107.95)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c57edfc5-a4c3-48d3-8591-3c7c8e509dfa")
+	)
+	(wire
+		(pts
 			(xy 175.26 76.2) (xy 175.26 113.03)
 		)
 		(stroke
@@ -4034,13 +4219,13 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 104.14) (xy 154.94 110.49)
+			(xy 153.67 104.14) (xy 153.67 107.95)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d7114ad9-f22d-4cb8-9837-db79e1acef8e")
+		(uuid "d239cb5e-d26f-4865-9209-8b3c025e23b4")
 	)
 	(wire
 		(pts
@@ -4064,23 +4249,13 @@
 	)
 	(wire
 		(pts
-			(xy 134.62 107.95) (xy 165.1 107.95)
+			(xy 153.67 93.98) (xy 165.1 93.98)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "dd6d3482-f2d2-49f9-be1d-3cfe8375d5cc")
-	)
-	(wire
-		(pts
-			(xy 134.62 99.06) (xy 134.62 107.95)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dd70acb8-cecc-46cb-b18b-5201d5fb32fd")
+		(uuid "dd9d175e-2e79-489f-bed4-abc2062dfec9")
 	)
 	(wire
 		(pts
@@ -4111,6 +4286,16 @@
 			(type default)
 		)
 		(uuid "e9510c7f-de2c-4077-b83d-dc864c466f62")
+	)
+	(wire
+		(pts
+			(xy 165.1 76.2) (xy 165.1 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e9539337-46b0-4cbf-941e-7d7f1286bf66")
 	)
 	(wire
 		(pts
@@ -4254,6 +4439,16 @@
 			(justify left)
 		)
 		(uuid "1a6f79f8-ac66-410c-a0dc-ce79c5b1e69f")
+	)
+	(text "When the SynCrystal Controller \nis mounted internally, it connects \nto J2 and J4 instead of DIN-6."
+		(exclude_from_sim no)
+		(at 70.358 64.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "1b56f2c9-2fd4-47b9-b1b3-0df54bfd2871")
 	)
 	(text "> (3) 15V"
 		(exclude_from_sim no)
@@ -4406,17 +4601,6 @@
 			)
 		)
 	)
-	(hierarchical_label "Stop_EN"
-		(shape input)
-		(at 133.35 110.49 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "0ce1a844-c98a-44f7-ae70-1e64de5f18d1")
-	)
 	(hierarchical_label "DAC_EN"
 		(shape input)
 		(at 104.14 129.54 0)
@@ -4516,6 +4700,17 @@
 		)
 		(uuid "d79c1cb0-896b-4cc9-b4c3-645088448939")
 	)
+	(hierarchical_label "Stop_EN"
+		(shape input)
+		(at 138.43 99.06 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "f697524d-9ab4-440f-8e28-f94b6313b895")
+	)
 	(symbol
 		(lib_id "power:GNDD")
 		(at 130.81 46.99 0)
@@ -4582,6 +4777,71 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/b4ac20a2-eea5-4dd0-b1b6-8c6de2e0011b"
 					(reference "#PWR055")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GNDD")
+		(at 45.72 55.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "0a5d1dea-5e60-4307-9660-176de8c7ffac")
+		(property "Reference" "#PWR012"
+			(at 45.72 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 45.72 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 45.72 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 45.72 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
+			(at 45.72 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bca40bf5-cd22-46da-8394-52ee14da058d")
+		)
+		(instances
+			(project "SynCrystal_ProjectorBoard"
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -4794,15 +5054,15 @@
 		(dnp no)
 		(uuid "1a0a170f-c255-4323-911b-78f57e9da9db")
 		(property "Reference" "J2"
-			(at 57.658 37.846 0)
+			(at 56.134 27.432 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "to DIN Connector"
-			(at 62.484 27.432 0)
+		(property "Value" "to DIN connecting 3+1 Socket plug"
+			(at 73.406 37.592 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4937,33 +5197,32 @@
 		)
 	)
 	(symbol
-		(lib_id "easyEDA:TS5A3160DBVR-TP_nicer")
-		(at 146.05 101.6 0)
-		(mirror x)
+		(lib_id "Device:R_Small")
+		(at 142.24 99.06 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "1c73e71c-6d39-428c-be42-a5745c3e35c0")
-		(property "Reference" "U2"
-			(at 135.89 92.71 0)
+		(uuid "21ff1b3c-d301-42e4-b64a-5c859a47d97b")
+		(property "Reference" "R1"
+			(at 142.24 94.742 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "TS5A3160DBVR-TP"
-			(at 143.764 94.996 0)
+		(property "Value" "220"
+			(at 142.24 96.774 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "easyEDA:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BR"
-			(at 146.05 91.44 0)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 142.24 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4971,8 +5230,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2412301609_TECH-PUBLIC-TS5A3160DBVR-TP_C42411033.pdf"
-			(at 147.32 101.6 0)
+		(property "Datasheet" "~"
+			(at 142.24 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4981,54 +5240,24 @@
 			)
 		)
 		(property "Description" ""
-			(at 147.32 101.6 0)
+			(at 142.24 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(property "LCSC Part" ""
-			(at 147.32 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C42411033"
-			(at 146.05 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "5"
-			(uuid "1f7bcee8-98ba-4552-afca-4c7894af08c7")
-		)
-		(pin "6"
-			(uuid "192c0f13-143e-4017-9331-15ab0728bcb2")
-		)
-		(pin "2"
-			(uuid "bf7f593e-9acb-44bf-80a9-8ba1c1df3f2b")
 		)
 		(pin "1"
-			(uuid "189c1def-9333-4480-9f83-aeddc1c36934")
+			(uuid "f29a00ba-98ca-4880-be21-171c55129dce")
 		)
-		(pin "3"
-			(uuid "9de751b7-6810-451d-a4a6-e567f4189175")
-		)
-		(pin "4"
-			(uuid "6b245ac9-89fd-4865-99d1-c7842a47d9f5")
+		(pin "2"
+			(uuid "9cc695d0-c95c-49dc-a01d-2c5f21864576")
 		)
 		(instances
 			(project "SynCrystal_ProjectorBoard"
 				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "U2")
+					(reference "R1")
 					(unit 1)
 				)
 			)
@@ -5294,8 +5523,8 @@
 				)
 			)
 		)
-		(property "Value" "to DIN Socket"
-			(at 31.242 53.848 0)
+		(property "Value" "to DIN Socket traces"
+			(at 27.94 54.356 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5464,6 +5693,73 @@
 			(project ""
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/b4ac20a2-eea5-4dd0-b1b6-8c6de2e0011b"
 					(reference "J5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 165.1 104.14 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "402cfa83-5522-4eb6-9f18-dd9df5597902")
+		(property "Reference" "R6"
+			(at 168.148 103.124 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 168.148 105.156 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 165.1 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 165.1 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 165.1 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8bc7cd62-60c5-45eb-a3de-a3a796de6a2f")
+		)
+		(pin "2"
+			(uuid "25c52766-5704-4d00-a4b7-4521abeae727")
+		)
+		(instances
+			(project "SynCrystal_ProjectorBoard"
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "R6")
 					(unit 1)
 				)
 			)
@@ -5705,16 +6001,55 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GNDD")
-		(at 137.16 113.03 0)
+		(lib_id "Transistor_FET:AO3400A")
+		(at 151.13 99.06 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "5f014334-3201-483a-b9f2-798f36da2332")
-		(property "Reference" "#PWR011"
-			(at 137.16 119.38 0)
+		(uuid "4b2c601b-2dfa-45dc-8389-4c00d50343cd")
+		(property "Reference" "Q1"
+			(at 148.336 94.488 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "AO3400A"
+			(at 148.082 92.456 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+			(at 156.21 100.965 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.aosmd.com/pdfs/datasheet/AO3400A.pdf"
+			(at 156.21 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Description" "30V Vds, 5.7A Id, N-Channel MOSFET, SOT-23"
+			(at 151.13 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5722,34 +6057,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "GND"
-			(at 137.16 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 137.16 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 137.16 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
-			(at 137.16 113.03 0)
+		(property "LCSC" "C20917"
+			(at 151.13 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5758,12 +6067,83 @@
 			)
 		)
 		(pin "1"
-			(uuid "08e40ce9-1935-4262-8de2-6176e79fbdfa")
+			(uuid "a0e0ec5c-a506-424c-b70d-5dd916aef36e")
+		)
+		(pin "2"
+			(uuid "b1bc0c6e-8792-4551-a155-e681b4aa8931")
+		)
+		(pin "3"
+			(uuid "8822d1cd-ac38-47ba-8544-4c73df7289f4")
+		)
+		(instances
+			(project ""
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "Q1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GNDD")
+		(at 153.67 107.95 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "53715c73-7e14-4e14-830e-ec326a6a5c1d")
+		(property "Reference" "#PWR016"
+			(at 153.67 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 153.67 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 153.67 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 153.67 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
+			(at 153.67 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "eed1382b-685c-49ec-90a2-67d4915028ef")
 		)
 		(instances
 			(project "SynCrystal_ProjectorBoard"
 				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "#PWR011")
+					(reference "#PWR016")
 					(unit 1)
 				)
 			)
@@ -5989,35 +6369,32 @@
 		)
 	)
 	(symbol
-		(lib_id "Mechanical:MountingHole")
-		(at 160.02 179.07 0)
+		(lib_id "Device:R_Small")
+		(at 146.05 104.14 180)
 		(unit 1)
-		(exclude_from_sim yes)
-		(in_bom no)
+		(exclude_from_sim no)
+		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "68c40cab-415b-49c1-8978-5e17bb717162")
-		(property "Reference" "H2"
-			(at 162.56 177.7999 0)
+		(uuid "7fa6851e-ede4-4d71-be87-7c20d96ba00f")
+		(property "Reference" "R5"
+			(at 143.51 102.362 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Value" "MountingHole"
-			(at 162.56 180.3399 0)
+		(property "Value" "10k"
+			(at 143.256 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:MountingHole_2.1mm_just_hole"
-			(at 160.02 179.07 0)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 146.05 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6026,7 +6403,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 160.02 179.07 0)
+			(at 146.05 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6034,83 +6411,25 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Mounting Hole without connection"
-			(at 160.02 179.07 0)
+		(property "Description" ""
+			(at 146.05 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
+		)
+		(pin "1"
+			(uuid "f2cbf8ed-7d23-42a0-9bdb-804b211e658c")
+		)
+		(pin "2"
+			(uuid "aaa8c33a-cb4e-41c2-a76c-3caa633e934e")
 		)
 		(instances
 			(project "SynCrystal_ProjectorBoard"
 				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "H2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Mechanical:MountingHole")
-		(at 160.02 172.72 0)
-		(unit 1)
-		(exclude_from_sim yes)
-		(in_bom no)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7e2a4adb-9059-4024-88a5-e6a343f9034b")
-		(property "Reference" "H1"
-			(at 162.56 171.4499 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "MountingHole"
-			(at 162.56 173.9899 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Peacemans Teile:MountingHole_2.1mm_just_hole"
-			(at 160.02 172.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 160.02 172.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Mounting Hole without connection"
-			(at 160.02 172.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project ""
-				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "H1")
+					(reference "R5")
 					(unit 1)
 				)
 			)
@@ -6745,71 +7064,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 143.51 76.2 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "e2c60a30-cae1-4f11-a464-b12425519e55")
-		(property "Reference" "#PWR08"
-			(at 143.51 80.01 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 143.891 71.8058 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 143.51 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 143.51 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 143.51 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "9e4e8dc6-7b51-410f-85ba-1a7dbf769e42")
-		)
-		(instances
-			(project "SynCrystal_ProjectorBoard"
-				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "#PWR08")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:+15V")
 		(at 152.4 76.2 0)
 		(unit 1)
@@ -7057,8 +7311,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "to Motor Ctrl PCB"
-			(at 37.846 35.56 0)
+		(property "Value" "to TCA955 PCB"
+			(at 36.83 36.322 0)
 			(effects
 				(font
 					(size 1.27 1.27)
