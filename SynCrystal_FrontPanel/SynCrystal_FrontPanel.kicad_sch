@@ -2,7 +2,7 @@
 	(version 20231120)
 	(generator "eeschema")
 	(generator_version "8.0")
-	(uuid "b6ae4edd-f27d-432d-b859-26cf75d4a542")
+	(uuid "f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21")
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector:Conn_01x04_Pin"
@@ -649,489 +649,134 @@
 		)
 	)
 	(junction
-		(at 68.58 107.95)
+		(at 123.19 62.23)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "0d61eb60-8b2b-4c03-8871-65ffdc5b2259")
+		(uuid "19eba7af-0b0b-4546-96fc-06f870581936")
 	)
 	(junction
-		(at 68.58 110.49)
+		(at 123.19 59.69)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "ee804cd8-737d-4aa0-b0fb-60a1463b4ad4")
+		(uuid "479bfc39-9778-4553-ad29-4363c38f37f2")
 	)
 	(junction
-		(at 68.58 113.03)
+		(at 123.19 64.77)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "f3050aa7-6741-4b36-9008-a1bd795597db")
+		(uuid "9df27530-5a8e-480d-98bf-c6c2f532d45a")
 	)
 	(wire
 		(pts
-			(xy 60.96 107.95) (xy 63.5 107.95)
+			(xy 104.14 57.15) (xy 110.49 57.15)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "030955cc-2a10-4162-8465-a65adfd25025")
+		(uuid "03390140-2e3f-4228-b6dc-160c0fa03bc1")
 	)
 	(wire
 		(pts
-			(xy 68.58 107.95) (xy 68.58 110.49)
+			(xy 123.19 64.77) (xy 104.14 64.77)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "3903c296-b270-4bf8-a129-b2b517bf5144")
+		(uuid "04370783-fc9e-4b67-a75d-139d3e5f62fa")
 	)
 	(wire
 		(pts
-			(xy 68.58 113.03) (xy 49.53 113.03)
+			(xy 118.11 57.15) (xy 115.57 57.15)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "3b51ad4b-5b51-4b51-849e-c80f0389e7e3")
+		(uuid "693c5157-5eed-45cd-b450-7c0bd732992f")
 	)
 	(wire
 		(pts
-			(xy 68.58 110.49) (xy 68.58 113.03)
+			(xy 123.19 57.15) (xy 123.19 59.69)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "51453519-75ce-451e-b772-e513a4ad69cd")
+		(uuid "7ec581a5-2d00-46a3-a0a4-327b0c4f41b6")
 	)
 	(wire
 		(pts
-			(xy 49.53 110.49) (xy 55.88 110.49)
+			(xy 123.19 59.69) (xy 123.19 62.23)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "997bb913-78e9-423f-96ef-1b0f8a48c977")
+		(uuid "879921ea-f358-4c11-914e-e1b1ed7fa102")
 	)
 	(wire
 		(pts
-			(xy 63.5 110.49) (xy 60.96 110.49)
+			(xy 115.57 59.69) (xy 118.11 59.69)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "aeb3acda-0e31-42dd-b4b6-e0be29e10268")
+		(uuid "8def33cf-5d6e-4e2d-bb43-c37821443aad")
 	)
 	(wire
 		(pts
-			(xy 68.58 105.41) (xy 68.58 107.95)
+			(xy 104.14 62.23) (xy 110.49 62.23)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b9c48e85-be17-4631-b5bc-dc3adb9602bb")
+		(uuid "ac1cf68e-8a47-49a3-a41b-ee127ded6f09")
 	)
 	(wire
 		(pts
-			(xy 49.53 107.95) (xy 55.88 107.95)
+			(xy 118.11 62.23) (xy 115.57 62.23)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "bb8d607b-fc7b-4ff3-8355-51945a558ba2")
+		(uuid "ac5233ab-3028-4d68-a1e2-38d7d596c08f")
 	)
 	(wire
 		(pts
-			(xy 63.5 105.41) (xy 60.96 105.41)
+			(xy 123.19 62.23) (xy 123.19 64.77)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "e6d2a7a8-71a0-417f-95bf-34788fc57c66")
+		(uuid "ca575de1-5364-421c-8c53-f9ca767d78ce")
 	)
 	(wire
 		(pts
-			(xy 49.53 105.41) (xy 55.88 105.41)
+			(xy 104.14 59.69) (xy 110.49 59.69)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "f08634c1-14c1-4279-9bcd-a95ec71f5b91")
-	)
-	(text "Make this a separate PCB & Project"
-		(exclude_from_sim no)
-		(at 35.56 23.622 0)
-		(effects
-			(font
-				(size 3.81 3.81)
-				(thickness 0.762)
-				(bold yes)
-			)
-			(justify left)
-		)
-		(uuid "fb5a2a8f-d116-46db-8f3e-6887c9a8f865")
-	)
-	(symbol
-		(lib_id "Device:R_Small")
-		(at 58.42 105.41 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "020a6068-0d00-4f85-ae93-0dbe1646a1b2")
-		(property "Reference" "R21"
-			(at 73.66 105.41 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "3K3"
-			(at 77.978 105.41 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 58.42 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 58.42 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 58.42 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C26010"
-			(at 58.42 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Inventory" "B"
-			(at 58.42 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "412d8191-9acd-4cc3-a345-edfb4d58f569")
-		)
-		(pin "2"
-			(uuid "57d79e7a-f7b2-452b-b4cb-da6cbceeee6c")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/02557cc7-fd3f-446d-a77c-212816d66f0c"
-					(reference "R21")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:LED_Small")
-		(at 66.04 107.95 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "15fba05d-d844-46fa-a470-d384bf3e784c")
-		(property "Reference" "D7"
-			(at 63.5 106.934 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "Crystal"
-			(at 81.788 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
-			(at 66.04 107.95 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1806151820_Hubei-KENTO-Elec-KT-0805G_C2297.pdf"
-			(at 66.04 107.95 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 66.04 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C2297"
-			(at 66.04 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Inventory" "B"
-			(at 66.04 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8799184b-23be-43e1-807f-3b8f1f947ef9")
-		)
-		(pin "2"
-			(uuid "a199c519-d269-4758-8c75-e4f729a97935")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/02557cc7-fd3f-446d-a77c-212816d66f0c"
-					(reference "D7")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:LED_Small")
-		(at 66.04 105.41 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "1e6b50ea-efb2-40ba-82f7-a94274c19ad7")
-		(property "Reference" "D6"
-			(at 63.5 104.394 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "no sync"
-			(at 82.042 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
-			(at 66.04 105.41 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1806151820_Hubei-KENTO-Elec-KT-0805G_C2297.pdf"
-			(at 66.04 105.41 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 66.04 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C2297"
-			(at 66.04 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Inventory" "B"
-			(at 66.04 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ce4942f6-7f93-4e1c-a81d-add3a9acc2dd")
-		)
-		(pin "2"
-			(uuid "eb07dc94-64ad-454a-b4bd-3a6a204c7e8a")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/02557cc7-fd3f-446d-a77c-212816d66f0c"
-					(reference "D6")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:LED_Small")
-		(at 66.04 110.49 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "38ee08a6-1285-4671-8955-38812f5e8115")
-		(property "Reference" "D8"
-			(at 63.5 109.474 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "Ext. Imp."
-			(at 82.804 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
-			(at 66.04 110.49 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1806151820_Hubei-KENTO-Elec-KT-0805G_C2297.pdf"
-			(at 66.04 110.49 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 66.04 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C2297"
-			(at 66.04 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Inventory" "B"
-			(at 66.04 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "030cf6d5-030a-4d84-937d-6f7facead2f4")
-		)
-		(pin "2"
-			(uuid "e98ee5d8-36f1-416c-a7a7-27578ba0ba37")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/02557cc7-fd3f-446d-a77c-212816d66f0c"
-					(reference "D8")
-					(unit 1)
-				)
-			)
-		)
+		(uuid "ec915175-9e8f-4460-b3f4-b4c734d1103d")
 	)
 	(symbol
 		(lib_id "power:GNDD")
-		(at 68.58 113.03 0)
+		(at 123.19 64.77 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "4cd01980-1d80-4450-b295-fa7e06fe0a97")
-		(property "Reference" "#PWR052"
-			(at 68.58 119.38 0)
+		(uuid "156b522e-6522-4059-bc9b-513738131a20")
+		(property "Reference" "#PWR01"
+			(at 123.19 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1140,7 +785,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 68.58 116.84 0)
+			(at 123.19 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1148,7 +793,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 68.58 113.03 0)
+			(at 123.19 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1157,7 +802,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 68.58 113.03 0)
+			(at 123.19 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1166,7 +811,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
-			(at 68.58 113.03 0)
+			(at 123.19 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1175,99 +820,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "fb9f4de2-04e6-441c-b880-7e6795e5fbba")
+			(uuid "e63d397a-5c69-457b-9677-0dd90b37f8ea")
 		)
 		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/02557cc7-fd3f-446d-a77c-212816d66f0c"
-					(reference "#PWR052")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R_Small")
-		(at 58.42 110.49 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "b13ced61-c740-43ba-9425-e7828d8f36be")
-		(property "Reference" "R23"
-			(at 69.85 110.49 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "1k"
-			(at 74.93 110.49 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 58.42 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 58.42 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 58.42 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C26010"
-			(at 58.42 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Inventory" "B"
-			(at 58.42 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "4fbb2992-9635-4588-af3d-6d7cb32ca167")
-		)
-		(pin "2"
-			(uuid "020fc072-168c-41f6-b5b0-a90d68fb9d70")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/02557cc7-fd3f-446d-a77c-212816d66f0c"
-					(reference "R23")
+			(project "SynCrystal_FrontPanel"
+				(path "/f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21"
+					(reference "#PWR01")
 					(unit 1)
 				)
 			)
@@ -1275,15 +833,15 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x04_Pin")
-		(at 44.45 107.95 0)
+		(at 99.06 59.69 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "d4201b8f-d9b9-4c0a-ad87-202b08fde271")
-		(property "Reference" "J4"
-			(at 46.736 101.346 0)
+		(uuid "18324c72-d12c-4b7a-b247-23f16ac7a46b")
+		(property "Reference" "J1"
+			(at 101.346 53.086 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1291,7 +849,7 @@
 			)
 		)
 		(property "Value" "~"
-			(at 45.085 104.14 0)
+			(at 99.695 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1299,7 +857,7 @@
 			)
 		)
 		(property "Footprint" "easyEDA:HDR-SMD_HX-PM2.54-1X4P-TP-YQ"
-			(at 44.45 107.95 0)
+			(at 99.06 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1308,7 +866,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 44.45 107.95 0)
+			(at 99.06 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1317,7 +875,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated"
-			(at 44.45 107.95 0)
+			(at 99.06 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1326,55 +884,53 @@
 			)
 		)
 		(pin "2"
-			(uuid "496d3aa0-ea72-479f-9600-a656a377f432")
+			(uuid "003c729a-25dc-478e-b804-a274cf1ae0e6")
 		)
 		(pin "1"
-			(uuid "cf7a662b-ae21-47f5-890b-5bb8c6285b91")
+			(uuid "e6b136a9-f788-442a-a820-f2cb645d3bec")
 		)
 		(pin "4"
-			(uuid "60ebb203-9db5-487e-bc87-d1459ae5cb52")
+			(uuid "1f3a243f-f4fb-4243-b4ad-9a601e69bf0a")
 		)
 		(pin "3"
-			(uuid "fef0f3cd-dfaa-4727-b7d1-20b290ea6c80")
+			(uuid "da37aa77-9d49-44c4-96cd-293f0f396f59")
 		)
 		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/02557cc7-fd3f-446d-a77c-212816d66f0c"
-					(reference "J4")
+			(project "SynCrystal_FrontPanel"
+				(path "/f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21"
+					(reference "J1")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
-		(at 58.42 107.95 90)
+		(lib_id "Device:LED_Small")
+		(at 120.65 59.69 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "f38f870f-4ce2-4780-bef8-c321a21ff6d1")
-		(property "Reference" "R22"
-			(at 69.85 107.95 90)
+		(uuid "2bcb6839-c6cd-4544-9017-6c5f16ab9355")
+		(property "Reference" "D2"
+			(at 118.11 58.674 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
 			)
 		)
-		(property "Value" "3K3"
-			(at 77.978 107.95 90)
+		(property "Value" "Crystal"
+			(at 136.398 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 58.42 107.95 0)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
+			(at 120.65 59.69 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1382,8 +938,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
-			(at 58.42 107.95 0)
+		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1806151820_Hubei-KENTO-Elec-KT-0805G_C2297.pdf"
+			(at 120.65 59.69 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1392,7 +948,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 58.42 107.95 0)
+			(at 120.65 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1400,8 +956,8 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C26010"
-			(at 58.42 107.95 0)
+		(property "LCSC" "C2297"
+			(at 120.65 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1410,7 +966,7 @@
 			)
 		)
 		(property "Inventory" "B"
-			(at 58.42 107.95 0)
+			(at 120.65 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1419,18 +975,454 @@
 			)
 		)
 		(pin "1"
-			(uuid "ba549b96-8193-4175-aa40-670605b2c07e")
+			(uuid "37329d94-7af4-447a-aede-90adc09db336")
 		)
 		(pin "2"
-			(uuid "a744c086-1bf5-4c2b-82bc-5d726beb2f78")
+			(uuid "4415b07f-e8c6-40ea-9ec0-8da6b3d2ee3e")
 		)
 		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/02557cc7-fd3f-446d-a77c-212816d66f0c"
-					(reference "R22")
+			(project "SynCrystal_FrontPanel"
+				(path "/f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21"
+					(reference "D2")
 					(unit 1)
 				)
 			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 113.03 57.15 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "683e4f3a-a87f-4029-bfc7-15e3e9508708")
+		(property "Reference" "R1"
+			(at 128.27 57.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "3K3"
+			(at 132.588 57.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 113.03 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 113.03 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 113.03 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C26010"
+			(at 113.03 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Inventory" "B"
+			(at 113.03 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f98df3ea-65fb-4284-9384-6a1e2553f79b")
+		)
+		(pin "2"
+			(uuid "8ded8bca-c40a-408a-9002-c056996e9e88")
+		)
+		(instances
+			(project "SynCrystal_FrontPanel"
+				(path "/f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED_Small")
+		(at 120.65 62.23 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "7be01474-0e09-45e1-a5db-9597aace2600")
+		(property "Reference" "D3"
+			(at 118.11 61.214 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Ext. Imp."
+			(at 137.414 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
+			(at 120.65 62.23 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1806151820_Hubei-KENTO-Elec-KT-0805G_C2297.pdf"
+			(at 120.65 62.23 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 120.65 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C2297"
+			(at 120.65 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Inventory" "B"
+			(at 120.65 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d35993a6-70a5-4608-bd6e-e8b2dd837b1c")
+		)
+		(pin "2"
+			(uuid "c50ac707-ff4e-40c3-bfdd-7a720c7a6b3a")
+		)
+		(instances
+			(project "SynCrystal_FrontPanel"
+				(path "/f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21"
+					(reference "D3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 113.03 62.23 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "97d84438-fe11-4eb8-ac82-c6c5beed3b42")
+		(property "Reference" "R3"
+			(at 124.46 62.23 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1k"
+			(at 129.54 62.23 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 113.03 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 113.03 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 113.03 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C26010"
+			(at 113.03 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Inventory" "B"
+			(at 113.03 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "adfd8145-7843-4cb4-b04b-623413f5c481")
+		)
+		(pin "2"
+			(uuid "ffbea490-8dce-497f-aef0-888da64e1902")
+		)
+		(instances
+			(project "SynCrystal_FrontPanel"
+				(path "/f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21"
+					(reference "R3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED_Small")
+		(at 120.65 57.15 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f36ae3c4-ee4a-4515-b22a-a4ad1ee67164")
+		(property "Reference" "D1"
+			(at 118.11 56.134 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "no sync"
+			(at 136.652 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
+			(at 120.65 57.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1806151820_Hubei-KENTO-Elec-KT-0805G_C2297.pdf"
+			(at 120.65 57.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 120.65 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C2297"
+			(at 120.65 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Inventory" "B"
+			(at 120.65 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0588aee3-56ee-4daa-8349-c6797c05ce6f")
+		)
+		(pin "2"
+			(uuid "65f1ea11-ccf6-4a23-9fa4-6c6b56a89256")
+		)
+		(instances
+			(project "SynCrystal_FrontPanel"
+				(path "/f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21"
+					(reference "D1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 113.03 59.69 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f3d89bac-6e78-407e-8faf-7d3040b524a5")
+		(property "Reference" "R2"
+			(at 124.46 59.69 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "3K3"
+			(at 132.588 59.69 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 113.03 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 113.03 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 113.03 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C26010"
+			(at 113.03 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Inventory" "B"
+			(at 113.03 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "577407cf-6cb4-4ca2-b4fa-e28d46b6d5c3")
+		)
+		(pin "2"
+			(uuid "4f8e0cb5-ddb5-42a7-a9ff-dcfab8de0477")
+		)
+		(instances
+			(project "SynCrystal_FrontPanel"
+				(path "/f23c48c2-6d76-4ca9-b0ed-9b0197f6cd21"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
 		)
 	)
 )
