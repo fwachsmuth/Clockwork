@@ -553,6 +553,12 @@
           "label": "Description",
           "name": "Description",
           "show": false
+        },
+        {
+          "group_by": false,
+          "label": "TP_Label",
+          "name": "TP_Label",
+          "show": false
         }
       ],
       "filter_string": "",
