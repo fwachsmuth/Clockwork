@@ -588,7 +588,7 @@
         },
         {
           "group_by": false,
-          "label": "LCSC Part",
+          "label": "LCSC Repl",
           "name": "LCSC Part",
           "show": true
         },
