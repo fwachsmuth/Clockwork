@@ -4868,6 +4868,16 @@
 	)
 	(wire
 		(pts
+			(xy 57.15 129.54) (xy 59.69 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8706f2f7-adec-4983-b6c6-9757607dcf2d")
+	)
+	(wire
+		(pts
 			(xy 133.35 39.37) (xy 133.35 43.18)
 		)
 		(stroke
@@ -5523,6 +5533,17 @@
 		)
 		(uuid "3758bae4-119f-4773-8e2c-c445a4044e4e")
 	)
+	(text "Im Januar: 12k/4k7 und 2k3 feedback"
+		(exclude_from_sim no)
+		(at 63.5 155.448 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4fb0bb83-8592-4d8d-ad79-64b8c508b2b0")
+	)
 	(text "> (2) M-Pin"
 		(exclude_from_sim no)
 		(at 58.166 32.766 0)
@@ -5702,7 +5723,7 @@
 		(uuid "9dbbe60c-5de5-47a9-a256-e2f74ecf7171")
 	)
 	(label "Ctrl_V_in"
-		(at 64.77 129.54 180)
+		(at 57.15 129.54 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -9534,6 +9555,82 @@
 			(project "SynCrystal_ProjectorBoard"
 				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
 					(reference "#PWR08")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 62.23 129.54 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "fcb800bd-eb79-46fa-b0ff-2c28f2e785ed")
+		(property "Reference" "R10"
+			(at 62.23 132.08 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 62.23 134.62 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 62.23 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 62.23 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 62.23 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25804"
+			(at 62.23 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5f3770e5-0650-4e04-ae86-eb169ccf046e")
+		)
+		(pin "2"
+			(uuid "1c50fa25-1791-4f0c-810b-83e880cf3511")
+		)
+		(instances
+			(project "SynCrystal_ProjectorBoard"
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "R10")
 					(unit 1)
 				)
 			)
