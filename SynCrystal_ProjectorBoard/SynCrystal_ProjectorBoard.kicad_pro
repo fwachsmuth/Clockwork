@@ -218,7 +218,12 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [],
+    "erc_exclusions": [
+      "pin_not_connected|1041400|457200|65dc4529-c689-4285-bad1-e4d7f382ddd5|00000000-0000-0000-0000-000000000000|/01bd7818-adef-4612-bb26-3dbff95808f6|/01bd7818-adef-4612-bb26-3dbff95808f6|",
+      "pin_not_connected|1041400|508000|efe93f7a-385f-4cfa-887e-2c99d371de05|00000000-0000-0000-0000-000000000000|/01bd7818-adef-4612-bb26-3dbff95808f6|/01bd7818-adef-4612-bb26-3dbff95808f6|",
+      "pin_not_connected|889000|457200|4a1b43f9-8104-4970-b1aa-ce3827ba7406|00000000-0000-0000-0000-000000000000|/01bd7818-adef-4612-bb26-3dbff95808f6|/01bd7818-adef-4612-bb26-3dbff95808f6|",
+      "pin_not_connected|965200|406400|5a430278-cfdf-44f4-a33c-9b31e05771a6|00000000-0000-0000-0000-000000000000|/01bd7818-adef-4612-bb26-3dbff95808f6|/01bd7818-adef-4612-bb26-3dbff95808f6|"
+    ],
     "meta": {
       "version": 0
     },
@@ -513,7 +518,7 @@
           "show": true
         },
         {
-          "group_by": false,
+          "group_by": true,
           "label": "Footprint",
           "name": "Footprint",
           "show": true

@@ -1,6 +1,6 @@
 /* Todo
 
-D7 will stop the engines. 
+D7 will stop the engines.
 Logic Table:
 DAC ENG COM-
 lo  lo  -   NC
@@ -9,19 +9,26 @@ lo  hi  no1 STOP
 hi  hi  no2 NC
 So make sure DAC and STOP are not both high!
 
-An A0 das Teilerverhältnis auslesen
+An A0 das Teilerverhältnis auslesen um das Projektoboard zu erkennen:
+5x 10k ergibt 6 Werte
+- GND Keiner
+- 10k Bauer Studioklasse (T610/T525/T510/T502) (12:1, 1.63 V)
+- 20k Bauer P8 (Custom:1, 1.63V)
+- 30k Bauer P8 Selecton (3:1, 1,63V
+- 40k Braun Visacustic (3:1, 1.89V)
+- 50k Reserve
 
 Test D7 for a connected Lamp Relais Board
 
 Bugs:
 - Starting in NONE does not work yet, DAC stays connected
 
-Todo: 
-- Do I still ned force_redraw? 
+Todo:
+- Do I still need force_redraw?
 make the 5 call of updateDigit more efficient: stop calculating if a digit did not need to beupdated.
 
 - Use the display
-    - make fps_rn an int 
+    - make fps_rn an int
     - create "fps", "Auto" and "Off" tiles to save some progmem (_r font is 4KB bigger than _n)
 - Use FreqMeasure in FPS_NONE
 - actually apply the timer_factor
@@ -30,7 +37,7 @@ make the 5 call of updateDigit more efficient: stop calculating if a digit did n
 - flash the DAC just once on very first start
 - Decrement Shaft Impulses after detected shaft noise!
 - Reset Counters? (long press both buttons?)
-- Implement non-sepmag mode — on speed change when running, 
+- Implement non-sepmag mode — on speed change when running,
         - Forget any previous errors and start fresh
         + allows for quick speed changes
         + ideal mode for use as "Peaceman's Box" (ESS out mode)
@@ -47,7 +54,7 @@ Hardware:
 - (ESS Out)
 
 Notes:
-- Is the dithering really delivering the target frequency? Seems to be slightly below. 
+- Is the dithering really delivering the target frequency? Seems to be slightly below.
   This might be diluted due to run up and breaking. Cross-validate the frac32!
 
 

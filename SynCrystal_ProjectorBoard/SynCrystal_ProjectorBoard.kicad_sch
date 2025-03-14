@@ -4249,6 +4249,12 @@
 		(uuid "66640ef4-3c8e-46a4-ab91-65c95eaeb635")
 	)
 	(junction
+		(at 48.26 68.58)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "780dee51-1061-4711-8018-81579add674f")
+	)
+	(junction
 		(at 90.17 125.73)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4445,6 +4451,16 @@
 			(type default)
 		)
 		(uuid "281dfd8a-6b4c-420b-aae3-6e3d3d4d1044")
+	)
+	(wire
+		(pts
+			(xy 45.72 68.58) (xy 48.26 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2c2e642a-6644-4728-a99d-451bc9086872")
 	)
 	(wire
 		(pts
@@ -5028,6 +5044,26 @@
 	)
 	(wire
 		(pts
+			(xy 48.26 68.58) (xy 48.26 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a9a0a1b5-2722-4462-915e-ff1fd144c44f")
+	)
+	(wire
+		(pts
+			(xy 45.72 55.88) (xy 45.72 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "abecb4ab-d194-4de9-9cc2-2eb2ff39f2e0")
+	)
+	(wire
+		(pts
 			(xy 231.14 31.75) (xy 231.14 36.83)
 		)
 		(stroke
@@ -5278,6 +5314,16 @@
 	)
 	(wire
 		(pts
+			(xy 48.26 69.85) (xy 48.26 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e11c7496-9880-44bc-b62e-681a477e8010")
+	)
+	(wire
+		(pts
 			(xy 261.62 96.52) (xy 261.62 133.35)
 		)
 		(stroke
@@ -5503,7 +5549,7 @@
 	)
 	(text "When the SynCrystal Controller \nis mounted internally, it connects \nto J2 and J4 instead of DIN-6."
 		(exclude_from_sim no)
-		(at 70.358 64.77 0)
+		(at 96.012 63.754 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -5566,7 +5612,18 @@
 		)
 		(uuid "62766bba-fcb0-4b96-878e-e3e689679835")
 	)
-	(text "< (5) ?"
+	(text "GND: None\n10k: Bauer T\n20k: P8\n30k: Selecton\n40k: Visacustic\n50k: Reserve"
+		(exclude_from_sim no)
+		(at 55.118 69.596 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "69846737-f8e4-49d6-b4d9-0c0d46fe09cc")
+	)
+	(text "< (5) Proj_ID"
 		(exclude_from_sim no)
 		(at 58.166 56.388 0)
 		(effects
@@ -5878,7 +5935,7 @@
 	)
 	(symbol
 		(lib_id "power:GNDD")
-		(at 45.72 55.88 0)
+		(at 48.26 74.93 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5886,7 +5943,7 @@
 		(dnp no)
 		(uuid "0a5d1dea-5e60-4307-9660-176de8c7ffac")
 		(property "Reference" "#PWR012"
-			(at 45.72 62.23 0)
+			(at 48.26 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5895,7 +5952,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 45.72 59.69 0)
+			(at 48.26 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5903,7 +5960,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 45.72 55.88 0)
+			(at 48.26 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5912,7 +5969,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 45.72 55.88 0)
+			(at 48.26 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5921,7 +5978,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
-			(at 45.72 55.88 0)
+			(at 48.26 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6912,6 +6969,82 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R_Small")
+		(at 48.26 64.77 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "34efe3d5-51fc-4406-adff-499bf078622c")
+		(property "Reference" "R12"
+			(at 51.562 63.754 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "40k2"
+			(at 51.562 66.294 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 48.26 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_YAGEO-RC0402FR-0740K2L_C137983.pdf"
+			(at 48.26 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 48.26 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C137983"
+			(at 48.26 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ac8216d7-c9d1-47d0-838f-0a414dee99ab")
+		)
+		(pin "2"
+			(uuid "1c00841e-fb9d-48ad-bcb9-e318ade138d3")
+		)
+		(instances
+			(project "SynCrystal_ProjectorBoard"
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "R12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GNDD")
 		(at 76.2 115.57 0)
 		(unit 1)
@@ -7700,6 +7833,82 @@
 	)
 	(symbol
 		(lib_id "Device:R_Small")
+		(at 48.26 72.39 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "5c7e0481-226b-4887-95b6-585cfa185ac0")
+		(property "Reference" "R11"
+			(at 51.562 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 51.562 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 48.26 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2411221126_UNI-ROYAL-Uniroyal-Elec-0402WGF1002TCE_C25744.pdf"
+			(at 48.26 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 48.26 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25744"
+			(at 48.26 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "01d837ef-75e2-4c9f-87fc-e68f1a030424")
+		)
+		(pin "2"
+			(uuid "fa873cfb-b8c0-4055-8044-b0781a73a1a0")
+		)
+		(instances
+			(project "SynCrystal_ProjectorBoard"
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "R11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
 		(at 106.68 137.16 180)
 		(unit 1)
 		(exclude_from_sim no)
@@ -8338,6 +8547,71 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/b4ac20a2-eea5-4dd0-b1b6-8c6de2e0011b"
 					(reference "#PWR046")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 48.26 62.23 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a21029be-2684-42de-bfe2-1b8129c07492")
+		(property "Reference" "#PWR018"
+			(at 48.26 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 48.641 57.8358 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 48.26 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 48.26 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 48.26 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "38e5dedd-9838-4e14-87d1-510de61a7c86")
+		)
+		(instances
+			(project "SynCrystal_ProjectorBoard"
+				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
+					(reference "#PWR018")
 					(unit 1)
 				)
 			)
