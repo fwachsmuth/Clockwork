@@ -10979,7 +10979,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0087138a-92c6-4668-991f-888def296f5c")
-		(property "Reference" "SW1"
+		(property "Reference" "SW2"
 			(at 228.092 236.728 0)
 			(effects
 				(font
@@ -11055,7 +11055,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "SW1")
+					(reference "SW2")
 					(unit 1)
 				)
 			)
@@ -11071,7 +11071,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "00ff1cf7-fab2-4ffd-bfc4-ff40579ba6b5")
-		(property "Reference" "U1"
+		(property "Reference" "U3"
 			(at 133.35 104.14 0)
 			(effects
 				(font
@@ -11168,7 +11168,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U1")
+					(reference "U3")
 					(unit 6)
 				)
 			)
@@ -11183,7 +11183,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "01587b4c-bb95-4987-91cb-b69788c3517a")
-		(property "Reference" "TP10"
+		(property "Reference" "TP9"
 			(at 212.09 191.008 0)
 			(effects
 				(font
@@ -11242,7 +11242,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP10")
+					(reference "TP9")
 					(unit 1)
 				)
 			)
@@ -11258,7 +11258,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "028b084c-5fad-456c-bf90-641ed1d3343c")
-		(property "Reference" "TP5"
+		(property "Reference" "TP13"
 			(at 89.408 222.25 0)
 			(effects
 				(font
@@ -11317,7 +11317,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP5")
+					(reference "TP13")
 					(unit 1)
 				)
 			)
@@ -11332,7 +11332,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "088b930c-50a8-4983-ba78-f39753de5784")
-		(property "Reference" "#PWR024"
+		(property "Reference" "#PWR038"
 			(at 400.05 241.3 0)
 			(effects
 				(font
@@ -11382,7 +11382,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR024")
+					(reference "#PWR038")
 					(unit 1)
 				)
 			)
@@ -11478,7 +11478,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0a08f498-4012-425f-ac46-4a421487adde")
-		(property "Reference" "U1"
+		(property "Reference" "U3"
 			(at 254 49.0982 0)
 			(effects
 				(font
@@ -11575,7 +11575,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U1")
+					(reference "U3")
 					(unit 2)
 				)
 			)
@@ -11665,7 +11665,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0b91bb22-c871-447a-82b3-cc957f572bdf")
-		(property "Reference" "TP14"
+		(property "Reference" "TP3"
 			(at 381 94.742 0)
 			(effects
 				(font
@@ -11724,7 +11724,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP14")
+					(reference "TP3")
 					(unit 1)
 				)
 			)
@@ -11739,7 +11739,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0bf4b525-b14e-4704-9978-8d43de1165b8")
-		(property "Reference" "#PWR033"
+		(property "Reference" "#PWR028"
 			(at 232.41 203.2 0)
 			(effects
 				(font
@@ -11789,7 +11789,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR033")
+					(reference "#PWR028")
 					(unit 1)
 				)
 			)
@@ -11805,7 +11805,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0e9cb54a-0ce3-47e1-89e2-950d73dd7c81")
-		(property "Reference" "U1"
+		(property "Reference" "U3"
 			(at 387.35 224.79 90)
 			(effects
 				(font
@@ -11902,7 +11902,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U1")
+					(reference "U3")
 					(unit 7)
 				)
 			)
@@ -11917,7 +11917,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0f36cfd5-ea6f-411e-9ede-f8e4f599e46b")
-		(property "Reference" "J1"
+		(property "Reference" "J4"
 			(at 125.73 238.76 0)
 			(effects
 				(font
@@ -11981,7 +11981,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "J1")
+					(reference "J4")
 					(unit 1)
 				)
 			)
@@ -11996,7 +11996,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1320a23c-084f-4208-8b3e-6c093c211f3b")
-		(property "Reference" "U2"
+		(property "Reference" "U7"
 			(at 65.6941 245.11 0)
 			(effects
 				(font
@@ -12150,7 +12150,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U2")
+					(reference "U7")
 					(unit 1)
 				)
 			)
@@ -12166,7 +12166,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "13e29797-6b4c-4a6d-90dd-0a599645301f")
-		(property "Reference" "#PWR051"
+		(property "Reference" "#PWR05"
 			(at 340.36 50.8 0)
 			(effects
 				(font
@@ -12216,7 +12216,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR051")
+					(reference "#PWR05")
 					(unit 1)
 				)
 			)
@@ -12231,7 +12231,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1443c284-d94a-4d34-98bf-c30cc47a0a99")
-		(property "Reference" "#PWR06"
+		(property "Reference" "#PWR08"
 			(at 242.57 71.12 0)
 			(effects
 				(font
@@ -12281,7 +12281,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR06")
+					(reference "#PWR08")
 					(unit 1)
 				)
 			)
@@ -12296,7 +12296,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "146e2ffe-af9c-4ad0-ab2f-d7a02bbe38f6")
-		(property "Reference" "J3"
+		(property "Reference" "J5"
 			(at 274.066 236.22 0)
 			(effects
 				(font
@@ -12356,7 +12356,7 @@
 		(instances
 			(project ""
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "J3")
+					(reference "J5")
 					(unit 1)
 				)
 			)
@@ -12372,7 +12372,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1887646d-9708-42f1-b2bc-386800096b58")
-		(property "Reference" "R17"
+		(property "Reference" "R2"
 			(at 384.81 63.5 0)
 			(effects
 				(font
@@ -12433,7 +12433,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R17")
+					(reference "R2")
 					(unit 1)
 				)
 			)
@@ -12449,7 +12449,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "19b40910-a89f-4558-b378-b1ef1bdb48d6")
-		(property "Reference" "#PWR05"
+		(property "Reference" "#PWR02"
 			(at 242.57 46.99 0)
 			(effects
 				(font
@@ -12499,7 +12499,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR05")
+					(reference "#PWR02")
 					(unit 1)
 				)
 			)
@@ -12514,7 +12514,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "19c3ca05-d889-4376-91b1-2833017c26a6")
-		(property "Reference" "D7"
+		(property "Reference" "D5"
 			(at 332.74 91.186 0)
 			(effects
 				(font
@@ -12577,7 +12577,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "D7")
+					(reference "D5")
 					(unit 1)
 				)
 			)
@@ -12592,7 +12592,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1ad847df-0d7e-4cea-be49-7d2a6d7e2cff")
-		(property "Reference" "#PWR041"
+		(property "Reference" "#PWR048"
 			(at 196.85 279.4 0)
 			(effects
 				(font
@@ -12642,7 +12642,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR041")
+					(reference "#PWR048")
 					(unit 1)
 				)
 			)
@@ -12657,7 +12657,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1e4908d1-ac13-4aef-a941-6265d3546fb9")
-		(property "Reference" "R13"
+		(property "Reference" "R17"
 			(at 215.9 179.07 90)
 			(effects
 				(font
@@ -12718,7 +12718,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R13")
+					(reference "R17")
 					(unit 1)
 				)
 			)
@@ -12734,7 +12734,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1e818867-5fd1-4896-98e1-0097f6ab25cf")
-		(property "Reference" "SW3"
+		(property "Reference" "SW4"
 			(at 228.092 254.508 0)
 			(effects
 				(font
@@ -12810,7 +12810,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "SW3")
+					(reference "SW4")
 					(unit 1)
 				)
 			)
@@ -12825,7 +12825,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2069c2f4-7d97-45fa-b500-4ac315f520f9")
-		(property "Reference" "#PWR014"
+		(property "Reference" "#PWR013"
 			(at 111.76 107.95 0)
 			(effects
 				(font
@@ -12875,7 +12875,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR014")
+					(reference "#PWR013")
 					(unit 1)
 				)
 			)
@@ -12890,7 +12890,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "21f91651-000e-4cb9-9584-b77e972c6ea7")
-		(property "Reference" "C14"
+		(property "Reference" "C15"
 			(at 302.514 181.61 90)
 			(effects
 				(font
@@ -12953,7 +12953,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C14")
+					(reference "C15")
 					(unit 1)
 				)
 			)
@@ -12968,7 +12968,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2585edb6-b1d0-448e-a21c-776755c4ed4e")
-		(property "Reference" "D4"
+		(property "Reference" "D7"
 			(at 221.996 193.294 90)
 			(effects
 				(font
@@ -13031,7 +13031,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "D4")
+					(reference "D7")
 					(unit 1)
 				)
 			)
@@ -13046,7 +13046,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "26348e07-9888-4be5-b96a-82c37133f65e")
-		(property "Reference" "R16"
+		(property "Reference" "R18"
 			(at 264.16 181.61 90)
 			(effects
 				(font
@@ -13107,7 +13107,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R16")
+					(reference "R18")
 					(unit 1)
 				)
 			)
@@ -13123,7 +13123,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2b2cc48f-502a-4d37-9198-75e7988aedfa")
-		(property "Reference" "C17"
+		(property "Reference" "C5"
 			(at 358.14 55.88 0)
 			(effects
 				(font
@@ -13186,7 +13186,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C17")
+					(reference "C5")
 					(unit 1)
 				)
 			)
@@ -13201,7 +13201,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2b831bb3-a96e-4600-adc9-068cd90575c2")
-		(property "Reference" "C4"
+		(property "Reference" "C2"
 			(at 242.57 49.53 0)
 			(effects
 				(font
@@ -13264,7 +13264,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C4")
+					(reference "C2")
 					(unit 1)
 				)
 			)
@@ -13280,7 +13280,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2b87b922-70d4-41d1-bfbf-776aca5b4e90")
-		(property "Reference" "SW4"
+		(property "Reference" "SW5"
 			(at 228.092 263.398 0)
 			(effects
 				(font
@@ -13356,7 +13356,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "SW4")
+					(reference "SW5")
 					(unit 1)
 				)
 			)
@@ -13371,7 +13371,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2d56fef4-7929-45ba-8dc8-14321ec91318")
-		(property "Reference" "R23"
+		(property "Reference" "R4"
 			(at 330.2 76.2 0)
 			(effects
 				(font
@@ -13432,7 +13432,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R23")
+					(reference "R4")
 					(unit 1)
 				)
 			)
@@ -13447,7 +13447,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "325ad0a9-e227-411a-a587-209f0565816b")
-		(property "Reference" "#PWR01"
+		(property "Reference" "#PWR024"
 			(at 40.64 190.5 0)
 			(effects
 				(font
@@ -13497,7 +13497,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR01")
+					(reference "#PWR024")
 					(unit 1)
 				)
 			)
@@ -13512,7 +13512,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "35bb83f6-8ff5-41ac-a98a-3c699798af0d")
-		(property "Reference" "U1"
+		(property "Reference" "U3"
 			(at 159.766 105.156 0)
 			(effects
 				(font
@@ -13609,7 +13609,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U1")
+					(reference "U3")
 					(unit 5)
 				)
 			)
@@ -13624,7 +13624,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "37f97954-4a73-41c4-9e4a-1ab82ec92658")
-		(property "Reference" "#PWR02"
+		(property "Reference" "#PWR020"
 			(at 63.5 168.91 0)
 			(effects
 				(font
@@ -13674,7 +13674,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR02")
+					(reference "#PWR020")
 					(unit 1)
 				)
 			)
@@ -13689,7 +13689,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "3adcfc2a-0391-4901-a5c9-d31e6c9bb8ac")
-		(property "Reference" "#PWR045"
+		(property "Reference" "#PWR011"
 			(at 353.06 88.9 0)
 			(effects
 				(font
@@ -13739,7 +13739,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR045")
+					(reference "#PWR011")
 					(unit 1)
 				)
 			)
@@ -13755,7 +13755,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "3dfaab1c-9174-4b6e-a637-50cda201679c")
-		(property "Reference" "TP7"
+		(property "Reference" "TP2"
 			(at 123.19 58.928 0)
 			(effects
 				(font
@@ -13814,7 +13814,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP7")
+					(reference "TP2")
 					(unit 1)
 				)
 			)
@@ -13829,7 +13829,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "3e93714d-faa5-460c-ae92-bc10bd3a9379")
-		(property "Reference" "C2"
+		(property "Reference" "C17"
 			(at 103.124 199.898 0)
 			(effects
 				(font
@@ -13892,7 +13892,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C2")
+					(reference "C17")
 					(unit 1)
 				)
 			)
@@ -13907,7 +13907,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "3f4b412a-4839-4536-ad58-151af052a560")
-		(property "Reference" "C1"
+		(property "Reference" "C13"
 			(at 40.64 181.61 0)
 			(effects
 				(font
@@ -13970,7 +13970,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C1")
+					(reference "C13")
 					(unit 1)
 				)
 			)
@@ -13985,7 +13985,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "415f3836-f707-43b3-aad6-3cbc7d5c44c9")
-		(property "Reference" "#PWR012"
+		(property "Reference" "#PWR014"
 			(at 222.25 107.95 0)
 			(effects
 				(font
@@ -14035,7 +14035,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR012")
+					(reference "#PWR014")
 					(unit 1)
 				)
 			)
@@ -14115,7 +14115,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "43a013a6-3b0e-4599-b5ab-10d5318c2ce9")
-		(property "Reference" "TP3"
+		(property "Reference" "TP11"
 			(at 99.568 204.47 0)
 			(effects
 				(font
@@ -14174,7 +14174,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP3")
+					(reference "TP11")
 					(unit 1)
 				)
 			)
@@ -14189,7 +14189,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "43b21137-a7c7-4e97-880f-141302f2e612")
-		(property "Reference" "R4"
+		(property "Reference" "R15"
 			(at 117.348 172.466 90)
 			(effects
 				(font
@@ -14250,7 +14250,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R4")
+					(reference "R15")
 					(unit 1)
 				)
 			)
@@ -14265,7 +14265,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "45283a57-575e-4864-9412-284c9c3d83e6")
-		(property "Reference" "#FLG01"
+		(property "Reference" "#FLG02"
 			(at 89.535 73.66 0)
 			(effects
 				(font
@@ -14315,7 +14315,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#FLG01")
+					(reference "#FLG02")
 					(unit 1)
 				)
 			)
@@ -14330,7 +14330,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "491ab487-0b4c-44c0-9f6a-fb53217591a9")
-		(property "Reference" "C6"
+		(property "Reference" "C3"
 			(at 153.416 53.34 0)
 			(effects
 				(font
@@ -14391,7 +14391,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C6")
+					(reference "C3")
 					(unit 1)
 				)
 			)
@@ -14406,7 +14406,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "4bd3575a-6214-4437-a62f-0b7084e8b380")
-		(property "Reference" "C5"
+		(property "Reference" "C8"
 			(at 116.332 58.928 0)
 			(effects
 				(font
@@ -14467,7 +14467,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C5")
+					(reference "C8")
 					(unit 1)
 				)
 			)
@@ -14482,7 +14482,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "4c572f4a-4bee-4fe3-ba83-cab37ecca589")
-		(property "Reference" "#PWR011"
+		(property "Reference" "#PWR039"
 			(at 130.81 242.57 0)
 			(effects
 				(font
@@ -14532,7 +14532,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR011")
+					(reference "#PWR039")
 					(unit 1)
 				)
 			)
@@ -14547,7 +14547,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "4e5a8758-4f07-4373-ad3e-daac00177b83")
-		(property "Reference" "#PWR015"
+		(property "Reference" "#PWR017"
 			(at 148.59 135.89 0)
 			(effects
 				(font
@@ -14597,7 +14597,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR015")
+					(reference "#PWR017")
 					(unit 1)
 				)
 			)
@@ -14613,7 +14613,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "5475520f-2029-45aa-b060-b72fb9bfa3f6")
-		(property "Reference" "J6"
+		(property "Reference" "J1"
 			(at 34.6711 66.04 0)
 			(effects
 				(font
@@ -14679,7 +14679,7 @@
 		(instances
 			(project ""
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "J6")
+					(reference "J1")
 					(unit 1)
 				)
 			)
@@ -14695,7 +14695,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "5684c479-4503-4d0f-894a-cbde3aa66958")
-		(property "Reference" "TP4"
+		(property "Reference" "TP12"
 			(at 89.408 219.71 0)
 			(effects
 				(font
@@ -14754,7 +14754,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP4")
+					(reference "TP12")
 					(unit 1)
 				)
 			)
@@ -14769,7 +14769,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5977a3c5-aab0-42ac-ae5d-0ed46f2c802b")
-		(property "Reference" "R29"
+		(property "Reference" "R8"
 			(at 327.66 101.6 0)
 			(effects
 				(font
@@ -14830,7 +14830,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R29")
+					(reference "R8")
 					(unit 1)
 				)
 			)
@@ -14846,7 +14846,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5d0314ec-87a2-4e0b-a40c-959dfefb93bf")
-		(property "Reference" "J5"
+		(property "Reference" "J2"
 			(at 68.326 88.392 0)
 			(effects
 				(font
@@ -14924,7 +14924,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "J5")
+					(reference "J2")
 					(unit 1)
 				)
 			)
@@ -14939,7 +14939,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5df1bf2d-657e-4d6a-ae24-ff48d664e180")
-		(property "Reference" "#PWR08"
+		(property "Reference" "#PWR035"
 			(at 109.22 215.9 0)
 			(effects
 				(font
@@ -14989,7 +14989,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR08")
+					(reference "#PWR035")
 					(unit 1)
 				)
 			)
@@ -15004,7 +15004,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5e77b01a-835e-492f-9b6b-670caf9aa885")
-		(property "Reference" "R35"
+		(property "Reference" "R16"
 			(at 117.856 183.642 90)
 			(effects
 				(font
@@ -15065,7 +15065,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R35")
+					(reference "R16")
 					(unit 1)
 				)
 			)
@@ -15159,7 +15159,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "61416ccf-18bb-4e31-9cdb-7fa1124019d8")
-		(property "Reference" "U1"
+		(property "Reference" "U3"
 			(at 292.1 177.8 0)
 			(effects
 				(font
@@ -15256,7 +15256,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U1")
+					(reference "U3")
 					(unit 4)
 				)
 			)
@@ -15271,7 +15271,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "61906218-b68c-4aa8-8be3-588786098e78")
-		(property "Reference" "R30"
+		(property "Reference" "R9"
 			(at 348.234 104.14 0)
 			(effects
 				(font
@@ -15334,7 +15334,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R30")
+					(reference "R9")
 					(unit 1)
 				)
 			)
@@ -15349,7 +15349,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "63f1337d-caf7-4c20-83e0-5aaedc1be392")
-		(property "Reference" "C21"
+		(property "Reference" "C1"
 			(at 343.916 38.354 0)
 			(effects
 				(font
@@ -15410,7 +15410,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C21")
+					(reference "C1")
 					(unit 1)
 				)
 			)
@@ -15425,7 +15425,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6418ba6a-36dc-4e7f-b19b-0c0e40a0c8dd")
-		(property "Reference" "R18"
+		(property "Reference" "R19"
 			(at 228.854 188.976 0)
 			(effects
 				(font
@@ -15486,7 +15486,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R18")
+					(reference "R19")
 					(unit 1)
 				)
 			)
@@ -15501,7 +15501,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6516dc2e-ebfd-4a9a-b4ef-a06f4e3e3eca")
-		(property "Reference" "R21"
+		(property "Reference" "R22"
 			(at 252.2855 197.5485 90)
 			(effects
 				(font
@@ -15562,7 +15562,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R21")
+					(reference "R22")
 					(unit 1)
 				)
 			)
@@ -15577,7 +15577,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "68d0083e-776b-4ad8-bacd-04ab265c451d")
-		(property "Reference" "#PWR046"
+		(property "Reference" "#PWR015"
 			(at 331.47 116.84 0)
 			(effects
 				(font
@@ -15627,7 +15627,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR046")
+					(reference "#PWR015")
 					(unit 1)
 				)
 			)
@@ -15642,7 +15642,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "69a0f6ec-31d2-40c4-8b41-61bf6acdce19")
-		(property "Reference" "Q1"
+		(property "Reference" "Q3"
 			(at 125.5014 118.2116 0)
 			(effects
 				(font
@@ -15711,7 +15711,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "Q1")
+					(reference "Q3")
 					(unit 1)
 				)
 			)
@@ -15726,7 +15726,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6a1787bb-e9fd-484b-b459-9a08ff39574b")
-		(property "Reference" "R6"
+		(property "Reference" "R23"
 			(at 111.76 198.374 0)
 			(effects
 				(font
@@ -15787,7 +15787,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R6")
+					(reference "R23")
 					(unit 1)
 				)
 			)
@@ -15802,7 +15802,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6ab19f94-ff43-44bf-a43c-b190f2c328a5")
-		(property "Reference" "#PWR019"
+		(property "Reference" "#PWR010"
 			(at 87.63 77.47 0)
 			(effects
 				(font
@@ -15852,7 +15852,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR019")
+					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -15867,7 +15867,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6bdd6ea4-7575-4d29-8685-f43e9adf823f")
-		(property "Reference" "R20"
+		(property "Reference" "R21"
 			(at 302.006 193.04 0)
 			(effects
 				(font
@@ -15939,7 +15939,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R20")
+					(reference "R21")
 					(unit 1)
 				)
 			)
@@ -15954,7 +15954,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6e2caa48-fa1e-4bb1-a052-153b1f61eb55")
-		(property "Reference" "#PWR035"
+		(property "Reference" "#PWR029"
 			(at 267.97 203.2 0)
 			(effects
 				(font
@@ -16004,7 +16004,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR035")
+					(reference "#PWR029")
 					(unit 1)
 				)
 			)
@@ -16020,7 +16020,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6e4f1169-050a-4e96-ad16-66e19a9bb652")
-		(property "Reference" "TP2"
+		(property "Reference" "TP7"
 			(at 48.26 191.008 0)
 			(effects
 				(font
@@ -16079,7 +16079,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP2")
+					(reference "TP7")
 					(unit 1)
 				)
 			)
@@ -16094,7 +16094,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6fb4307d-bd13-4ed7-b31e-89217621b3d0")
-		(property "Reference" "#PWR020"
+		(property "Reference" "#PWR043"
 			(at 237.49 255.27 0)
 			(effects
 				(font
@@ -16144,7 +16144,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR020")
+					(reference "#PWR043")
 					(unit 1)
 				)
 			)
@@ -16159,7 +16159,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "73df4f77-48c3-41fb-9543-1ea07ae72276")
-		(property "Reference" "U10"
+		(property "Reference" "U5"
 			(at 226.06 127 0)
 			(effects
 				(font
@@ -16234,7 +16234,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U10")
+					(reference "U5")
 					(unit 1)
 				)
 			)
@@ -16249,7 +16249,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "77965451-83ad-4904-ac94-f61c654dc1ec")
-		(property "Reference" "#PWR042"
+		(property "Reference" "#PWR031"
 			(at 314.96 203.2 0)
 			(effects
 				(font
@@ -16299,7 +16299,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR042")
+					(reference "#PWR031")
 					(unit 1)
 				)
 			)
@@ -16378,7 +16378,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "78a104b6-c592-4b08-9cbe-aa8e4289b269")
-		(property "Reference" "Q3"
+		(property "Reference" "Q1"
 			(at 347.726 70.866 0)
 			(effects
 				(font
@@ -16447,7 +16447,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "Q3")
+					(reference "Q1")
 					(unit 1)
 				)
 			)
@@ -16463,7 +16463,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "798ad495-6191-42f3-bb21-75acbe81610b")
-		(property "Reference" "U5"
+		(property "Reference" "U6"
 			(at 386.08 205.74 90)
 			(effects
 				(font
@@ -16542,7 +16542,7 @@
 		(instances
 			(project ""
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U5")
+					(reference "U6")
 					(unit 3)
 				)
 			)
@@ -16557,7 +16557,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "7f9aac7c-b51d-4f7a-93b6-21f33f432c7d")
-		(property "Reference" "C15"
+		(property "Reference" "C16"
 			(at 273.304 192.532 0)
 			(effects
 				(font
@@ -16620,7 +16620,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C15")
+					(reference "C16")
 					(unit 1)
 				)
 			)
@@ -16635,7 +16635,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "809cfb87-48a1-4bed-82ae-9f1ac356d676")
-		(property "Reference" "#PWR031"
+		(property "Reference" "#PWR027"
 			(at 220.98 203.2 0)
 			(effects
 				(font
@@ -16685,7 +16685,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR031")
+					(reference "#PWR027")
 					(unit 1)
 				)
 			)
@@ -16700,7 +16700,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "875e117a-3ea8-4254-b50c-e6163264c78d")
-		(property "Reference" "D6"
+		(property "Reference" "D2"
 			(at 357.632 74.676 0)
 			(effects
 				(font
@@ -16718,7 +16718,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "easyeda2kicad:LED-SMD_XYC-IRA4335A65-X4"
+		(property "Footprint" "easyEDA:LED-SMD_XYC-IRA4335A65-X4"
 			(at 359.41 63.5 0)
 			(effects
 				(font
@@ -16772,7 +16772,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "D6")
+					(reference "D2")
 					(unit 1)
 				)
 			)
@@ -16787,7 +16787,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "87736460-d4a3-48ae-9c07-922f5ee421eb")
-		(property "Reference" "D3"
+		(property "Reference" "D8"
 			(at 184.15 236.22 0)
 			(effects
 				(font
@@ -16847,7 +16847,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "D3")
+					(reference "D8")
 					(unit 1)
 				)
 			)
@@ -16862,7 +16862,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8b25e80c-9595-4d52-98e6-a12db4f6d995")
-		(property "Reference" "#PWR050"
+		(property "Reference" "#PWR021"
 			(at 124.46 180.34 0)
 			(effects
 				(font
@@ -16912,7 +16912,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR050")
+					(reference "#PWR021")
 					(unit 1)
 				)
 			)
@@ -16927,7 +16927,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8d5213dd-42ad-486c-900f-640d4b2ef342")
-		(property "Reference" "#PWR021"
+		(property "Reference" "#PWR016"
 			(at 232.41 118.11 0)
 			(effects
 				(font
@@ -16977,7 +16977,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR021")
+					(reference "#PWR016")
 					(unit 1)
 				)
 			)
@@ -16992,7 +16992,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8d5f0b71-ad0a-4a83-9e8f-7e25fe494daa")
-		(property "Reference" "R19"
+		(property "Reference" "R20"
 			(at 237.998 187.706 0)
 			(effects
 				(font
@@ -17053,7 +17053,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R19")
+					(reference "R20")
 					(unit 1)
 				)
 			)
@@ -17068,7 +17068,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8e368a5a-a7c2-496d-9c18-ec409c6b575f")
-		(property "Reference" "R28"
+		(property "Reference" "R7"
 			(at 361.442 103.886 90)
 			(effects
 				(font
@@ -17131,7 +17131,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R28")
+					(reference "R7")
 					(unit 1)
 				)
 			)
@@ -17146,7 +17146,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "903cfbdc-f5e5-4fb0-985a-5c74d1ceb83e")
-		(property "Reference" "#PWR07"
+		(property "Reference" "#PWR032"
 			(at 105.41 208.28 0)
 			(effects
 				(font
@@ -17196,7 +17196,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR07")
+					(reference "#PWR032")
 					(unit 1)
 				)
 			)
@@ -17211,7 +17211,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "928782f6-aca0-4ef2-8277-688ceae89236")
-		(property "Reference" "SW6"
+		(property "Reference" "SW1"
 			(at 109.982 171.45 0)
 			(effects
 				(font
@@ -17275,7 +17275,7 @@
 		(instances
 			(project ""
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "SW6")
+					(reference "SW1")
 					(unit 1)
 				)
 			)
@@ -17290,7 +17290,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "94118863-15b3-41b6-b839-03370f516022")
-		(property "Reference" "#PWR026"
+		(property "Reference" "#PWR019"
 			(at 222.25 135.89 0)
 			(effects
 				(font
@@ -17340,7 +17340,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR026")
+					(reference "#PWR019")
 					(unit 1)
 				)
 			)
@@ -17356,7 +17356,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "94e5bcec-9fd4-4dd1-a3b5-fe054e332a2e")
-		(property "Reference" "SW2"
+		(property "Reference" "SW3"
 			(at 228.092 245.618 0)
 			(effects
 				(font
@@ -17432,7 +17432,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "SW2")
+					(reference "SW3")
 					(unit 1)
 				)
 			)
@@ -17447,7 +17447,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "96f628ae-26b7-4f13-bbcd-50cc204174cc")
-		(property "Reference" "R24"
+		(property "Reference" "R5"
 			(at 321.818 85.598 0)
 			(effects
 				(font
@@ -17508,7 +17508,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R24")
+					(reference "R5")
 					(unit 1)
 				)
 			)
@@ -17523,7 +17523,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "97145574-6d77-42ef-94fe-ffcf2b3d2dfd")
-		(property "Reference" "C20"
+		(property "Reference" "C10"
 			(at 341.884 105.156 0)
 			(effects
 				(font
@@ -17586,7 +17586,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C20")
+					(reference "C10")
 					(unit 1)
 				)
 			)
@@ -17602,7 +17602,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9803883e-1a8c-4436-8bd0-67c29271e10f")
-		(property "Reference" "#FLG02"
+		(property "Reference" "#FLG01"
 			(at 151.765 50.8 0)
 			(effects
 				(font
@@ -17653,7 +17653,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#FLG02")
+					(reference "#FLG01")
 					(unit 1)
 				)
 			)
@@ -17668,7 +17668,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9a9fd41b-d988-4f75-a50f-755e42b39450")
-		(property "Reference" "R31"
+		(property "Reference" "R1"
 			(at 344.17 27.94 0)
 			(effects
 				(font
@@ -17729,7 +17729,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R31")
+					(reference "R1")
 					(unit 1)
 				)
 			)
@@ -17744,7 +17744,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9bb11b8a-71e0-472e-a6c0-e6e6cda988fa")
-		(property "Reference" "#PWR044"
+		(property "Reference" "#PWR07"
 			(at 375.92 67.31 0)
 			(effects
 				(font
@@ -17794,7 +17794,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR044")
+					(reference "#PWR07")
 					(unit 1)
 				)
 			)
@@ -17810,7 +17810,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9d0566e1-75d5-4592-b3a6-8535d7c2afb5")
-		(property "Reference" "#PWR052"
+		(property "Reference" "#PWR012"
 			(at 77.47 90.17 0)
 			(effects
 				(font
@@ -17860,7 +17860,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR052")
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -17876,7 +17876,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9d41125e-a303-4cd8-b6c1-6c2c2fb1d950")
-		(property "Reference" "C19"
+		(property "Reference" "C7"
 			(at 370.84 55.88 0)
 			(effects
 				(font
@@ -17939,7 +17939,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C19")
+					(reference "C7")
 					(unit 1)
 				)
 			)
@@ -17954,7 +17954,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9ec8c27b-04e7-4af5-92fc-aabf96221040")
-		(property "Reference" "#PWR016"
+		(property "Reference" "#PWR040"
 			(at 237.49 246.38 0)
 			(effects
 				(font
@@ -18004,7 +18004,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR016")
+					(reference "#PWR040")
 					(unit 1)
 				)
 			)
@@ -18019,7 +18019,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a38951f5-c2b3-4ae8-943a-d4858dafbfbc")
-		(property "Reference" "R2"
+		(property "Reference" "R25"
 			(at 104.14 213.36 90)
 			(effects
 				(font
@@ -18080,7 +18080,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R2")
+					(reference "R25")
 					(unit 1)
 				)
 			)
@@ -18096,7 +18096,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "a62adff0-b0be-4b70-a818-fe8065e209e6")
-		(property "Reference" "U5"
+		(property "Reference" "U6"
 			(at 387.35 176.53 0)
 			(effects
 				(font
@@ -18175,7 +18175,7 @@
 		(instances
 			(project ""
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U5")
+					(reference "U6")
 					(unit 1)
 				)
 			)
@@ -18190,7 +18190,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a8f61a85-2eb2-4b96-a2a9-481c669b3424")
-		(property "Reference" "#PWR025"
+		(property "Reference" "#PWR018"
 			(at 212.09 135.89 0)
 			(effects
 				(font
@@ -18240,7 +18240,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR025")
+					(reference "#PWR018")
 					(unit 1)
 				)
 			)
@@ -18255,7 +18255,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ab4c3254-970d-4ef8-a2cc-308a13867898")
-		(property "Reference" "#PWR038"
+		(property "Reference" "#PWR045"
 			(at 237.49 264.16 0)
 			(effects
 				(font
@@ -18305,7 +18305,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR038")
+					(reference "#PWR045")
 					(unit 1)
 				)
 			)
@@ -18321,7 +18321,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ac21d1d2-2030-468f-a87c-7c5ce3a72744")
-		(property "Reference" "R1"
+		(property "Reference" "R24"
 			(at 103.886 208.28 90)
 			(effects
 				(font
@@ -18382,7 +18382,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R1")
+					(reference "R24")
 					(unit 1)
 				)
 			)
@@ -18398,7 +18398,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "adb83025-1a57-4516-82bc-724cedc49bb8")
-		(property "Reference" "C18"
+		(property "Reference" "C6"
 			(at 364.49 55.88 0)
 			(effects
 				(font
@@ -18461,7 +18461,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C18")
+					(reference "C6")
 					(unit 1)
 				)
 			)
@@ -18476,7 +18476,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "aef1fef1-2216-4879-be0a-0542cf1a79cd")
-		(property "Reference" "TP11"
+		(property "Reference" "TP10"
 			(at 294.64 198.628 0)
 			(effects
 				(font
@@ -18535,7 +18535,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP11")
+					(reference "TP10")
 					(unit 1)
 				)
 			)
@@ -18550,7 +18550,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b1c5911f-0f77-4b40-9fbc-5f74c3280c25")
-		(property "Reference" "TP6"
+		(property "Reference" "TP8"
 			(at 90.678 184.15 0)
 			(effects
 				(font
@@ -18609,7 +18609,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP6")
+					(reference "TP8")
 					(unit 1)
 				)
 			)
@@ -18625,7 +18625,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b3b8824c-6d35-4612-81f1-916febd06ce3")
-		(property "Reference" "#PWR022"
+		(property "Reference" "#PWR06"
 			(at 381 54.61 0)
 			(effects
 				(font
@@ -18675,7 +18675,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR022")
+					(reference "#PWR06")
 					(unit 1)
 				)
 			)
@@ -18690,7 +18690,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b3bbe1f8-e2df-4ef8-ace9-e8caf73bcb58")
-		(property "Reference" "R8"
+		(property "Reference" "R12"
 			(at 118.11 110.49 90)
 			(effects
 				(font
@@ -18751,7 +18751,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R8")
+					(reference "R12")
 					(unit 1)
 				)
 			)
@@ -18766,7 +18766,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b40f900e-5415-40e9-9084-61d50af95d82")
-		(property "Reference" "R7"
+		(property "Reference" "R11"
 			(at 109.22 110.49 90)
 			(effects
 				(font
@@ -18829,7 +18829,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R7")
+					(reference "R11")
 					(unit 1)
 				)
 			)
@@ -18844,7 +18844,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b65638f2-51e0-4361-9d65-7989bb0fc86a")
-		(property "Reference" "#PWR017"
+		(property "Reference" "#PWR09"
 			(at 130.81 72.39 0)
 			(effects
 				(font
@@ -18894,7 +18894,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR017")
+					(reference "#PWR09")
 					(unit 1)
 				)
 			)
@@ -18909,7 +18909,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "bb17e570-3369-45e3-b4cd-58d9290449e4")
-		(property "Reference" "R3"
+		(property "Reference" "R26"
 			(at 104.14 218.44 90)
 			(effects
 				(font
@@ -18970,7 +18970,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R3")
+					(reference "R26")
 					(unit 1)
 				)
 			)
@@ -18986,7 +18986,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "bb1dcd8a-5293-4e69-a8e9-a6aa07253c4b")
-		(property "Reference" "U4"
+		(property "Reference" "U1"
 			(at 228.6 41.91 0)
 			(effects
 				(font
@@ -19053,7 +19053,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U4")
+					(reference "U1")
 					(unit 1)
 				)
 			)
@@ -19068,7 +19068,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "bd12ad3a-492f-452a-9052-5b21e3861a49")
-		(property "Reference" "#PWR030"
+		(property "Reference" "#PWR022"
 			(at 220.98 180.34 0)
 			(effects
 				(font
@@ -19118,7 +19118,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR030")
+					(reference "#PWR022")
 					(unit 1)
 				)
 			)
@@ -19133,7 +19133,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "bd32b2ab-2510-4629-9da1-3cac3b102e4a")
-		(property "Reference" "R11"
+		(property "Reference" "R13"
 			(at 144.78 110.49 90)
 			(effects
 				(font
@@ -19194,7 +19194,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R11")
+					(reference "R13")
 					(unit 1)
 				)
 			)
@@ -19210,7 +19210,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "bd9a3b80-4b54-4de8-8846-9ca0d7cec2e1")
-		(property "Reference" "U3"
+		(property "Reference" "U2"
 			(at 139.7 43.18 90)
 			(effects
 				(font
@@ -19283,7 +19283,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U3")
+					(reference "U2")
 					(unit 1)
 				)
 			)
@@ -19298,7 +19298,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c02973f5-1cbd-4534-81bf-e51e8162e210")
-		(property "Reference" "D8"
+		(property "Reference" "D1"
 			(at 350.52 30.226 0)
 			(effects
 				(font
@@ -19361,7 +19361,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "D8")
+					(reference "D1")
 					(unit 1)
 				)
 			)
@@ -19376,7 +19376,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c3ac2d36-3c48-4eac-b6c4-6cab13adb18d")
-		(property "Reference" "R27"
+		(property "Reference" "R6"
 			(at 341.63 99.06 90)
 			(effects
 				(font
@@ -19437,7 +19437,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R27")
+					(reference "R6")
 					(unit 1)
 				)
 			)
@@ -19453,7 +19453,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c4f026f1-dfe4-4376-8215-08c5dceb4574")
-		(property "Reference" "U5"
+		(property "Reference" "U6"
 			(at 251.46 176.53 0)
 			(effects
 				(font
@@ -19532,7 +19532,7 @@
 		(instances
 			(project ""
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U5")
+					(reference "U6")
 					(unit 2)
 				)
 			)
@@ -19547,7 +19547,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c57e3dac-5165-4732-afab-4f6a01482071")
-		(property "Reference" "#PWR048"
+		(property "Reference" "#PWR023"
 			(at 124.46 187.96 0)
 			(effects
 				(font
@@ -19597,7 +19597,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR048")
+					(reference "#PWR023")
 					(unit 1)
 				)
 			)
@@ -19689,7 +19689,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c6c5c9c9-eb94-4380-92bf-31ead210982c")
-		(property "Reference" "U1"
+		(property "Reference" "U3"
 			(at 276.86 191.516 0)
 			(effects
 				(font
@@ -19786,7 +19786,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U1")
+					(reference "U3")
 					(unit 1)
 				)
 			)
@@ -19801,7 +19801,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c7b3e26c-879d-46b1-9faa-9d9c3c488402")
-		(property "Reference" "#PWR036"
+		(property "Reference" "#PWR044"
 			(at 273.05 255.27 0)
 			(effects
 				(font
@@ -19851,7 +19851,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR036")
+					(reference "#PWR044")
 					(unit 1)
 				)
 			)
@@ -19866,7 +19866,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c7fdf654-434a-4e88-8515-2fc83a02a366")
-		(property "Reference" "#PWR034"
+		(property "Reference" "#PWR041"
 			(at 374.65 246.38 0)
 			(effects
 				(font
@@ -19916,7 +19916,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR034")
+					(reference "#PWR041")
 					(unit 1)
 				)
 			)
@@ -19931,7 +19931,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c88276e0-e068-4aaa-8ef1-5ffe80994faf")
-		(property "Reference" "#PWR039"
+		(property "Reference" "#PWR046"
 			(at 237.49 273.05 0)
 			(effects
 				(font
@@ -19981,7 +19981,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR039")
+					(reference "#PWR046")
 					(unit 1)
 				)
 			)
@@ -19996,7 +19996,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c8c57782-f963-4b4f-84c7-1c60d1bb324d")
-		(property "Reference" "#PWR018"
+		(property "Reference" "#PWR025"
 			(at 379.73 190.5 0)
 			(effects
 				(font
@@ -20046,7 +20046,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR018")
+					(reference "#PWR025")
 					(unit 1)
 				)
 			)
@@ -20062,7 +20062,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "cae04634-366a-42b0-9c05-c18106dd2e01")
-		(property "Reference" "TP8"
+		(property "Reference" "TP1"
 			(at 156.718 48.26 0)
 			(effects
 				(font
@@ -20121,7 +20121,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP8")
+					(reference "TP1")
 					(unit 1)
 				)
 			)
@@ -20136,7 +20136,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "cf29c126-9c0f-49b3-9d54-3bbf222e90a2")
-		(property "Reference" "C12"
+		(property "Reference" "C18"
 			(at 372.872 238.76 90)
 			(effects
 				(font
@@ -20199,7 +20199,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C12")
+					(reference "C18")
 					(unit 1)
 				)
 			)
@@ -20214,7 +20214,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "cfe9b330-eefc-4eb4-861b-6bdae4b42379")
-		(property "Reference" "TP12"
+		(property "Reference" "TP5"
 			(at 240.538 123.19 0)
 			(effects
 				(font
@@ -20273,7 +20273,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP12")
+					(reference "TP5")
 					(unit 1)
 				)
 			)
@@ -20460,7 +20460,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d4a83fdb-3438-4051-ac5c-5579db251176")
-		(property "Reference" "U7"
+		(property "Reference" "U4"
 			(at 366.268 94.234 0)
 			(effects
 				(font
@@ -20536,7 +20536,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U7")
+					(reference "U4")
 					(unit 1)
 				)
 			)
@@ -20551,7 +20551,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d50f22e6-868f-4c04-a2a3-dac0045a5109")
-		(property "Reference" "#PWR032"
+		(property "Reference" "#PWR034"
 			(at 393.7 217.17 0)
 			(effects
 				(font
@@ -20601,7 +20601,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR032")
+					(reference "#PWR034")
 					(unit 1)
 				)
 			)
@@ -20616,7 +20616,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d5274056-b948-4930-9ff2-7d6b7d70310c")
-		(property "Reference" "C8"
+		(property "Reference" "C12"
 			(at 148.59 114.3 0)
 			(effects
 				(font
@@ -20679,7 +20679,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C8")
+					(reference "C12")
 					(unit 1)
 				)
 			)
@@ -20694,7 +20694,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d5431caf-15a7-4312-9b5e-863be36371bb")
-		(property "Reference" "#PWR09"
+		(property "Reference" "#PWR04"
 			(at 149.86 48.26 0)
 			(effects
 				(font
@@ -20744,7 +20744,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR09")
+					(reference "#PWR04")
 					(unit 1)
 				)
 			)
@@ -20759,7 +20759,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "da5d773c-fd6e-441f-ac94-59f8f97955cb")
-		(property "Reference" "J4"
+		(property "Reference" "J3"
 			(at 388.366 102.87 0)
 			(effects
 				(font
@@ -20822,7 +20822,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "J4")
+					(reference "J3")
 					(unit 1)
 				)
 			)
@@ -20838,7 +20838,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "db91d78b-302c-41d0-b72e-4c1fff9e513a")
-		(property "Reference" "C16"
+		(property "Reference" "C4"
 			(at 350.52 55.88 0)
 			(effects
 				(font
@@ -20901,7 +20901,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C16")
+					(reference "C4")
 					(unit 1)
 				)
 			)
@@ -20918,7 +20918,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "de243e1a-bf6c-4331-8a3a-9225a8e78973")
-		(property "Reference" "U1"
+		(property "Reference" "U3"
 			(at 269.24 48.26 0)
 			(effects
 				(font
@@ -21015,7 +21015,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "U1")
+					(reference "U3")
 					(unit 3)
 				)
 			)
@@ -21097,7 +21097,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "df92e94a-0de3-4a2a-8f2a-5060048ccedb")
-		(property "Reference" "Q4"
+		(property "Reference" "Q2"
 			(at 342.9 90.3986 0)
 			(effects
 				(font
@@ -21166,7 +21166,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "Q4")
+					(reference "Q2")
 					(unit 1)
 				)
 			)
@@ -21181,7 +21181,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e10e16ac-b635-492d-bb01-2ec237dc4ea9")
-		(property "Reference" "C13"
+		(property "Reference" "C14"
 			(at 240.538 179.07 90)
 			(effects
 				(font
@@ -21244,7 +21244,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "C13")
+					(reference "C14")
 					(unit 1)
 				)
 			)
@@ -21259,7 +21259,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e205fe41-52b5-488f-b4e5-11b4b6769837")
-		(property "Reference" "D2"
+		(property "Reference" "D6"
 			(at 223.012 178.054 90)
 			(effects
 				(font
@@ -21322,7 +21322,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "D2")
+					(reference "D6")
 					(unit 1)
 				)
 			)
@@ -21337,7 +21337,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e287e682-3a09-4ada-b6ab-3b59e9c19187")
-		(property "Reference" "#PWR037"
+		(property "Reference" "#PWR030"
 			(at 307.34 203.2 0)
 			(effects
 				(font
@@ -21387,7 +21387,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR037")
+					(reference "#PWR030")
 					(unit 1)
 				)
 			)
@@ -21402,7 +21402,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e307f639-af1a-4c2d-9cc4-2995555c4d65")
-		(property "Reference" "#PWR049"
+		(property "Reference" "#PWR01"
 			(at 340.36 29.21 0)
 			(effects
 				(font
@@ -21452,7 +21452,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR049")
+					(reference "#PWR01")
 					(unit 1)
 				)
 			)
@@ -21467,7 +21467,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e6c757ba-06ef-4b84-b71e-f0d89b90df88")
-		(property "Reference" "Q2"
+		(property "Reference" "Q4"
 			(at 316.23 189.9666 0)
 			(effects
 				(font
@@ -21536,7 +21536,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "Q2")
+					(reference "Q4")
 					(unit 1)
 				)
 			)
@@ -21551,7 +21551,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e81451f4-4320-440d-b9db-56b5c7900e92")
-		(property "Reference" "R22"
+		(property "Reference" "R3"
 			(at 339.09 74.93 90)
 			(effects
 				(font
@@ -21612,7 +21612,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R22")
+					(reference "R3")
 					(unit 1)
 				)
 			)
@@ -21627,7 +21627,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "eabae1ca-21c4-4215-816d-a38ce7b2212c")
-		(property "Reference" "R5"
+		(property "Reference" "R10"
 			(at 124.6886 108.0516 0)
 			(effects
 				(font
@@ -21690,7 +21690,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R5")
+					(reference "R10")
 					(unit 1)
 				)
 			)
@@ -21706,7 +21706,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "eba0fcbd-5be1-42d2-9605-98de071b3514")
-		(property "Reference" "TP1"
+		(property "Reference" "TP6"
 			(at 48.26 174.752 0)
 			(effects
 				(font
@@ -21765,7 +21765,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP1")
+					(reference "TP6")
 					(unit 1)
 				)
 			)
@@ -21780,7 +21780,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ed3c3c7f-d58b-48bf-88af-4da2d0916f4e")
-		(property "Reference" "#PWR013"
+		(property "Reference" "#PWR026"
 			(at 204.47 196.85 0)
 			(effects
 				(font
@@ -21830,7 +21830,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR013")
+					(reference "#PWR026")
 					(unit 1)
 				)
 			)
@@ -21939,7 +21939,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ef296e61-d57a-4330-b027-7139452a5e4a")
-		(property "Reference" "D5"
+		(property "Reference" "D3"
 			(at 365.252 74.676 0)
 			(effects
 				(font
@@ -21957,7 +21957,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "easyeda2kicad:LED-SMD_XYC-IRA4335A65-X4"
+		(property "Footprint" "easyEDA:LED-SMD_XYC-IRA4335A65-X4"
 			(at 367.03 63.5 0)
 			(effects
 				(font
@@ -22011,7 +22011,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "D5")
+					(reference "D3")
 					(unit 1)
 				)
 			)
@@ -22026,7 +22026,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "efae9d08-4db9-4254-a481-c7d30ef497ac")
-		(property "Reference" "#PWR023"
+		(property "Reference" "#PWR037"
 			(at 374.65 238.76 0)
 			(effects
 				(font
@@ -22076,7 +22076,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR023")
+					(reference "#PWR037")
 					(unit 1)
 				)
 			)
@@ -22091,7 +22091,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f050c325-6110-4859-bc0d-901dd3f6f963")
-		(property "Reference" "#PWR029"
+		(property "Reference" "#PWR033"
 			(at 378.46 214.63 0)
 			(effects
 				(font
@@ -22141,7 +22141,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR029")
+					(reference "#PWR033")
 					(unit 1)
 				)
 			)
@@ -22156,7 +22156,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f19a60c3-0e7b-4ce3-9953-ba5e18e0fc70")
-		(property "Reference" "#PWR010"
+		(property "Reference" "#PWR036"
 			(at 130.81 234.95 0)
 			(effects
 				(font
@@ -22206,7 +22206,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR010")
+					(reference "#PWR036")
 					(unit 1)
 				)
 			)
@@ -22221,7 +22221,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f43790be-9d9c-4583-b3a2-b2eb56ca017d")
-		(property "Reference" "#PWR040"
+		(property "Reference" "#PWR047"
 			(at 173.99 273.05 0)
 			(effects
 				(font
@@ -22271,7 +22271,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR040")
+					(reference "#PWR047")
 					(unit 1)
 				)
 			)
@@ -22286,7 +22286,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f4cedf6f-a7f3-4cd6-a6d5-e1558cf14483")
-		(property "Reference" "D1"
+		(property "Reference" "D4"
 			(at 372.872 74.676 0)
 			(effects
 				(font
@@ -22304,7 +22304,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "easyeda2kicad:LED-SMD_XYC-IRA4335A65-X4"
+		(property "Footprint" "easyEDA:LED-SMD_XYC-IRA4335A65-X4"
 			(at 374.65 63.5 0)
 			(effects
 				(font
@@ -22358,7 +22358,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "D1")
+					(reference "D4")
 					(unit 1)
 				)
 			)
@@ -22373,7 +22373,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f6615cff-5358-4964-9439-12a6ad59dd72")
-		(property "Reference" "#PWR04"
+		(property "Reference" "#PWR03"
 			(at 114.3 48.26 0)
 			(effects
 				(font
@@ -22423,7 +22423,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR04")
+					(reference "#PWR03")
 					(unit 1)
 				)
 			)
@@ -22438,7 +22438,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f8c5550c-42fe-40ef-a301-ba643ceafc14")
-		(property "Reference" "#PWR03"
+		(property "Reference" "#PWR042"
 			(at 63.5 254 0)
 			(effects
 				(font
@@ -22488,7 +22488,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "#PWR03")
+					(reference "#PWR042")
 					(unit 1)
 				)
 			)
@@ -22503,7 +22503,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f8eeb7a2-e128-4a52-963f-6bb9eaa199a6")
-		(property "Reference" "TP13"
+		(property "Reference" "TP4"
 			(at 381 114.808 0)
 			(effects
 				(font
@@ -22562,7 +22562,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP13")
+					(reference "TP4")
 					(unit 1)
 				)
 			)
@@ -22577,7 +22577,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "faeb6a92-ef1f-48b3-b4ab-3338fa1574d8")
-		(property "Reference" "R12"
+		(property "Reference" "R27"
 			(at 100.33 236.22 90)
 			(effects
 				(font
@@ -22638,7 +22638,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R12")
+					(reference "R27")
 					(unit 1)
 				)
 			)
@@ -22653,7 +22653,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "fed6666e-950c-4d72-9e84-8e9a125fa28f")
-		(property "Reference" "R15"
+		(property "Reference" "R14"
 			(at 107.95 116.84 90)
 			(effects
 				(font
@@ -22714,7 +22714,7 @@
 		(instances
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R15")
+					(reference "R14")
 					(unit 1)
 				)
 			)
