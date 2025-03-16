@@ -7062,10 +7062,10 @@
 		(uuid "07c5a753-98e4-4e29-87da-b5f4f61a7098")
 	)
 	(junction
-		(at 207.01 186.69)
+		(at 207.01 181.61)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "0cf6eb02-77f9-4ff0-b6df-e0ef9bd5d21f")
+		(uuid "07c638f0-69ab-4c3e-92ac-0de1a81648c7")
 	)
 	(junction
 		(at 193.04 269.24)
@@ -7164,12 +7164,6 @@
 		(uuid "494e5a66-0076-490b-aada-5b63ab90c3da")
 	)
 	(junction
-		(at 212.09 184.15)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "50a4b28f-af59-403a-ba75-aaf0d6cf4de0")
-	)
-	(junction
 		(at 105.41 195.58)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7228,6 +7222,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "6c356230-24b5-4924-ab01-f066369ad9dd")
+	)
+	(junction
+		(at 212.09 184.15)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6d9379f3-63fe-46c6-99c5-fb81f13389cc")
 	)
 	(junction
 		(at 63.5 165.1)
@@ -7368,7 +7368,7 @@
 		(uuid "c84f0b00-4aea-4f4b-a0c5-57dbde22db83")
 	)
 	(junction
-		(at 207.01 181.61)
+		(at 207.01 179.07)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "cd067604-c599-48ae-8189-ef7fc4152764")
@@ -7438,7 +7438,7 @@
 		(uuid "2c881856-7cd7-474c-aa91-5b3021b574b2")
 	)
 	(no_connect
-		(at 204.47 179.07)
+		(at 204.47 176.53)
 		(uuid "c4b33c83-33bd-4680-a47d-69083c316777")
 	)
 	(wire
@@ -7510,6 +7510,16 @@
 			(type default)
 		)
 		(uuid "0599962e-6657-4dd7-96d6-55c68cc8dd89")
+	)
+	(wire
+		(pts
+			(xy 204.47 181.61) (xy 207.01 181.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0764f3b3-ed8c-47f8-ba7b-2a5a45b0d0ea")
 	)
 	(wire
 		(pts
@@ -7653,16 +7663,6 @@
 	)
 	(wire
 		(pts
-			(xy 207.01 186.69) (xy 207.01 181.61)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1b2befe2-6c51-4e7c-9512-e9dba85c94d3")
-	)
-	(wire
-		(pts
 			(xy 361.95 109.22) (xy 353.06 109.22)
 		)
 		(stroke
@@ -7773,7 +7773,7 @@
 	)
 	(wire
 		(pts
-			(xy 207.01 190.5) (xy 207.01 186.69)
+			(xy 207.01 179.07) (xy 207.01 181.61)
 		)
 		(stroke
 			(width 0)
@@ -8020,16 +8020,6 @@
 			(type default)
 		)
 		(uuid "37fe7114-787c-4946-b5b6-79032076fc5f")
-	)
-	(wire
-		(pts
-			(xy 204.47 186.69) (xy 207.01 186.69)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "395d613d-9bfd-4b9b-b125-0cccfdc6a23f")
 	)
 	(wire
 		(pts
@@ -8453,7 +8443,7 @@
 	)
 	(wire
 		(pts
-			(xy 204.47 190.5) (xy 207.01 190.5)
+			(xy 204.47 187.96) (xy 207.01 187.96)
 		)
 		(stroke
 			(width 0)
@@ -8590,6 +8580,16 @@
 			(type default)
 		)
 		(uuid "67a94148-07e7-402e-b934-26af451ca876")
+	)
+	(wire
+		(pts
+			(xy 204.47 184.15) (xy 212.09 184.15)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "690a7be3-379e-40ec-b167-bf604f453020")
 	)
 	(wire
 		(pts
@@ -8933,7 +8933,7 @@
 	)
 	(wire
 		(pts
-			(xy 207.01 181.61) (xy 204.47 181.61)
+			(xy 207.01 179.07) (xy 204.47 179.07)
 		)
 		(stroke
 			(width 0)
@@ -9070,16 +9070,6 @@
 			(type default)
 		)
 		(uuid "90fa6fc0-da81-446e-9893-1a653c7315e0")
-	)
-	(wire
-		(pts
-			(xy 204.47 184.15) (xy 212.09 184.15)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "91220356-096c-4fc6-8d22-f546db37c0af")
 	)
 	(wire
 		(pts
@@ -9383,7 +9373,7 @@
 	)
 	(wire
 		(pts
-			(xy 207.01 176.53) (xy 207.01 181.61)
+			(xy 207.01 173.99) (xy 207.01 179.07)
 		)
 		(stroke
 			(width 0)
@@ -9933,6 +9923,16 @@
 	)
 	(wire
 		(pts
+			(xy 207.01 181.61) (xy 207.01 187.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f2c3ef21-3910-46b3-b002-f63414d8ab04")
+	)
+	(wire
+		(pts
 			(xy 361.95 107.95) (xy 361.95 109.22)
 		)
 		(stroke
@@ -10013,7 +10013,7 @@
 	)
 	(wire
 		(pts
-			(xy 204.47 176.53) (xy 207.01 176.53)
+			(xy 204.47 173.99) (xy 207.01 173.99)
 		)
 		(stroke
 			(width 0)
@@ -15683,7 +15683,7 @@
 	)
 	(symbol
 		(lib_id "power:GNDD")
-		(at 204.47 190.5 0)
+		(at 204.47 187.96 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -15691,7 +15691,7 @@
 		(dnp no)
 		(uuid "6880c5df-b4d1-41b8-9f95-9cbe9e7c9dac")
 		(property "Reference" "#PWR050"
-			(at 204.47 196.85 0)
+			(at 204.47 194.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15700,7 +15700,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 204.47 194.31 0)
+			(at 204.47 191.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15708,7 +15708,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 204.47 190.5 0)
+			(at 204.47 187.96 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15717,7 +15717,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 204.47 190.5 0)
+			(at 204.47 187.96 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15726,7 +15726,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
-			(at 204.47 190.5 0)
+			(at 204.47 187.96 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20051,7 +20051,7 @@
 	)
 	(symbol
 		(lib_id "easyEDA:PJ-307N5")
-		(at 199.39 181.61 0)
+		(at 199.39 179.07 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -20060,7 +20060,7 @@
 		(fields_autoplaced yes)
 		(uuid "c7a6a22f-3d5e-45aa-8527-105e35dd60be")
 		(property "Reference" "CN2"
-			(at 196.34 171.45 0)
+			(at 196.34 168.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20068,7 +20068,7 @@
 			)
 		)
 		(property "Value" "PJ-307N5"
-			(at 196.34 173.99 0)
+			(at 196.34 171.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20076,7 +20076,7 @@
 			)
 		)
 		(property "Footprint" "easyEDA:AUDIO-TH_PJ-307N5"
-			(at 199.39 194.31 0)
+			(at 199.39 191.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20085,7 +20085,7 @@
 			)
 		)
 		(property "Datasheet" "https://lcsc.com/product-detail/Audio-Video-Connectors_XKB-Connectivity-PJ-307N5_C692542.html"
-			(at 199.39 196.85 0)
+			(at 199.39 194.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20094,7 +20094,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 199.39 181.61 0)
+			(at 199.39 179.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20103,7 +20103,7 @@
 			)
 		)
 		(property "LCSC Part" "C692542"
-			(at 199.39 199.39 0)
+			(at 199.39 196.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
