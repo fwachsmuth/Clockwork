@@ -7120,12 +7120,6 @@
 		(uuid "35b1b29e-8803-4acb-8f24-1891ea1147c3")
 	)
 	(junction
-		(at 381 101.6)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "37017792-25a6-4736-8b09-e4b5d761b75d")
-	)
-	(junction
 		(at 232.41 195.58)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7214,6 +7208,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "6c356230-24b5-4924-ab01-f066369ad9dd")
+	)
+	(junction
+		(at 63.5 165.1)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6e58ddbb-4bdd-4330-bc03-afdd552cce35")
 	)
 	(junction
 		(at 123.19 113.03)
@@ -7322,12 +7322,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b7dbd74c-ab79-4209-bab0-bf00709221f2")
-	)
-	(junction
-		(at 381 107.95)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b9166bee-816c-4855-a76f-b2438fb6451a")
 	)
 	(junction
 		(at 374.65 234.95)
@@ -10247,7 +10241,7 @@
 		)
 		(uuid "8b4611cb-efe4-4625-9b9e-15d39bfa84e5")
 	)
-	(text "To Do:\n- OpAmp-Rs auf Projektorboard neu berechnen/testen\n- Stop-Spannung messen\n- Monoflop auf Relaisplatine testen\n- Schottky an Lampe testen\n- INT1 wegsparen? (2 Schottkys)\n- Startpiepser statt ESS Impulen erkennen\n\nConsider:\n- Projektor-Erkennung (für Imp-Ratio) über \n  Spannungsteiler an DAC_EN, der dann an A0 muss"
+	(text "To Do:\n- OpAmp-Rs auf Projektorboard neu berechnen/testen\n- Stop-Spannung messen\n- Monoflop auf Relaisplatine testen\n- Schottky an Lampe testen\n- INT1 wegsparen? (2 Schottkys)\n- Startpiepser statt ESS Impulen erkennen\n"
 		(exclude_from_sim no)
 		(at 19.812 17.78 0)
 		(effects
@@ -11656,81 +11650,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Peacemans Teile:TestPoint_named")
-		(at 381 101.6 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "0b91bb22-c871-447a-82b3-cc957f572bdf")
-		(property "Reference" "TP3"
-			(at 381 94.742 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "Pause"
-			(at 382.778 98.298 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 375.92 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 375.92 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "test point"
-			(at 381 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TP_Label" ""
-			(at 381 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "5e97435e-9fb2-493b-b87a-2bf1db2d14b8")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GNDD")
 		(at 232.41 196.85 0)
 		(unit 1)
@@ -11933,7 +11852,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical_displaced+"
+		(property "Footprint" "Peacemans Teile:PinHeader_2x03_P2.54mm_Vertical_displaced"
 			(at 123.19 233.68 0)
 			(effects
 				(font
@@ -12357,6 +12276,70 @@
 			(project ""
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "J5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 365.76 133.35 0)
+		(unit 1)
+		(exclude_from_sim yes)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "168c013f-9cdf-427e-be75-ebf66238abb2")
+		(property "Reference" "H4"
+			(at 368.3 132.0799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 368.3 134.6199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965"
+			(at 365.76 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 365.76 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 365.76 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "SynCrystal-kicad"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "H4")
 					(unit 1)
 				)
 			)
@@ -12811,6 +12794,70 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "SW4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 360.68 138.43 0)
+		(unit 1)
+		(exclude_from_sim yes)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1fb5918e-ca23-4a89-ba86-7bcd7c474391")
+		(property "Reference" "H5"
+			(at 363.22 137.1599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 363.22 139.6999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965"
+			(at 360.68 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 360.68 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 360.68 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "SynCrystal-kicad"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "H5")
 					(unit 1)
 				)
 			)
@@ -13504,6 +13551,70 @@
 		)
 	)
 	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 365.76 138.43 0)
+		(unit 1)
+		(exclude_from_sim yes)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "34f52ff9-8e32-4a87-9337-2f546f0b98fb")
+		(property "Reference" "H6"
+			(at 368.3 137.1599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 368.3 139.6999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965"
+			(at 365.76 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 365.76 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 365.76 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "SynCrystal-kicad"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "H6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Peacemans Teile:74HCT14")
 		(at 157.48 113.03 0)
 		(unit 5)
@@ -14069,7 +14180,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "MountingHole:MountingHole_4.3mm_M4_ISO14580"
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965"
 			(at 383.54 165.1 0)
 			(effects
 				(font
@@ -14831,6 +14942,71 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "R8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GNDD")
+		(at 68.58 165.1 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "5ad18627-9eab-4344-8c0d-70f42107eed9")
+		(property "Reference" "#PWR049"
+			(at 68.58 171.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 68.58 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 68.58 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 68.58 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
+			(at 68.58 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a74c8aad-2939-490b-ba34-3994af99a76f")
+		)
+		(instances
+			(project "SynCrystal-kicad"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "#PWR049")
 					(unit 1)
 				)
 			)
@@ -16333,7 +16509,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "MountingHole:MountingHole_4.3mm_M4_ISO14580"
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965"
 			(at 383.54 160.02 0)
 			(effects
 				(font
@@ -18836,6 +19012,70 @@
 		)
 	)
 	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 360.68 133.35 0)
+		(unit 1)
+		(exclude_from_sim yes)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b4c5f1bd-62c5-4aef-8aef-c11d522c3ecd")
+		(property "Reference" "H3"
+			(at 363.22 132.0799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 363.22 134.6199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965"
+			(at 360.68 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 360.68 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 360.68 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project ""
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "H3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GNDD")
 		(at 130.81 66.04 0)
 		(unit 1)
@@ -20752,7 +20992,8 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
-		(at 386.08 102.87 0)
+		(at 386.08 105.41 0)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -20760,15 +21001,6 @@
 		(dnp no)
 		(uuid "da5d773c-fd6e-441f-ac94-59f8f97955cb")
 		(property "Reference" "J3"
-			(at 388.366 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "Pause Button"
 			(at 388.366 105.41 0)
 			(effects
 				(font
@@ -20777,8 +21009,17 @@
 				(justify left)
 			)
 		)
+		(property "Value" "Pause Button"
+			(at 388.366 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
 		(property "Footprint" "easyEDA:CONN-TH_2P-P2.54_MX128-2.54-GN01-02P-CU-Y-A"
-			(at 386.08 102.87 0)
+			(at 386.08 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20787,7 +21028,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2301061530_DORABO-DB125-2-54-2P-GN-S_C918120.pdf"
-			(at 386.08 102.87 0)
+			(at 386.08 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20796,7 +21037,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 386.08 102.87 0)
+			(at 386.08 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20805,7 +21046,7 @@
 			)
 		)
 		(property "LCSC" "C918120"
-			(at 386.08 102.87 0)
+			(at 386.08 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21537,6 +21778,84 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "Q4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C_Small")
+		(at 66.04 165.1 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e7e5d757-bc6c-4586-8d2f-cea41838c2ad")
+		(property "Reference" "C19"
+			(at 67.31 161.29 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1u"
+			(at 67.31 163.83 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
+			(at 66.04 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 66.04 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 66.04 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C15849"
+			(at 66.04 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e5865256-3c83-4b8d-8574-b3036be49453")
+		)
+		(pin "2"
+			(uuid "2a206783-55c1-4dc5-ad15-dd860ef1738d")
+		)
+		(instances
+			(project "SynCrystal-kicad"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "C19")
 					(unit 1)
 				)
 			)
@@ -22489,80 +22808,6 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "#PWR042")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Peacemans Teile:TestPoint_named")
-		(at 381 107.95 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "f8eeb7a2-e128-4a52-963f-6bb9eaa199a6")
-		(property "Reference" "TP4"
-			(at 381 114.808 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "Pause"
-			(at 382.778 111.252 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 375.92 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 375.92 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "test point"
-			(at 381 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TP_Label" ""
-			(at 381 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "c6dbbfcb-66a6-4aba-9647-9d6b93dd7a19")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "TP4")
 					(unit 1)
 				)
 			)
