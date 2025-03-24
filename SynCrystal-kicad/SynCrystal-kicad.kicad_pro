@@ -61,9 +61,9 @@
       "drc_exclusions": [
         "silk_edge_clearance|38608000|34870000|6a66c613-0509-4a01-8a42-d1e041faa609|3dd496d5-b8f7-4420-b555-9394bb428487",
         "silk_edge_clearance|38608000|43870000|6a66c613-0509-4a01-8a42-d1e041faa609|84d06131-84cc-48ee-87bc-5658d315f990",
-        "silk_overlap|53548000|53552600|70cfadbf-ea13-41be-8b59-d5260119ce40|07a47f09-ef2e-4d1a-b172-8017bd100f40",
-        "silk_overlap|53548000|53552600|70cfadbf-ea13-41be-8b59-d5260119ce40|be026589-458b-4883-9744-59d08c6c596d",
-        "silk_overlap|53548000|64902600|70cfadbf-ea13-41be-8b59-d5260119ce40|3b2b8d80-9d2f-4ab9-920b-8e35334d7370"
+        "silk_overlap|53519132|53552600|07a47f09-ef2e-4d1a-b172-8017bd100f40|70cfadbf-ea13-41be-8b59-d5260119ce40",
+        "silk_overlap|53519132|53552600|be026589-458b-4883-9744-59d08c6c596d|70cfadbf-ea13-41be-8b59-d5260119ce40",
+        "silk_overlap|53519132|64902600|3b2b8d80-9d2f-4ab9-920b-8e35334d7370|70cfadbf-ea13-41be-8b59-d5260119ce40"
       ],
       "meta": {
         "version": 2
@@ -522,8 +522,8 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
-      "pos_files": "",
+      "plot": "production/",
+      "pos_files": "production/",
       "specctra_dsn": "",
       "step": "",
       "svg": "",

@@ -454,252 +454,6 @@
 				)
 			)
 		)
-		(symbol "Connector:Conn_01x04_Socket"
-			(pin_names
-				(offset 1.016) hide)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "J"
-				(at 0 5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Conn_01x04_Socket"
-				(at 0 -7.62 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Generic connector, single row, 01x04, script generated"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "connector"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "Connector*:*_1x??_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "Conn_01x04_Socket_1_1"
-				(arc
-					(start 0 -4.572)
-					(mid -0.5058 -5.08)
-					(end 0 -5.588)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 -2.032)
-					(mid -0.5058 -2.54)
-					(end 0 -3.048)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 -5.08) (xy -0.508 -5.08)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 -2.54) (xy -0.508 -2.54)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 0) (xy -0.508 0)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 2.54) (xy -0.508 2.54)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 0.508)
-					(mid -0.5058 0)
-					(end 0 -0.508)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 3.048)
-					(mid -0.5058 2.54)
-					(end 0 2.032)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 2.54 0)
-					(length 3.81)
-					(name "Pin_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "Pin_2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -2.54 0)
-					(length 3.81)
-					(name "Pin_3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -5.08 0)
-					(length 3.81)
-					(name "Pin_4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-		)
 		(symbol "Connector:DIN-6"
 			(pin_names
 				(offset 1.016)
@@ -6163,13 +5917,13 @@
 						(type none)
 					)
 				)
-				(pin unspecified line
+				(pin power_in line
 					(at 5.08 5.08 180)
 					(length 2.54)
 					(name "1"
 						(effects
 							(font
-								(size 1.27 1.27)
+								(size 0 0)
 							)
 						)
 					)
@@ -6181,13 +5935,13 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin output line
 					(at 5.08 -5.08 180)
 					(length 2.54)
 					(name "2"
 						(effects
 							(font
-								(size 1.27 1.27)
+								(size 0 0)
 							)
 						)
 					)
@@ -6199,13 +5953,13 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 5.08 2.54 180)
 					(length 2.54)
 					(name "3"
 						(effects
 							(font
-								(size 1.27 1.27)
+								(size 0 0)
 							)
 						)
 					)
@@ -6217,13 +5971,13 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 5.08 -2.54 180)
 					(length 2.54)
 					(name "4"
 						(effects
 							(font
-								(size 1.27 1.27)
+								(size 0 0)
 							)
 						)
 					)
@@ -6235,13 +5989,13 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 5.08 0 180)
 					(length 2.54)
 					(name "5"
 						(effects
 							(font
-								(size 1.27 1.27)
+								(size 0 0)
 							)
 						)
 					)
@@ -6599,6 +6353,197 @@
 						(effects
 							(font
 								(size 0.5 0.5)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "easyEDA:ZX-PM2.0-2-3PY"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "ZX-PM2.0-2-3PY"
+				(at 0 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "easyeda2kicad:HDR-TH_6P-P2.00-V-F-R2-C3-S2.00-2"
+				(at 0 -10.16 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "LCSC Part" "C7499367"
+				(at 0 -12.7 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "ZX-PM2.0-2-3PY_0_1"
+				(rectangle
+					(start -2.54 5.08)
+					(end 2.54 -5.08)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(circle
+					(center -1.27 3.81)
+					(radius 0.38)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 2.54 180)
+					(length 2.54)
+					(name "2"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "3"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 2.54)
+					(name "5"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 2.54)
+					(name "6"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(symbol "ZX-PM2.0-2-3PY_1_1"
+				(pin passive line
+					(at 5.08 0 180)
+					(length 2.54)
+					(name "4"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
 							)
 						)
 					)
@@ -7164,6 +7109,12 @@
 		(uuid "494e5a66-0076-490b-aada-5b63ab90c3da")
 	)
 	(junction
+		(at 273.05 245.11)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "53ca90aa-08da-4776-89e8-445fe6848c6e")
+	)
+	(junction
 		(at 105.41 195.58)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7420,6 +7371,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ee6324bf-889c-42b0-af53-6224c5631280")
+	)
+	(junction
+		(at 273.05 242.57)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f4c3998e-82d8-40bf-9397-8f7c7c3728fa")
 	)
 	(junction
 		(at 111.76 105.41)
@@ -9033,6 +8990,16 @@
 	)
 	(wire
 		(pts
+			(xy 273.05 242.57) (xy 273.05 245.11)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8dec86be-107e-4311-998c-d521b97ef307")
+	)
+	(wire
+		(pts
 			(xy 238.76 49.53) (xy 242.57 49.53)
 		)
 		(stroke
@@ -9100,16 +9067,6 @@
 			(type default)
 		)
 		(uuid "932e4322-fdb2-4091-b556-5ba8bc1d3a5e")
-	)
-	(wire
-		(pts
-			(xy 273.05 247.65) (xy 273.05 248.92)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9535930f-92d7-4e0f-9248-7f508f693f5e")
 	)
 	(wire
 		(pts
@@ -9240,6 +9197,16 @@
 			(type default)
 		)
 		(uuid "9c76a49d-bda7-4a63-863c-d3e762026d91")
+	)
+	(wire
+		(pts
+			(xy 273.05 245.11) (xy 273.05 248.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9dd12895-b934-4f46-bb00-163cfdbe72b0")
 	)
 	(wire
 		(pts
@@ -9550,6 +9517,16 @@
 			(type default)
 		)
 		(uuid "be75a5a9-610f-42b6-9868-5f24c1f0aff6")
+	)
+	(wire
+		(pts
+			(xy 273.05 240.03) (xy 273.05 242.57)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "befc1b29-e239-4e51-98e0-6040076b6ab0")
 	)
 	(wire
 		(pts
@@ -10210,7 +10187,7 @@
 	)
 	(text "to Frontpanel"
 		(exclude_from_sim no)
-		(at 267.462 231.902 0)
+		(at 277.114 229.87 0)
 		(effects
 			(font
 				(size 2.54 2.54)
@@ -10548,12 +10525,12 @@
 		(uuid "42c99c4e-5f0f-44a5-b2d9-0f2986b41cb7")
 	)
 	(label "In_Sync-LED"
-		(at 273.05 240.03 180)
+		(at 283.21 240.03 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right bottom)
+			(justify left bottom)
 		)
 		(uuid "4933e2f5-de14-44ba-9ac6-740a3523296c")
 	)
@@ -10608,22 +10585,22 @@
 		(uuid "7258dd80-7386-44e5-aa5f-49149d374340")
 	)
 	(label "DAC_EN"
-		(at 273.05 242.57 180)
+		(at 283.21 242.57 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right bottom)
+			(justify left bottom)
 		)
 		(uuid "79249352-554a-4a64-9fc1-07bed980f85b")
 	)
 	(label "Ext_Imp_LED"
-		(at 273.05 245.11 180)
+		(at 283.21 245.11 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right bottom)
+			(justify left bottom)
 		)
 		(uuid "80f12401-5026-4390-9dcf-f3bcedf67524")
 	)
@@ -12207,8 +12184,9 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Conn_01x04_Socket")
+		(lib_id "easyEDA:ZX-PM2.0-2-3PY")
 		(at 278.13 242.57 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12216,7 +12194,7 @@
 		(dnp no)
 		(uuid "146e2ffe-af9c-4ad0-ab2f-d7a02bbe38f6")
 		(property "Reference" "J5"
-			(at 274.066 236.22 0)
+			(at 279.654 236.22 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12224,8 +12202,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "~"
-			(at 279.4 245.11 0)
+		(property "Value" "LED-Connector"
+			(at 284.734 234.188 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12233,8 +12211,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "easyEDA:HDR-SMD_HX-PM2.54-1X4P-TP-YQ"
-			(at 278.13 242.57 0)
+		(property "Footprint" "easyEDA:HDR-TH_6P-P2.00-V-F-R2-C3-S2.00-2"
+			(at 278.13 252.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12242,7 +12220,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2410121623_Megastar-ZX-PM2-0-2-3PY_C7499367.pdf"
 			(at 278.13 242.57 0)
 			(effects
 				(font
@@ -12253,6 +12231,24 @@
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated"
 			(at 278.13 242.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C7499367"
+			(at 278.13 242.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part" "C7499367"
+			(at 278.13 255.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12271,6 +12267,12 @@
 		)
 		(pin "4"
 			(uuid "e76779f0-67f8-464c-823d-83d4549ccc64")
+		)
+		(pin "6"
+			(uuid "1f12adf9-bfa2-4953-a32f-25c3f5b1094d")
+		)
+		(pin "5"
+			(uuid "81cc233b-3d91-4f91-95ed-a89b017c90be")
 		)
 		(instances
 			(project ""
@@ -18209,7 +18211,7 @@
 		(at 99.06 214.63 270)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "a38951f5-c2b3-4ae8-943a-d4858dafbfbc")
@@ -18511,7 +18513,7 @@
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "ac21d1d2-2030-468f-a87c-7c5ce3a72744")
@@ -20104,6 +20106,15 @@
 		)
 		(property "LCSC Part" "C692542"
 			(at 199.39 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C692542"
+			(at 199.39 179.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
