@@ -5,7 +5,7 @@
 	(uuid "904e3c46-2ed3-4778-9ca9-733b218304b0")
 	(paper "A3")
 	(title_block
-		(title "SynCrystal Controller")
+		(title "ImpulsWerk Controller")
 		(date "2025-02-11")
 		(rev "Rev.A")
 		(company "filmkorn.org")
@@ -10966,7 +10966,7 @@
 				)
 			)
 		)
-		(property "Footprint" "easyEDA:KEY-SMD_4P-L6.0-W6.0-P4.50-LS8.6"
+		(property "Footprint" "easyEDA:SW-SMD_4P-L6.0-W6.0-P4.50-LS9.0-H11.5"
 			(at 231.14 250.19 0)
 			(effects
 				(font
@@ -10993,7 +10993,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C455116"
+		(property "LCSC" "C455123"
 			(at 231.14 240.03 0)
 			(effects
 				(font
@@ -12735,7 +12735,7 @@
 				)
 			)
 		)
-		(property "Footprint" "easyEDA:KEY-SMD_4P-L6.0-W6.0-P4.50-LS8.6"
+		(property "Footprint" "easyEDA:SW-SMD_4P-L6.0-W6.0-P4.50-LS9.0-H11.5"
 			(at 231.14 267.97 0)
 			(effects
 				(font
@@ -12762,7 +12762,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C455116"
+		(property "LCSC" "C455123"
 			(at 231.14 257.81 0)
 			(effects
 				(font
@@ -13346,7 +13346,7 @@
 				)
 			)
 		)
-		(property "Footprint" "easyEDA:KEY-SMD_4P-L6.0-W6.0-P4.50-LS8.6"
+		(property "Footprint" "easyEDA:SW-SMD_4P-L6.0-W6.0-P4.50-LS9.0-H11.5"
 			(at 231.14 276.86 0)
 			(effects
 				(font
@@ -13373,7 +13373,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C455116"
+		(property "LCSC" "C455123"
 			(at 231.14 266.7 0)
 			(effects
 				(font
@@ -16985,7 +16985,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:OLED_128x63_i2c_0.96"
+		(property "Footprint" "easyEDA:HDR-TH_4P-P2.54-V-F"
 			(at 193.04 247.65 90)
 			(effects
 				(font
@@ -16994,7 +16994,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2501071555_Hong-Cheng-HC-PM254-5-0H-1x4PZ-02A_C42163122.pdf"
 			(at 193.04 247.65 90)
 			(effects
 				(font
@@ -17005,6 +17005,15 @@
 		)
 		(property "Description" ""
 			(at 193.04 247.65 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C42163122"
+			(at 186.69 254 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17568,7 +17577,7 @@
 				)
 			)
 		)
-		(property "Footprint" "easyEDA:KEY-SMD_4P-L6.0-W6.0-P4.50-LS8.6"
+		(property "Footprint" "easyEDA:SW-SMD_4P-L6.0-W6.0-P4.50-LS9.0-H11.5"
 			(at 231.14 259.08 0)
 			(effects
 				(font
@@ -17595,7 +17604,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C455116"
+		(property "LCSC" "C455123"
 			(at 231.14 248.92 0)
 			(effects
 				(font
