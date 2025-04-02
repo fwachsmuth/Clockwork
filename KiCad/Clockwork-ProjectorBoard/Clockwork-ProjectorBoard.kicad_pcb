@@ -8782,7 +8782,7 @@
 		(layer "Edge.Cuts")
 		(uuid "715158a1-e90a-43fe-94c8-b642c886930e")
 	)
-	(gr_text "SynCrystal Projector Board for Bauer T610 / T525"
+	(gr_text "Clockwork Projector Board for Bauer T610 / T525"
 		(at 172.085 91.44 0)
 		(layer "B.SilkS")
 		(uuid "218a5593-2a10-40cf-baa4-c7f4af34736f")

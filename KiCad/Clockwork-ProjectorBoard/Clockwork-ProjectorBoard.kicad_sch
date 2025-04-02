@@ -5,8 +5,8 @@
 	(uuid "01bd7818-adef-4612-bb26-3dbff95808f6")
 	(paper "A4")
 	(title_block
-		(title "SynCrystal Projector Board T610/T525")
-		(date "2025-02-11")
+		(title "Clockwork Projector Board T610/T525")
+		(date "2025-04-02")
 		(rev "Rev.A")
 		(company "filmkorn.org")
 		(comment 1 "Friedemann Wachsmuth")

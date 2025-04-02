@@ -5,7 +5,7 @@
 	(uuid "904e3c46-2ed3-4778-9ca9-733b218304b0")
 	(paper "A3")
 	(title_block
-		(title "ImpulsWerk Controller")
+		(title "Clockwork Controller")
 		(date "2025-02-11")
 		(rev "Rev.A")
 		(company "filmkorn.org")
