@@ -80,7 +80,7 @@
 			(subtractmaskfromsilk no)
 			(outputformat 1)
 			(mirror no)
-			(drillshape 1)
+			(drillshape 0)
 			(scaleselection 1)
 			(outputdirectory "")
 		)
@@ -164,7 +164,7 @@
 		(property ki_fp_filters "MountingHole*")
 		(path "/20a6b169-c205-41e7-87a5-06d990953c3a")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_circle
 			(center 0 0)
@@ -279,7 +279,7 @@
 		(property ki_fp_filters "MountingHole*")
 		(path "/d0280cb3-561b-489d-a6bc-0416ab34bbfa")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_circle
 			(center 0 0)
@@ -393,7 +393,7 @@
 		(property ki_fp_filters "MountingHole*")
 		(path "/37cc40f4-1b1b-4843-97ca-7f3c3fed49a8")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_circle
 			(center 0 0)
@@ -508,7 +508,7 @@
 		(property ki_fp_filters "MountingHole*")
 		(path "/acad8fd8-31b2-44c2-8109-52596fcf9c6e")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_circle
 			(center 0 0)
@@ -623,7 +623,7 @@
 		(property ki_fp_filters "MountingHole*")
 		(path "/aeb4650c-704b-410d-b960-141989b43b94")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_circle
 			(center 0 0)
@@ -737,7 +737,7 @@
 		(property ki_fp_filters "MountingHole*")
 		(path "/3b0f8785-0076-46c0-a483-33c9d02d5fde")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_circle
 			(center 0 0)
@@ -851,7 +851,7 @@
 		(property ki_fp_filters "MountingHole*")
 		(path "/499d06ba-bbbc-4970-a2a4-b16e97eb1daa")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_circle
 			(center 0 0)
@@ -966,7 +966,7 @@
 		(property ki_fp_filters "MountingHole*")
 		(path "/7ae0555a-3973-4166-b4d7-fd8a7eef0ac8")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr exclude_from_pos_files exclude_from_bom)
 		(fp_circle
 			(center 0 0)
@@ -1112,7 +1112,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/97d84438-fe11-4eb8-ac82-c6c5beed3b42")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0.237258 0.5225)
@@ -1261,9 +1261,9 @@
 		(uuid "606b9a05-69e8-416d-8cc7-d27b74ad769c")
 		(at 134.9695 74.4)
 		(property "Reference" "D1"
-			(at 3.4605 0.022 360)
+			(at 3.4605 0.022 180)
 			(layer "B.SilkS")
-			(uuid "eed28e16-f8d1-4775-bb69-8e33e4e1ee3c")
+			(uuid "075ef0cb-9020-40f8-9718-289355ff495d")
 			(effects
 				(font
 					(size 1 1)
@@ -1273,9 +1273,9 @@
 			)
 		)
 		(property "Value" "no sync (re)"
-			(at 0 -4 360)
+			(at 0 -4 180)
 			(layer "B.Fab")
-			(uuid "b1a01852-a769-4ce8-b174-daefdec38f6b")
+			(uuid "7f0be0e6-dac9-492f-bcc4-fb22216809ab")
 			(effects
 				(font
 					(size 1 1)
@@ -1285,10 +1285,10 @@
 			)
 		)
 		(property "Footprint" "easyEDA:LED-SMD_L3.2-W1.6-RD-EH-3_kicad"
-			(at 0 0 360)
+			(at 0 0 180)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "2d8d2136-241d-47e8-9971-b676610e0f44")
+			(uuid "99160244-7bab-47d7-8115-a5aaa39eb883")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1298,10 +1298,10 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 360)
+			(at 0 0 180)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "0c7715d6-2007-4ab1-83f6-fd3816eb1efd")
+			(uuid "5508f0b3-07dc-4225-8d62-dcd1c3cb450e")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1311,10 +1311,10 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 360)
+			(at 0 0 180)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "3c40efb1-0d44-47bd-bd4c-f8aa8c80805b")
+			(uuid "f0903d0c-ddca-458e-82a9-cfdf73971ae2")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1328,7 +1328,7 @@
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "62d1cfe7-277e-4812-8022-01971c99eac8")
+			(uuid "3c4e438a-b5bb-498b-aadd-b4e780bf06e7")
 			(effects
 				(font
 					(size 1 1)
@@ -1342,7 +1342,7 @@
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "c919f9dc-4e56-41b6-913b-b86101a78d77")
+			(uuid "7c616ae4-760b-4873-be63-775d3676e9ea")
 			(effects
 				(font
 					(size 1 1)
@@ -1354,7 +1354,7 @@
 		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/f36ae3c4-ee4a-4515-b22a-a4ad1ee67164")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.1 1.1)
@@ -1364,7 +1364,7 @@
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "05c701d2-1eaf-4c0d-b90e-18523107947f")
+			(uuid "5ae09799-02aa-4c36-958a-6c028a38435f")
 		)
 		(fp_line
 			(start 0.58 1.1)
@@ -1374,7 +1374,7 @@
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "84ef649b-b609-46e7-9c35-ca04711a31ee")
+			(uuid "85b0ae12-9dbf-471f-8e79-3dfb4d58fbbf")
 		)
 		(fp_line
 			(start 1.1 1.1)
@@ -1384,7 +1384,7 @@
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "671672ac-2a0c-4660-9922-6da2ae623950")
+			(uuid "42d81149-e583-417e-bf9b-ae4f52ca93ab")
 		)
 		(fp_line
 			(start 1.7 1.6)
@@ -1394,7 +1394,7 @@
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "86d0eb4c-831d-4346-b273-c26c868e0953")
+			(uuid "47768903-3419-4ba5-a9e9-ea9b250474c1")
 		)
 		(fp_line
 			(start 1.9 1.4)
@@ -1404,7 +1404,7 @@
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "56d09fde-3a90-4400-b4e1-e25444cd66cc")
+			(uuid "62a308e0-967b-4b18-be22-b08775d0a2b1")
 		)
 		(fp_line
 			(start 1.9 1.6)
@@ -1414,7 +1414,7 @@
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "c964545c-0f71-49e8-abe9-0d37e00bf8d9")
+			(uuid "b7a4a86a-152b-45f5-92e3-84fe8ccad36f")
 		)
 		(fp_line
 			(start 2 -1.1)
@@ -1424,7 +1424,7 @@
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "408d0a91-180d-46f8-9433-52a52ebdd149")
+			(uuid "b84a823c-339b-4f83-92f3-27519beab221")
 		)
 		(fp_circle
 			(center -1.6 -0.8)
@@ -1435,13 +1435,12 @@
 			)
 			(fill none)
 			(layer "B.Fab")
-			(uuid "8fc57032-2afe-4f6c-b799-3141b98e2878")
+			(uuid "57a6087e-cb74-425e-9c63-86512ff08307")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -2.1 360)
+			(at 0 -2.1 180)
 			(layer "B.Fab")
-			(hide yes)
-			(uuid "a0eede3b-0e2a-48ed-a667-483e1e4dd0c5")
+			(uuid "2ea5040e-4d8e-4eb8-8e51-c7fb7fcf0f55")
 			(effects
 				(font
 					(size 1 1)
@@ -1455,7 +1454,7 @@
 			(size 1.7 1.7)
 			(drill 1.7)
 			(layers "F&B.Cu" "*.Mask")
-			(uuid "450070fe-7cbb-4a4e-9aa6-84e551f0ac8a")
+			(uuid "27cf8914-e6cd-425e-b0a4-67db76506114")
 		)
 		(pad "1" smd rect
 			(at -1.4 0)
@@ -1464,7 +1463,7 @@
 			(net 1 "GND")
 			(pinfunction "K")
 			(pintype "passive")
-			(uuid "e033b209-1c87-4e67-92c4-f1f3a95e0fd2")
+			(uuid "9d908bed-e868-4bf0-a9e2-c197aecad040")
 		)
 		(pad "2" smd rect
 			(at 1.4 0)
@@ -1473,7 +1472,7 @@
 			(net 2 "Net-(D1-A)")
 			(pinfunction "A")
 			(pintype "passive")
-			(uuid "7c69f20d-1438-44e8-adcb-083dc0a522de")
+			(uuid "6c70ca59-1257-46df-97db-6da51f9dfccf")
 		)
 		(model "${EASYEDA2KICAD}/easyeda2kicad.3dshapes/LED-SMD_L3.2-W1.6-FD_EH-GREEN-1.wrl"
 			(offset
@@ -1590,7 +1589,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/683e4f3a-a87f-4029-bfc7-15e3e9508708")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0.237258 -0.5225)
@@ -1739,7 +1738,7 @@
 		(uuid "85009c0b-0298-45dc-8c0e-26b7af637e43")
 		(at 134.9875 77.8)
 		(property "Reference" "D3"
-			(at 3.4425 0.178 360)
+			(at 3.4425 0.178 0)
 			(layer "B.SilkS")
 			(uuid "c907bac1-ece1-4958-bd08-3100d64076af")
 			(effects
@@ -1750,8 +1749,8 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "Ext. Imp. (ye)"
-			(at 0 -4 360)
+		(property "Value" "Ext. Imp. (or)"
+			(at 0 -4 0)
 			(layer "B.Fab")
 			(uuid "93f20629-0b7e-4285-802c-ebb6fd88e7fd")
 			(effects
@@ -1763,7 +1762,7 @@
 			)
 		)
 		(property "Footprint" "easyEDA:LED-SMD_L3.2-W1.6-RD-EH-3_kicad"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
 			(uuid "75e4246a-92bb-4cc3-a075-ebdf5827e7fb")
@@ -1775,8 +1774,8 @@
 				(justify mirror)
 			)
 		)
-		(property "Datasheet" ""
-			(at 0 0 360)
+		(property "Datasheet" "https://www.mouser.de/datasheet/2/143/evers03120_1-2266815.pdf"
+			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
 			(uuid "f17c1e1e-26b7-494a-985c-d9ec7587b2db")
@@ -1789,7 +1788,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "B.Fab")
 			(hide yes)
 			(uuid "eacfb6e0-a934-4f70-ab51-4ba1b030f5bb")
@@ -1832,7 +1831,7 @@
 		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/7be01474-0e09-45e1-a5db-9597aace2600")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.1 1.1)
@@ -1916,7 +1915,7 @@
 			(uuid "a1dc26da-148e-4f03-a825-8201f534c0aa")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -2.1 360)
+			(at 0 -2.1 0)
 			(layer "B.Fab")
 			(hide yes)
 			(uuid "844b1795-d649-44a0-994c-a6e35d0c2d67")
@@ -2063,7 +2062,7 @@
 		)
 		(path "/18324c72-d12c-4b7a-b247-23f16ac7a46b")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.04 2.03)
@@ -2357,7 +2356,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/f3d89bac-6e78-407e-8faf-7d3040b524a5")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0.237258 -0.5225)
@@ -2506,9 +2505,9 @@
 		(uuid "fd48a67d-d85e-455f-b0a7-b02a3d1511ac")
 		(at 134.9695 71)
 		(property "Reference" "D2"
-			(at 3.4605 0.12 360)
+			(at 3.4605 0.12 180)
 			(layer "B.SilkS")
-			(uuid "67438717-7dd9-47d0-8498-5e83e62fb3b0")
+			(uuid "200bf600-fc08-4aa6-96c3-6205a7075498")
 			(effects
 				(font
 					(size 1 1)
@@ -2518,9 +2517,9 @@
 			)
 		)
 		(property "Value" "Crystal (gr)"
-			(at 0 -4 360)
+			(at 0 -4 180)
 			(layer "B.Fab")
-			(uuid "acd6ca5e-d382-4031-bc94-a2f02734913b")
+			(uuid "c4301dae-ac79-4f96-8e69-060db1222333")
 			(effects
 				(font
 					(size 1 1)
@@ -2530,10 +2529,10 @@
 			)
 		)
 		(property "Footprint" "easyEDA:LED-SMD_L3.2-W1.6-RD-EH-3_kicad"
-			(at 0 0 360)
+			(at 0 0 180)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "96e22c09-80bc-4441-810a-0f5a746317a3")
+			(uuid "9157d7ff-0520-4ce9-844a-ce94d521d6db")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2543,10 +2542,10 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 360)
+			(at 0 0 180)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "1dffac5e-ed59-4613-ab94-2a64504cac3f")
+			(uuid "4516e19d-2b0b-4f39-8d89-9d9a51adb7cb")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2556,10 +2555,10 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 360)
+			(at 0 0 180)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "83afe48e-1937-4288-9564-3ae04d2caf61")
+			(uuid "635f0b5a-b5c1-46da-b74f-1e6aebc4f6ab")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2573,7 +2572,7 @@
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "00639a56-8c8c-4e9b-aa99-22f58181ac6b")
+			(uuid "46c26f21-e35e-426d-8f84-04a4d9b1cfe7")
 			(effects
 				(font
 					(size 1 1)
@@ -2587,7 +2586,7 @@
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "82e502bf-ae7c-4933-84c0-2db4d436c542")
+			(uuid "4322dde0-1acd-4065-baf9-af556af49199")
 			(effects
 				(font
 					(size 1 1)
@@ -2599,7 +2598,7 @@
 		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/2bcb6839-c6cd-4544-9017-6c5f16ab9355")
 		(sheetname "Root")
-		(sheetfile "ImpulsWerk-Frontpanel.kicad_sch")
+		(sheetfile "Clockwork-Frontpanel.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.1 1.1)
@@ -2609,7 +2608,7 @@
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "6b119e03-5eae-421e-8ee3-959a6b96a458")
+			(uuid "c28d2fc7-38fe-4c3a-898a-b25905185bf2")
 		)
 		(fp_line
 			(start 0.58 1.1)
@@ -2619,7 +2618,7 @@
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "bf61da97-12b4-415a-a1d5-335d8b90b29b")
+			(uuid "a1a55356-82d9-4578-a1d5-bc70d9241bf0")
 		)
 		(fp_line
 			(start 1.1 1.1)
@@ -2629,7 +2628,7 @@
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "1a63885d-0bd4-4514-a56a-9b417ed52186")
+			(uuid "a130a7bc-4d4a-4b9b-a3cb-2acdc891e5ec")
 		)
 		(fp_line
 			(start 1.7 1.6)
@@ -2639,7 +2638,7 @@
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "db94d1f2-994a-40fe-bab7-922d52142bcb")
+			(uuid "c2970cc5-5ac0-4380-9fb1-d3feb27e8810")
 		)
 		(fp_line
 			(start 1.9 1.4)
@@ -2649,7 +2648,7 @@
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "eb583891-b140-4190-86db-d1362ecc85c2")
+			(uuid "e7342693-3734-46a8-9bdf-19007884d3b5")
 		)
 		(fp_line
 			(start 1.9 1.6)
@@ -2659,7 +2658,7 @@
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "88b05311-299f-43aa-abe3-14623c52315c")
+			(uuid "0c87eac8-1fa1-482c-afaf-883cb0477f54")
 		)
 		(fp_line
 			(start 2 -1.1)
@@ -2669,7 +2668,7 @@
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "0d98c4b5-1884-44ee-9ba3-3ca565832a8a")
+			(uuid "202ec444-c538-4668-8670-ed6fed3e75d2")
 		)
 		(fp_circle
 			(center -1.6 -0.8)
@@ -2680,13 +2679,12 @@
 			)
 			(fill none)
 			(layer "B.Fab")
-			(uuid "49daba1e-b612-43a9-8fe6-cddb02dceb28")
+			(uuid "9da9b602-2511-4704-bd9c-4e047e608caa")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -2.1 360)
+			(at 0 -2.1 180)
 			(layer "B.Fab")
-			(hide yes)
-			(uuid "10646d0a-f372-4113-bc3a-d38f5d02ac4d")
+			(uuid "caec83d4-fcf2-402a-ada4-8b2824316b0b")
 			(effects
 				(font
 					(size 1 1)
@@ -2700,7 +2698,7 @@
 			(size 1.7 1.7)
 			(drill 1.7)
 			(layers "F&B.Cu" "*.Mask")
-			(uuid "9f909411-ed1d-4b8d-99d1-0129e29f1519")
+			(uuid "f88f045f-b430-4fb9-9f19-24c1122992a4")
 		)
 		(pad "1" smd rect
 			(at -1.4 0)
@@ -2709,7 +2707,7 @@
 			(net 1 "GND")
 			(pinfunction "K")
 			(pintype "passive")
-			(uuid "291e6707-cb1c-472e-8a12-ab3fa8b7fe4f")
+			(uuid "fe11e2cf-3378-4dee-a98a-ccd8c67495df")
 		)
 		(pad "2" smd rect
 			(at 1.4 0)
@@ -2718,7 +2716,7 @@
 			(net 3 "Net-(D2-A)")
 			(pinfunction "A")
 			(pintype "passive")
-			(uuid "58f46feb-b67e-4350-942b-85e73e0eea7a")
+			(uuid "eab27d9d-7c85-4dce-b2b4-1c2df7d8a0ce")
 		)
 		(model "${EASYEDA2KICAD}/easyeda2kicad.3dshapes/LED-SMD_L3.2-W1.6-FD_EH-GREEN-1.wrl"
 			(offset

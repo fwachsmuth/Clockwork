@@ -6247,7 +6247,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C5188443"
+		(property "LCSC" "C6332196"
 			(at 57.15 33.02 0)
 			(effects
 				(font
@@ -6457,7 +6457,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2411221126_UNI-ROYAL-Uniroyal-Elec-0603WAF2200T5E_C22962.pdf"
 			(at 223.52 119.38 0)
 			(effects
 				(font
@@ -6467,6 +6467,15 @@
 			)
 		)
 		(property "Description" ""
+			(at 223.52 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C22962"
 			(at 223.52 119.38 0)
 			(effects
 				(font
@@ -7768,7 +7777,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "300"
+		(property "Value" "500"
 			(at 79.502 141.224 0)
 			(effects
 				(font
@@ -7786,7 +7795,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2409302333_BOURNS-TC33X-2-501E_C720649.pdf"
 			(at 77.47 139.7 0)
 			(effects
 				(font
@@ -7804,7 +7813,16 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C22461623"
+		(property "LCSC" "C720649"
+			(at 77.47 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part" "C22461623"
 			(at 77.47 139.7 0)
 			(effects
 				(font
@@ -8409,7 +8427,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x10_P2.54mm_Horizontal"
+		(property "Footprint" "easyEDA:HDR-TH_10P-P2.54-H-M-W10.4_flipped"
 			(at 254 138.43 0)
 			(effects
 				(font
@@ -8428,6 +8446,15 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x10, script generated"
+			(at 254 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C3012231"
 			(at 254 138.43 0)
 			(effects
 				(font
@@ -8661,6 +8688,15 @@
 			)
 		)
 		(property "Description" ""
+			(at 106.68 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C23212"
 			(at 106.68 120.65 0)
 			(effects
 				(font
@@ -9198,6 +9234,15 @@
 			)
 		)
 		(property "Description" ""
+			(at 138.43 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C23189"
 			(at 138.43 125.73 0)
 			(effects
 				(font
