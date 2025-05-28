@@ -87,7 +87,7 @@ constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Win
 // pins and consts
 const byte SHAFT_PULSE_PIN = 2;
 const byte LED_RED_PIN = 5; //  Out of Sync
-const byte FPS_PULSE_OUT_PIN = 11; //  11 on final PCB. Pulse when Crystal is enabled. Todo: This still needs to be coded
+const byte FPS_PULSE_OUT_PIN = 11; //  12 on breadboard. Pulse when Crystal is enabled. Todo: This still needs to be coded
 const byte ENABLE_PIN = 9;
 
 // Use this for PID tuning with Pots
@@ -96,9 +96,9 @@ const byte ENABLE_PIN = 9;
 // const byte D_PIN = A2;
 
 const byte LEFT_BTTN_PIN = 10;
-const byte RIGHT_BTTN_PIN = A3;     //A3 on final PCB
-const byte DROP_BACK_BTTN_PIN = 4; // 4 on final PCB
-const byte CATCH_UP_BTTN_PIN = 6;  // 6 on final PCB
+const byte RIGHT_BTTN_PIN = A3;     // 13 on breadboard
+const byte DROP_BACK_BTTN_PIN = 4;  // 11 on breadboard
+const byte CATCH_UP_BTTN_PIN = 6;   // 12 on breadboard
 
 #define BTTN_NONE 0
 #define BTTN_LEFT 1
