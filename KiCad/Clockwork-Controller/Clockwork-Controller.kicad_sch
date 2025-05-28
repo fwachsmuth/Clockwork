@@ -7091,12 +7091,6 @@
 		(uuid "3880d483-5f35-4c1b-a7a0-d45764157073")
 	)
 	(junction
-		(at 114.3 115.57)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "48021cee-d0b4-4fca-844f-4df19a00b7eb")
-	)
-	(junction
 		(at 220.98 184.15)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7379,12 +7373,6 @@
 		(uuid "f4c3998e-82d8-40bf-9397-8f7c7c3728fa")
 	)
 	(junction
-		(at 111.76 105.41)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f61187ba-d922-494f-a27f-b2769b8f2dc6")
-	)
-	(junction
 		(at 334.01 72.39)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7440,7 +7428,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 105.41) (xy 123.19 106.68)
+			(xy 123.19 104.14) (xy 123.19 106.68)
 		)
 		(stroke
 			(width 0)
@@ -7810,16 +7798,6 @@
 	)
 	(wire
 		(pts
-			(xy 111.76 104.14) (xy 111.76 105.41)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2c0e3e81-f937-4ac2-9509-034d9a0786f5")
-	)
-	(wire
-		(pts
 			(xy 223.52 111.76) (xy 222.25 111.76)
 		)
 		(stroke
@@ -8000,7 +7978,7 @@
 	)
 	(wire
 		(pts
-			(xy 114.3 113.03) (xy 114.3 115.57)
+			(xy 114.3 113.03) (xy 114.3 119.38)
 		)
 		(stroke
 			(width 0)
@@ -8170,16 +8148,6 @@
 	)
 	(wire
 		(pts
-			(xy 111.76 113.03) (xy 111.76 115.57)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4a3f00a8-843c-42f9-be37-95e75cca057a")
-	)
-	(wire
-		(pts
 			(xy 185.42 274.32) (xy 185.42 264.16)
 		)
 		(stroke
@@ -8320,16 +8288,6 @@
 	)
 	(wire
 		(pts
-			(xy 114.3 115.57) (xy 114.3 119.38)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "58839136-03f5-4cd7-bf2c-db103fda9b25")
-	)
-	(wire
-		(pts
 			(xy 87.63 207.01) (xy 88.9 207.01)
 		)
 		(stroke
@@ -8417,16 +8375,6 @@
 			(type default)
 		)
 		(uuid "5f0b9c2e-50f2-422d-ab5a-f52cd74c8150")
-	)
-	(wire
-		(pts
-			(xy 111.76 105.41) (xy 123.19 105.41)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5f756ec5-56fb-4ce2-a691-1e51ec480a35")
 	)
 	(wire
 		(pts
@@ -9087,16 +9035,6 @@
 			(type default)
 		)
 		(uuid "96d1edcd-e18c-45fa-9717-866faf16b0d1")
-	)
-	(wire
-		(pts
-			(xy 111.76 105.41) (xy 111.76 107.95)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "97edd399-f96c-4c00-b208-aab61282d6d5")
 	)
 	(wire
 		(pts
@@ -9787,16 +9725,6 @@
 			(type default)
 		)
 		(uuid "e391295f-0e27-4b0e-9b66-4c64a022f9aa")
-	)
-	(wire
-		(pts
-			(xy 111.76 115.57) (xy 114.3 115.57)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e5604fcd-1320-406e-ba21-2d7deccb3bd6")
 	)
 	(wire
 		(pts
@@ -12867,7 +12795,7 @@
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 111.76 104.14 0)
+		(at 123.19 104.14 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12875,7 +12803,7 @@
 		(dnp no)
 		(uuid "2069c2f4-7d97-45fa-b500-4ac315f520f9")
 		(property "Reference" "#PWR013"
-			(at 111.76 107.95 0)
+			(at 123.19 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12884,7 +12812,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 112.141 99.7458 0)
+			(at 123.571 99.7458 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12892,7 +12820,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 111.76 104.14 0)
+			(at 123.19 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12901,7 +12829,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 111.76 104.14 0)
+			(at 123.19 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12910,7 +12838,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 111.76 104.14 0)
+			(at 123.19 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18957,84 +18885,6 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "R12")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R_Small")
-		(at 111.76 110.49 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "b40f900e-5415-40e9-9084-61d50af95d82")
-		(property "Reference" "R11"
-			(at 109.22 110.49 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "47k"
-			(at 114.3 111.76 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 111.76 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2411221127_UNI-ROYAL-Uniroyal-Elec-0603WAF4702T5E_C25819.pdf"
-			(at 111.76 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 111.76 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C25819"
-			(at 111.76 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "2d8047bf-1633-4612-ba4c-9f5db9d1c048")
-		)
-		(pin "2"
-			(uuid "0a799742-14d2-4a0f-b829-f6f3e6f83d21")
-		)
-		(instances
-			(project "SynCrystal-kicad"
-				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
-					(reference "R11")
 					(unit 1)
 				)
 			)
