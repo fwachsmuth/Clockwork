@@ -7253,6 +7253,12 @@
 		(uuid "a60cc6fa-da06-429b-92d7-9d144d99c1f3")
 	)
 	(junction
+		(at 63.5 246.38)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a7844a4c-d8e3-43f9-80b5-8930a9a66381")
+	)
+	(junction
 		(at 340.36 35.56)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7377,6 +7383,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f6597ee7-24b9-42c3-a213-b5de4aaa1917")
+	)
+	(junction
+		(at 63.5 250.19)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "fbf2e396-0178-401f-bf8c-c65e17c1ad21")
 	)
 	(no_connect
 		(at 78.74 194.31)
@@ -7688,7 +7700,7 @@
 	)
 	(wire
 		(pts
-			(xy 63.5 245.11) (xy 63.5 247.65)
+			(xy 63.5 245.11) (xy 63.5 246.38)
 		)
 		(stroke
 			(width 0)
@@ -9018,6 +9030,16 @@
 	)
 	(wire
 		(pts
+			(xy 63.5 250.19) (xy 63.5 254)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9487d755-5c59-46ac-bf60-18967ecad38b")
+	)
+	(wire
+		(pts
 			(xy 300.99 186.69) (xy 299.72 186.69)
 		)
 		(stroke
@@ -9135,6 +9157,16 @@
 			(type default)
 		)
 		(uuid "9c76a49d-bda7-4a63-863c-d3e762026d91")
+	)
+	(wire
+		(pts
+			(xy 63.5 246.38) (xy 63.5 250.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9d39a1af-04ea-4c7e-8b80-accb7a46713e")
 	)
 	(wire
 		(pts
@@ -15536,6 +15568,81 @@
 		)
 	)
 	(symbol
+		(lib_id "Peacemans Teile:TestPoint_named")
+		(at 63.5 246.38 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "649f349e-0c10-4eaa-ac23-c902797e8a64")
+		(property "Reference" "TP3"
+			(at 56.642 246.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 58.42 246.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm"
+			(at 63.5 241.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 241.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 63.5 246.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
+			(at 63.5 246.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a855e9f7-6f5c-4ddd-861f-9178b21ad32d")
+		)
+		(instances
+			(project "Clockwork-Controller"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "TP3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R_Small")
 		(at 251.46 195.58 270)
 		(unit 1)
@@ -18138,6 +18245,81 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "#PWR040")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Peacemans Teile:TestPoint_named")
+		(at 63.5 250.19 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9fcf727c-f545-4b21-8c36-c627253ffa96")
+		(property "Reference" "TP4"
+			(at 56.642 250.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 58.42 250.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm"
+			(at 63.5 245.11 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 245.11 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 63.5 250.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
+			(at 63.5 250.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e0e27c36-d219-4baf-b230-d71de6ae8642")
+		)
+		(instances
+			(project "Clockwork-Controller"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "TP4")
 					(unit 1)
 				)
 			)
@@ -22632,7 +22814,7 @@
 	)
 	(symbol
 		(lib_id "power:GNDD")
-		(at 63.5 247.65 0)
+		(at 63.5 254 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -22640,7 +22822,7 @@
 		(dnp no)
 		(uuid "f8c5550c-42fe-40ef-a301-ba643ceafc14")
 		(property "Reference" "#PWR042"
-			(at 63.5 254 0)
+			(at 63.5 260.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22649,7 +22831,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 63.5 251.46 0)
+			(at 63.5 257.81 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22657,7 +22839,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 63.5 247.65 0)
+			(at 63.5 254 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22666,7 +22848,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 63.5 247.65 0)
+			(at 63.5 254 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22675,7 +22857,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
-			(at 63.5 247.65 0)
+			(at 63.5 254 0)
 			(effects
 				(font
 					(size 1.27 1.27)
