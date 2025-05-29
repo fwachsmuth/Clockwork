@@ -11668,7 +11668,8 @@
 	)
 	(symbol
 		(lib_id "Device:R_Potentiometer_Small")
-		(at 259.08 190.5 180)
+		(at 259.08 190.5 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -11676,7 +11677,7 @@
 		(dnp no)
 		(uuid "099d6e6c-b858-47ab-9793-f8861da05877")
 		(property "Reference" "RV1"
-			(at 260.604 190.754 0)
+			(at 260.604 190.246 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11685,7 +11686,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 260.604 193.294 0)
+			(at 260.604 187.706 0)
 			(effects
 				(font
 					(size 1.27 1.27)
