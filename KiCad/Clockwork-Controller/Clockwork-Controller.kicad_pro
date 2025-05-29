@@ -59,8 +59,9 @@
         }
       ],
       "drc_exclusions": [
-        "silk_edge_clearance|38608000|34870000|6a66c613-0509-4a01-8a42-d1e041faa609|3dd496d5-b8f7-4420-b555-9394bb428487",
-        "silk_edge_clearance|38608000|43870000|6a66c613-0509-4a01-8a42-d1e041faa609|84d06131-84cc-48ee-87bc-5658d315f990"
+        "silk_edge_clearance|38600000|36370000|6a66c613-0509-4a01-8a42-d1e041faa609|2257b622-d7e0-4e72-a802-8fa846fb8478",
+        "silk_edge_clearance|38608000|36370000|6a66c613-0509-4a01-8a42-d1e041faa609|75b8c31d-b1d2-4837-9e5a-452c5ccd974a",
+        "silk_edge_clearance|38608000|42370000|6a66c613-0509-4a01-8a42-d1e041faa609|936ad90a-48b7-4d07-b9d0-83653b0f6e2a"
       ],
       "meta": {
         "version": 2

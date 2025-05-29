@@ -10962,7 +10962,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC Part" "C93156"
+		(property "LCSC Part" ""
 			(at 231.14 255.27 0)
 			(effects
 				(font
@@ -12731,7 +12731,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC Part" "C93156"
+		(property "LCSC Part" ""
 			(at 231.14 273.05 0)
 			(effects
 				(font
@@ -13342,7 +13342,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC Part" "C93156"
+		(property "LCSC Part" ""
 			(at 231.14 281.94 0)
 			(effects
 				(font
@@ -16548,7 +16548,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Peacemans Teile:Kabelbinder 3mm"
+		(property "Footprint" "Peacemans Teile:Kabelbinder 4mm"
 			(at 383.54 160.02 0)
 			(effects
 				(font
@@ -17648,7 +17648,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC Part" "C93156"
+		(property "LCSC Part" ""
 			(at 231.14 264.16 0)
 			(effects
 				(font
