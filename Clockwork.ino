@@ -9,6 +9,23 @@ Fuses für TCXO setzen:
 
 /* Todo
 
+For Rev.A:
+- Test ESS in amp
+- Learn IR Codes
+- Send IR Codes
+- Test "Pause Button" (shorting?)
+- Read Guide/Follow Switch (D12)
+- Detect Lamp Relais Board (D7/STOP_EN pulled to GND)
+- Detect Projector Type — A0, 6 values from 5x 10k Resistors:
+    - GND: No Projector connected
+    - 10k Bauer Studioklasse (T610/T525/T510/T502) (12:1, 1.63 V)
+    - 20k Bauer P8 (Custom:1, 1.63V)
+    - 30k Bauer P8 Selecton (3:1, 1,63V
+    - 40k Braun Visacustic (3:1, 1.89V)
+    - 50k Reserve
+- Fine Tune Potentiometer on Projector Board
+- Create ESS out on D11 (Square wave)
+
 D7 will stop the engines.
 Logic Table:
 DAC ENG COM-
@@ -17,17 +34,6 @@ hi  lo  no0 DAC
 lo  hi  no1 STOP
 hi  hi  no2 NC
 So make sure DAC and STOP are not both high!
-
-An A0 das Teilerverhältnis auslesen um das Projektoboard zu erkennen:
-5x 10k ergibt 6 Werte
-- GND Keiner
-- 10k Bauer Studioklasse (T610/T525/T510/T502) (12:1, 1.63 V)
-- 20k Bauer P8 (Custom:1, 1.63V)
-- 30k Bauer P8 Selecton (3:1, 1,63V
-- 40k Braun Visacustic (3:1, 1.89V)
-- 50k Reserve
-
-Test D7 for a connected Lamp Relais Board
 
 Bugs:
 - Starting in NONE does not work yet, DAC stays connected
@@ -85,7 +91,7 @@ constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Win
 
 
 // pins and consts
-const byte SHAFT_PULSE_PIN = 2;
+const byte SHAFT_PULSE_PIN = 2;  // aka INT0
 const byte LED_RED_PIN = 5; //  Out of Sync
 const byte FPS_PULSE_OUT_PIN = 11; //  12 on breadboard. Pulse when Crystal is enabled. Todo: This still needs to be coded
 const byte ENABLE_PIN = 9;
