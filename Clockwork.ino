@@ -10,11 +10,13 @@ Fuses für TCXO setzen:
 /* Todo
 
 For Rev.A:
-- Test ESS in amp
+√ Test ESS in amp
+- Test writing to the DAC_ENABLE_PIN
 - Learn IR Codes
 - Send IR Codes
-- Test "Pause Button" (shorting?)
-- Read Guide/Follow Switch (D12)
+- Test "Pause Button" SSR (is it shorting?)
+√ Read Guide/Follow Switch (D12)
+    - Re-Read START_MODE_SWITCH_PIN when idling
 - Detect Lamp Relais Board (D7/STOP_EN pulled to GND)
 - Detect Projector Type — A0, 6 values from 5x 10k Resistors:
     - GND: No Projector connected
@@ -26,14 +28,7 @@ For Rev.A:
 - Fine Tune Potentiometer on Projector Board
 - Create ESS out on D11 (Square wave)
 
-D7 will stop the engines.
-Logic Table:
-DAC ENG COM-
-lo  lo  -   NC
-hi  lo  no0 DAC
-lo  hi  no1 STOP
-hi  hi  no2 NC
-So make sure DAC and STOP are not both high!
+
 
 Bugs:
 - Starting in NONE does not work yet, DAC stays connected
@@ -94,7 +89,11 @@ constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Win
 const byte SHAFT_PULSE_PIN = 2;  // aka INT0
 const byte LED_RED_PIN = 5; //  Out of Sync
 const byte FPS_PULSE_OUT_PIN = 11; //  12 on breadboard. Pulse when Crystal is enabled. Todo: This still needs to be coded
-const byte ENABLE_PIN = 9;
+const byte DAC_ENABLE_PIN = 9;
+const byte START_MODE_SWITCH_PIN = 12;
+const byte STOP_EN_PIN = 7; // Flipping this HIGH stops the projector if DAC_ENABLE_PIN is HIGH too
+const byte LAMP_RELAY_DETECT = 7; // The same pin (in input mode) reflects if a Lamp Relais Board is connected
+
 
 // Use this for PID tuning with Pots
 // const byte P_PIN = A6;
@@ -301,11 +300,35 @@ void setup()
     pinMode(SHAFT_PULSE_PIN, INPUT);
     pinMode(FPS_PULSE_OUT_PIN, OUTPUT);
     pinMode(LED_RED_PIN, OUTPUT);
-    pinMode(ENABLE_PIN, OUTPUT);
     pinMode(LEFT_BTTN_PIN, INPUT_PULLUP);
     pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
     pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
     pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
+    pinMode(START_MODE_SWITCH_PIN, INPUT); // This is used to read the Follow/Guide switch
+    pinMode(DAC_ENABLE_PIN, OUTPUT);
+
+    // Briefly configure Pin 7 as Input to detect a Lamp Relais Board
+    pinMode(LAMP_RELAY_DETECT, INPUT); 
+    // Check if the Lamp Relais Board is connected
+    if (digitalRead(LAMP_RELAY_DETECT) == LOW)
+    {
+        Serial.println(F("No Lamp-Relais found. Disabling Follow Mode."));
+    }
+    else
+    {
+        Serial.println(F("** Lamp-Relais found!"));
+        if (digitalRead(START_MODE_SWITCH_PIN) == LOW)
+        {
+            Serial.println(F("Guide-Mode enabled. We will start the Music."));
+        }
+        else
+        {
+            Serial.println(F("Follow-Mode enabled. The Music will start us."));
+        }
+    }
+    // Configure Pin 7 as OUTPUT again, allowing us to stop the projector
+    pinMode(STOP_EN_PIN, OUTPUT);
+
 
     // Use this for PID tuning with Pots
     // pinMode(P_PIN, INPUT);
@@ -420,7 +443,7 @@ void controlSpeed(long current_pulse_difference)
             Serial.print(F(", shaft: "));
             Serial.print(local_shaft_pulses);
             Serial.print(F(", Enable: "));
-            Serial.print(digitalRead(ENABLE_PIN));
+            Serial.print(digitalRead(DAC_ENABLE_PIN));
             Serial.print(F(", Running: "));
             Serial.println(projector_state);
         }
@@ -462,7 +485,7 @@ void checkForStop()
         Serial.print(F("PID Reset to initial DAC value: "));
         Serial.println(pid_output);
         myPID.SetMode(AUTOMATIC);
-        digitalWrite(ENABLE_PIN, LOW);
+        digitalWrite(DAC_ENABLE_PIN, LOW);
         digitalWrite(LED_RED_PIN, LOW);
         currently_selected_mode = FPS_AUTO;
         activateSpeedConfig(FPS_AUTO);
@@ -579,7 +602,7 @@ void checkProjectorRunningYet()
         Serial.print(F("Setting up Timer for "));
         Serial.println(speed.name);
         startTimer1();
-        digitalWrite(ENABLE_PIN, HIGH);
+        digitalWrite(DAC_ENABLE_PIN, HIGH);
     }
 
     // Reset variables
@@ -664,7 +687,7 @@ void activateSpeedConfig(byte next_speed)
 
     // Configure DAC
     dac.setVoltage(speed.dac_init, false);      // false: Do not make this the default value of the DAC
-    digitalWrite(ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
+    digitalWrite(DAC_ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
 }
 
 void handleButtonTap(Button2 &btn)
