@@ -10453,7 +10453,7 @@
 		(uuid "42c99c4e-5f0f-44a5-b2d9-0f2986b41cb7")
 	)
 	(label "In_Sync-LED"
-		(at 283.21 240.03 0)
+		(at 283.21 245.11 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -10523,7 +10523,7 @@
 		(uuid "79249352-554a-4a64-9fc1-07bed980f85b")
 	)
 	(label "Ext_Imp_LED"
-		(at 283.21 245.11 0)
+		(at 283.21 240.03 0)
 		(effects
 			(font
 				(size 1.27 1.27)
