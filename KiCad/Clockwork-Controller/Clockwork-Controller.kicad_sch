@@ -7583,6 +7583,12 @@
 		(uuid "a37fedf3-64b6-446f-9da7-ae98f86dab55")
 	)
 	(junction
+		(at 63.5 254)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a4302970-f487-4468-b647-3ad488605d54")
+	)
+	(junction
 		(at 123.19 52.07)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7715,12 +7721,6 @@
 		(uuid "ee6324bf-889c-42b0-af53-6224c5631280")
 	)
 	(junction
-		(at 273.05 242.57)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f4c3998e-82d8-40bf-9397-8f7c7c3728fa")
-	)
-	(junction
 		(at 334.01 72.39)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7839,6 +7839,16 @@
 			(type default)
 		)
 		(uuid "0bda562a-3bcf-425f-912c-e37e151270df")
+	)
+	(wire
+		(pts
+			(xy 63.5 254) (xy 63.5 260.35)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0fd3da98-353a-4773-9f12-d6b073161df2")
 	)
 	(wire
 		(pts
@@ -8139,6 +8149,16 @@
 			(type default)
 		)
 		(uuid "24a6e135-c6bf-4ffb-9220-fea0d653e749")
+	)
+	(wire
+		(pts
+			(xy 271.78 240.03) (xy 273.05 240.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "296d0b9d-e2a7-44bb-8544-3cc818704c6e")
 	)
 	(wire
 		(pts
@@ -9872,16 +9892,6 @@
 	)
 	(wire
 		(pts
-			(xy 273.05 240.03) (xy 273.05 242.57)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "befc1b29-e239-4e51-98e0-6040076b6ab0")
-	)
-	(wire
-		(pts
 			(xy 99.06 237.49) (xy 106.68 237.49)
 		)
 		(stroke
@@ -10866,7 +10876,7 @@
 		)
 		(uuid "40831d0b-f78b-4e22-95ca-5551d4fc6a37")
 	)
-	(label "In_Sync-LED"
+	(label "No_Sync-LED"
 		(at 78.74 232.41 0)
 		(effects
 			(font
@@ -10876,7 +10886,7 @@
 		)
 		(uuid "42c99c4e-5f0f-44a5-b2d9-0f2986b41cb7")
 	)
-	(label "In_Sync-LED"
+	(label "No_Sync-LED"
 		(at 283.21 245.11 0)
 		(effects
 			(font
@@ -17459,6 +17469,81 @@
 		)
 	)
 	(symbol
+		(lib_id "Peacemans Teile:TestPoint_named")
+		(at 63.5 254 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "86e09706-7d02-4b7f-b8ba-5b6f6bcdcea1")
+		(property "Reference" "TP12"
+			(at 56.642 254 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 58.42 254 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm"
+			(at 63.5 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 63.5 254 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
+			(at 63.5 254 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "77b9c416-1595-4072-8b57-be0453e7d377")
+		)
+		(instances
+			(project "Clockwork-Controller"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "TP12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "easyEDA:XYC-IRA4335A65-X4")
 		(at 359.41 71.12 180)
 		(unit 1)
@@ -19748,6 +19833,71 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
 					(reference "#PWR09")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 271.78 240.03 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "b6fe5e12-437c-45f7-bb82-df1572268d2d")
+		(property "Reference" "#PWR052"
+			(at 271.78 243.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 268.478 239.268 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 271.78 240.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 271.78 240.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 271.78 240.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b2341830-3c09-4376-acce-bdd9aa1554f5")
+		)
+		(instances
+			(project "Clockwork-Controller"
+				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0"
+					(reference "#PWR052")
 					(unit 1)
 				)
 			)
@@ -23366,7 +23516,7 @@
 	)
 	(symbol
 		(lib_id "power:GNDD")
-		(at 63.5 254 0)
+		(at 63.5 260.35 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -23374,7 +23524,7 @@
 		(dnp no)
 		(uuid "f8c5550c-42fe-40ef-a301-ba643ceafc14")
 		(property "Reference" "#PWR042"
-			(at 63.5 260.35 0)
+			(at 63.5 266.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23383,7 +23533,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 63.5 257.81 0)
+			(at 63.5 264.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23391,7 +23541,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 63.5 254 0)
+			(at 63.5 260.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23400,7 +23550,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 63.5 254 0)
+			(at 63.5 260.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23409,7 +23559,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GNDD\" , digital ground"
-			(at 63.5 254 0)
+			(at 63.5 260.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
