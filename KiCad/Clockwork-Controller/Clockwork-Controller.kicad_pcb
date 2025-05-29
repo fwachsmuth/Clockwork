@@ -23566,7 +23566,7 @@
 			(justify bottom mirror)
 		)
 	)
-	(gr_text "Rev.A"
+	(gr_text "Rev.B"
 		(at 71.628 79.756 90)
 		(layer "B.SilkS")
 		(uuid "2d2a4f10-8330-4d9a-9c26-9ef50f5254a4")
