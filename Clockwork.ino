@@ -287,8 +287,12 @@ to memory when needed.
 
 // !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
 
+long booted = 0; // millis() at boot time, used to detect a stop
+
 void setup()
 {
+    booted = millis();
+
     // Initialize buttons using the helper function
     initializeButton(leftButton, LEFT_BTTN_PIN);
     initializeButton(rightButton, RIGHT_BTTN_PIN);
@@ -308,24 +312,24 @@ void setup()
     pinMode(DAC_ENABLE_PIN, OUTPUT);
 
     // Briefly configure Pin 7 as Input to detect a Lamp Relais Board
-    pinMode(LAMP_RELAY_DETECT, INPUT); 
+    // pinMode(LAMP_RELAY_DETECT, INPUT); 
     // Check if the Lamp Relais Board is connected
-    if (digitalRead(LAMP_RELAY_DETECT) == LOW)
-    {
-        Serial.println(F("No Lamp-Relais found. Disabling Follow Mode."));
-    }
-    else
-    {
-        Serial.println(F("** Lamp-Relais found!"));
-        if (digitalRead(START_MODE_SWITCH_PIN) == LOW)
-        {
-            Serial.println(F("Guide-Mode enabled. We will start the Music."));
-        }
-        else
-        {
-            Serial.println(F("Follow-Mode enabled. The Music will start us."));
-        }
-    }
+    // if (digitalRead(LAMP_RELAY_DETECT) == LOW)
+    // {
+    //     Serial.println(F("No Lamp-Relais found. Disabling Follow Mode."));
+    // }
+    // else
+    // {
+    //     Serial.println(F("** Lamp-Relais found!"));
+    //     if (digitalRead(START_MODE_SWITCH_PIN) == LOW)
+    //     {
+    //         Serial.println(F("Guide-Mode enabled. We will start the Music."));
+    //     }
+    //     else
+    //     {
+    //         Serial.println(F("Follow-Mode enabled. The Music will start us."));
+    //     }
+    // }
     // Configure Pin 7 as OUTPUT again, allowing us to stop the projector
     pinMode(STOP_EN_PIN, OUTPUT);
 
@@ -401,6 +405,14 @@ void loop()
     // Update display
     drawCurrentTime(shaft_frames, speed.end_freq, false);
     drawCurrentMode();
+
+    if (millis() - booted > 15000)
+    {
+        Serial.println(F("*** STOP ****"));
+        digitalWrite(STOP_EN_PIN, HIGH);
+        // digitalWrite(DAC_ENABLE_PIN, HIGH);
+    } 
+
 }
 
 void controlSpeed(long current_pulse_difference)
@@ -744,7 +756,7 @@ ISR(TIMER1_COMPA_vect)
     {
         timer_pulses++;    // Increment timer_pulses
         timer_modulus = 0; // Reset the counter
-        PIND |= (1 << 7); // Toggle pin 7
+        // PIND |= (1 << 7); // Toggle pin 7 (I guess this was used for debugging. It now conflicts with the STOP
     }
     // Dither logic (fixed-point accumulator)
     dither_accumulator_32 += speed.dither_frac32;
