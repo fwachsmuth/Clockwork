@@ -5534,6 +5534,17 @@
 		)
 		(uuid "0e5c4551-9541-40e5-b3fa-90d987e756c0")
 	)
+	(text "9"
+		(exclude_from_sim no)
+		(at 245.618 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "0e902fc4-fa85-407a-a9e4-d6c8ec7136c2")
+	)
 	(text "M-Pin >"
 		(exclude_from_sim no)
 		(at 248.92 39.37 0)
@@ -5544,6 +5555,17 @@
 			(justify left)
 		)
 		(uuid "0f88da7c-c9a2-4990-8f5e-438d047211bf")
+	)
+	(text "1"
+		(exclude_from_sim no)
+		(at 263.144 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "147df687-f82a-41e9-93f3-3605a2418cf2")
 	)
 	(text "Für 0,5-1,5V: R9 12k, R14 2k2\nFür 0.6-1.9V: R9 10k, R14 2k8"
 		(exclude_from_sim no)
@@ -5577,6 +5599,28 @@
 		)
 		(uuid "1b56f2c9-2fd4-47b9-b1b3-0df54bfd2871")
 	)
+	(text "6 GND"
+		(exclude_from_sim no)
+		(at 252.984 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "249f096b-df78-4c24-9d7e-195ccfea3d02")
+	)
+	(text "2"
+		(exclude_from_sim no)
+		(at 260.604 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "250cb7e4-41bd-4978-a59b-9bb1e822b12a")
+	)
 	(text "> (3) 5V"
 		(exclude_from_sim no)
 		(at 58.166 32.512 0)
@@ -5598,6 +5642,28 @@
 			(justify left)
 		)
 		(uuid "3758bae4-119f-4773-8e2c-c445a4044e4e")
+	)
+	(text "Stop_EN is a misleading label here.\nTo stop the motor, we raise the \nvoltage on 6-7-8. Pulling the Gate\nup only disables the lamp \nprotection selenoid."
+		(exclude_from_sim no)
+		(at 195.58 137.414 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3c85aee9-5257-40fa-afc9-7adb18c16a21")
+	)
+	(text "2"
+		(exclude_from_sim no)
+		(at 260.858 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4d8581db-7617-4d7f-9266-f7f2afbba32c")
 	)
 	(text "Im Januar: 12k/4k7 und 2k3 feedback"
 		(exclude_from_sim no)
@@ -5621,6 +5687,28 @@
 		)
 		(uuid "529d6ef1-9bfc-4fc4-ba2a-7dc51c16261f")
 	)
+	(text "1"
+		(exclude_from_sim no)
+		(at 262.89 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5529f3ea-74fd-4782-8b35-0cc3d5d73d3c")
+	)
+	(text "10"
+		(exclude_from_sim no)
+		(at 243.078 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5ca13f71-bcd1-49de-8bc5-96a24461e410")
+	)
 	(text "DIN-PIN"
 		(exclude_from_sim no)
 		(at 62.23 26.924 90)
@@ -5631,6 +5719,27 @@
 			(justify left)
 		)
 		(uuid "62766bba-fcb0-4b96-878e-e3e689679835")
+	)
+	(text "6"
+		(exclude_from_sim no)
+		(at 253.238 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "65019dbe-77fd-4bd8-9ddd-6cac89691d4b")
+	)
+	(text "4k7 probieren, weil sonst aus den 15V nur noch 10,9 bleiben"
+		(exclude_from_sim no)
+		(at 278.384 124.206 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "65088fe2-9007-4768-ab90-f728e9416407")
 	)
 	(text "GND: None\n10k: Bauer T\n20k: P8\n30k: Selecton\n40k: Visacustic\n50k: Reserve"
 		(exclude_from_sim no)
@@ -5643,6 +5752,51 @@
 		)
 		(uuid "69846737-f8e4-49d6-b4d9-0c0d46fe09cc")
 	)
+	(text "5"
+		(exclude_from_sim no)
+		(at 255.778 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6ef9851d-6dab-480d-9497-afee2e834661")
+	)
+	(text "10 VCC 15V"
+		(exclude_from_sim no)
+		(at 242.824 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "72ee6213-27f6-4d2f-9704-f728c43c3265")
+	)
+	(text "7"
+		(exclude_from_sim no)
+		(at 250.698 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "75581e96-c956-46b6-8aee-cefca8c9d7e6")
+	)
+	(text "M"
+		(exclude_from_sim no)
+		(at 237.49 87.63 90)
+		(effects
+			(font
+				(size 1.905 1.905)
+				(thickness 0.254)
+				(bold yes)
+			)
+		)
+		(uuid "765b1fee-4ca3-49c6-a96c-86d028a79caf")
+	)
 	(text "< (5) Proj_ID"
 		(exclude_from_sim no)
 		(at 58.166 56.388 0)
@@ -5653,6 +5807,39 @@
 			(justify left)
 		)
 		(uuid "7edbcc36-198f-4338-bb6a-6519e0bb50b7")
+	)
+	(text "8"
+		(exclude_from_sim no)
+		(at 247.904 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9dd72cf7-edbf-403e-82f8-1290172bdd5e")
+	)
+	(text "3"
+		(exclude_from_sim no)
+		(at 258.318 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a2970756-ec15-48ea-ac46-6de98d3625ba")
+	)
+	(text "11"
+		(exclude_from_sim no)
+		(at 240.538 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ad111837-c335-4b5b-8138-79280fdb3513")
 	)
 	(text "< (4) Ctrl_V"
 		(exclude_from_sim no)
@@ -5698,6 +5885,17 @@
 		)
 		(uuid "bffd477e-0c3f-41e1-8241-2411d54b0b34")
 	)
+	(text "7"
+		(exclude_from_sim no)
+		(at 250.444 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c1a74cb7-1566-4433-8d8e-8ab98caa6bdf")
+	)
 	(text "12-15V >"
 		(exclude_from_sim no)
 		(at 248.92 34.29 0)
@@ -5709,6 +5907,50 @@
 		)
 		(uuid "c9bf9a98-3ad8-4cb9-ad6f-514716eb4856")
 	)
+	(text "9 Lamp Motor Selenoid"
+		(exclude_from_sim no)
+		(at 245.364 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d75eb797-dec1-4952-ac88-1ba7e6f44cea")
+	)
+	(text "8"
+		(exclude_from_sim no)
+		(at 248.158 142.24 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "dc942949-33ee-4ea8-8307-e79981f23b2f")
+	)
+	(text "11"
+		(exclude_from_sim no)
+		(at 240.284 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "dd043ec5-5dfc-4d25-938a-5409915d0f46")
+	)
+	(text "3"
+		(exclude_from_sim no)
+		(at 258.064 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e7da76bc-5151-4a20-bdeb-dc1e946f80e3")
+	)
 	(text "Stopp-Voltage Testen: 6k8 und 2k7 an 5V -> hinter 5k6 messen!"
 		(exclude_from_sim no)
 		(at 132.334 90.932 0)
@@ -5718,6 +5960,29 @@
 			)
 		)
 		(uuid "ed3cd04a-7495-4d36-8eb2-e65006a0ade1")
+	)
+	(text "5"
+		(exclude_from_sim no)
+		(at 255.524 88.646 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ee73ff74-b2f2-4655-bc16-1272fee71260")
+	)
+	(text "L"
+		(exclude_from_sim no)
+		(at 237.744 141.478 90)
+		(effects
+			(font
+				(size 1.905 1.905)
+				(thickness 0.254)
+				(bold yes)
+			)
+		)
+		(uuid "f51ad165-eb77-4c67-a1c2-fb5b42579e15")
 	)
 	(label "Stop_EN"
 		(at 88.9 50.8 180)
@@ -5738,6 +6003,16 @@
 			(justify left bottom)
 		)
 		(uuid "18600e15-b208-4623-b4a1-fcd4fa89bea4")
+	)
+	(label "Proj_ID"
+		(at 45.72 68.58 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "303fa25a-9755-4fce-b5d3-eee7ce9f5b91")
 	)
 	(label "Pin_678"
 		(at 45.72 41.91 180)
@@ -7149,7 +7424,7 @@
 		(dnp no)
 		(uuid "3a9c24cd-51bc-440d-bb1d-a84fe9a4920a")
 		(property "Reference" "J5"
-			(at 252.73 86.36 90)
+			(at 267.97 94.488 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7157,7 +7432,7 @@
 			)
 		)
 		(property "Value" "Relais Board"
-			(at 252.73 88.9 90)
+			(at 273.05 92.202 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7255,7 +7530,7 @@
 		(dnp no)
 		(uuid "402cfa83-5522-4eb6-9f18-dd9df5597902")
 		(property "Reference" "R6"
-			(at 249.428 123.444 0)
+			(at 245.364 128.016 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7263,7 +7538,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 249.428 125.476 0)
+			(at 245.364 120.65 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7962,7 +8237,7 @@
 				)
 			)
 		)
-		(property "Value" "2k7"
+		(property "Value" "4k3"
 			(at 103.378 137.668 0)
 			(effects
 				(font
@@ -7997,7 +8272,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C13167"
+		(property "LCSC" ""
 			(at 106.68 137.16 0)
 			(effects
 				(font
@@ -8432,7 +8707,7 @@
 		(dnp no)
 		(uuid "923af89d-e2ba-404c-a92a-b1631e45ad13")
 		(property "Reference" "J6"
-			(at 252.73 140.97 90)
+			(at 267.97 137.922 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8440,7 +8715,7 @@
 			)
 		)
 		(property "Value" "uC Cable"
-			(at 252.73 143.51 90)
+			(at 271.272 135.636 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8681,7 +8956,7 @@
 				)
 			)
 		)
-		(property "Value" "6k8"
+		(property "Value" "3k3"
 			(at 109.982 121.666 0)
 			(effects
 				(font
@@ -8716,7 +8991,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C23212"
+		(property "LCSC" ""
 			(at 106.68 120.65 0)
 			(effects
 				(font

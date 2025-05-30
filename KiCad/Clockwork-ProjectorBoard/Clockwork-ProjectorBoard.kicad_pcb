@@ -109,7 +109,7 @@
 	(net 27 "unconnected-(RV1-Pad1)")
 	(net 28 "Net-(R9-Pad1)")
 	(net 29 "Net-(U5--)")
-	(net 30 "Net-(J4-Pin_3)")
+	(net 30 "/Proj_ID")
 	(footprint "TestPoint:TestPoint_Pad_D1.0mm"
 		(layer "F.Cu")
 		(uuid "1b77d775-6c5d-47df-bf8f-b43d82019170")
@@ -644,7 +644,7 @@
 			(size 0.54 0.64)
 			(layers "F.Cu" "F.Paste" "F.Mask")
 			(roundrect_rratio 0.25)
-			(net 30 "Net-(J4-Pin_3)")
+			(net 30 "/Proj_ID")
 			(pintype "passive")
 			(uuid "c0a18896-24f5-46be-b973-1a56414a41f5")
 		)
@@ -4201,7 +4201,7 @@
 			(size 0.54 0.64)
 			(layers "F.Cu" "F.Paste" "F.Mask")
 			(roundrect_rratio 0.25)
-			(net 30 "Net-(J4-Pin_3)")
+			(net 30 "/Proj_ID")
 			(pintype "passive")
 			(uuid "244796ed-dfee-4a54-a805-42a83ae175d2")
 		)
@@ -5788,7 +5788,7 @@
 			(drill 1.100023)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 30 "Net-(J4-Pin_3)")
+			(net 30 "/Proj_ID")
 			(pinfunction "Pin_3")
 			(pintype "passive")
 			(uuid "685520d1-10d1-4f54-ba08-eba79c7706d1")
@@ -7993,6 +7993,18 @@
 		(layer "Edge.Cuts")
 		(uuid "715158a1-e90a-43fe-94c8-b642c886930e")
 	)
+	(gr_text "1"
+		(at 216.7 92.1 0)
+		(layer "B.SilkS")
+		(uuid "184a1d4d-44b4-449d-9fa9-b27a1ce2e486")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom mirror)
+		)
+	)
 	(gr_text "Clockwork Projector Board for Bauer T610 / T525"
 		(at 172.085 91.44 0)
 		(layer "B.SilkS")
@@ -8051,6 +8063,30 @@
 			(font
 				(size 1 1)
 				(thickness 0.15)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "6"
+		(at 216.7 97.3 0)
+		(layer "B.SilkS")
+		(uuid "c91bc0b6-bd9b-4f96-8e39-6b751557891d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "5"
+		(at 216.7 94.8 0)
+		(layer "B.SilkS")
+		(uuid "cf1b3eee-f365-4a4a-a74c-16c9764779d6")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
 			)
 			(justify left bottom mirror)
 		)
