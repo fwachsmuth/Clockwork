@@ -206,7 +206,7 @@
 				)
 			)
 		)
-		(symbol "Connector_Generic:Conn_01x05"
+		(symbol "Connector_Generic:Conn_01x06"
 			(pin_names
 				(offset 1.016) hide)
 			(exclude_from_sim no)
@@ -220,8 +220,8 @@
 					)
 				)
 			)
-			(property "Value" "Conn_01x05"
-				(at 0 -7.62 0)
+			(property "Value" "Conn_01x06"
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -246,7 +246,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(property "Description" "Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"
 				(at 0 0 0)
 				(effects
 					(font
@@ -273,7 +273,18 @@
 					(hide yes)
 				)
 			)
-			(symbol "Conn_01x05_1_1"
+			(symbol "Conn_01x06_1_1"
+				(rectangle
+					(start -1.27 -7.493)
+					(end 0 -7.747)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
 				(rectangle
 					(start -1.27 -4.953)
 					(end 0 -5.207)
@@ -331,7 +342,7 @@
 				)
 				(rectangle
 					(start -1.27 6.35)
-					(end 1.27 -6.35)
+					(end 1.27 -8.89)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -423,6 +434,24 @@
 						)
 					)
 					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -7.62 0)
+					(length 3.81)
+					(name "Pin_6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1843,6 +1872,12 @@
 		(uuid "705119c0-48ad-4103-bbb0-4f35f4de27e8")
 	)
 	(junction
+		(at 46.99 78.74)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7647b4aa-98e1-472b-8410-38338a1d46cc")
+	)
+	(junction
 		(at 44.45 95.25)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1926,7 +1961,7 @@
 	)
 	(wire
 		(pts
-			(xy 43.18 78.74) (xy 60.96 78.74)
+			(xy 43.18 78.74) (xy 46.99 78.74)
 		)
 		(stroke
 			(width 0)
@@ -2306,6 +2341,16 @@
 	)
 	(wire
 		(pts
+			(xy 43.18 88.9) (xy 46.99 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b47213c6-7180-453b-862c-0bf57a14c11e")
+	)
+	(wire
+		(pts
 			(xy 91.44 80.01) (xy 91.44 86.36)
 		)
 		(stroke
@@ -2556,6 +2601,26 @@
 	)
 	(wire
 		(pts
+			(xy 46.99 88.9) (xy 46.99 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ee7fab45-7c1b-4ad9-809c-b6846df61c33")
+	)
+	(wire
+		(pts
+			(xy 46.99 78.74) (xy 60.96 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ef9d14d8-8701-4400-b903-8ac3c469b904")
+	)
+	(wire
+		(pts
 			(xy 133.35 68.58) (xy 133.35 64.77)
 		)
 		(stroke
@@ -2583,6 +2648,17 @@
 			(type default)
 		)
 		(uuid "f76807d4-904b-4161-9d46-df818bfa185d")
+	)
+	(text "Disable Relay"
+		(exclude_from_sim no)
+		(at 22.098 88.9 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "31ca15ed-31e7-451a-98d2-37a526c97b76")
 	)
 	(text "12-15V >"
 		(exclude_from_sim no)
@@ -3711,7 +3787,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x05")
+		(lib_id "Connector_Generic:Conn_01x06")
 		(at 38.1 81.28 0)
 		(mirror y)
 		(unit 1)
@@ -3754,7 +3830,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" "Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"
 			(at 38.1 81.28 0)
 			(effects
 				(font
@@ -3777,6 +3853,9 @@
 		)
 		(pin "5"
 			(uuid "fc4c7e4d-3bdd-493d-809c-271f67becaa8")
+		)
+		(pin "6"
+			(uuid "c0ca4f53-3d83-4c44-b029-3c38e8f40a47")
 		)
 		(instances
 			(project ""

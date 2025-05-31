@@ -6490,6 +6490,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 57.15 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "4cadaaea-b38b-4aa9-b61f-2c0ae015f9b5")
 		)
@@ -6642,6 +6651,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 86.36 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "dea34268-d106-4053-b710-5f2c8656989d")
 		)
@@ -6718,6 +6736,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 223.52 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "f29a00ba-98ca-4880-be21-171c55129dce")
 		)
@@ -6786,6 +6813,15 @@
 			)
 		)
 		(property "LCSC" "C25804"
+			(at 67.31 118.11 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 67.31 118.11 0)
 			(effects
 				(font
@@ -6880,6 +6916,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 121.92 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "5"
 			(uuid "3daaf4ba-f971-4ab0-b75c-a90aaee32470")
 		)
@@ -6960,6 +7005,15 @@
 			)
 		)
 		(property "LCSC" "C45783"
+			(at 177.8 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 177.8 33.02 0)
 			(effects
 				(font
@@ -7178,7 +7232,16 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C22388685"
+		(property "LCSC" "C7429633"
+			(at 40.64 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 40.64 53.34 0)
 			(effects
 				(font
@@ -7264,6 +7327,15 @@
 			)
 		)
 		(property "LCSC" "C137983"
+			(at 48.26 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 48.26 64.77 0)
 			(effects
 				(font
@@ -7414,6 +7486,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 254 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "9"
 			(uuid "85f6330e-f21d-4b9c-8e12-602cdee35ccb")
 		)
@@ -7512,6 +7593,15 @@
 			)
 		)
 		(property "LCSC" "C25804"
+			(at 246.38 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 246.38 124.46 0)
 			(effects
 				(font
@@ -7749,6 +7839,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 170.18 30.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "959169b8-157c-4362-8a59-ae49fca2a0d2")
 		)
@@ -7828,6 +7927,15 @@
 			)
 		)
 		(property "LCSC" "C20917"
+			(at 232.41 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 232.41 119.38 0)
 			(effects
 				(font
@@ -7991,6 +8099,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 77.47 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "c50e95d2-51d5-4bd2-aca5-af97dd2fdc99")
 		)
@@ -8070,6 +8187,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 48.26 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "01d837ef-75e2-4c9f-87fc-e68f1a030424")
 		)
@@ -8138,6 +8264,15 @@
 			)
 		)
 		(property "LCSC" ""
+			(at 106.68 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 106.68 137.16 0)
 			(effects
 				(font
@@ -8230,6 +8365,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 72.39 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "ce254c65-e18c-4c13-9ee9-1f04a82ef100")
 		)
@@ -8298,6 +8442,15 @@
 			)
 		)
 		(property "LCSC" "C15850"
+			(at 133.35 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 133.35 36.83 0)
 			(effects
 				(font
@@ -8388,6 +8541,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 182.88 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "88f939d7-eb80-4fb6-9ae8-1302ab5e9442")
 		)
@@ -8462,6 +8624,15 @@
 			)
 		)
 		(property "LCSC" "C23162"
+			(at 67.31 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 67.31 133.35 0)
 			(effects
 				(font
@@ -8546,6 +8717,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 227.33 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "f2cbf8ed-7d23-42a0-9bdb-804b211e658c")
 		)
@@ -8615,6 +8795,15 @@
 			)
 		)
 		(property "LCSC" "C3012231"
+			(at 254 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 254 138.43 0)
 			(effects
 				(font
@@ -8857,6 +9046,15 @@
 			)
 		)
 		(property "LCSC" ""
+			(at 106.68 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 106.68 120.65 0)
 			(effects
 				(font
@@ -9147,6 +9345,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 96.52 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "4a1b43f9-8104-4970-b1aa-ce3827ba7406")
 		)
@@ -9227,6 +9434,15 @@
 			)
 		)
 		(property "LCSC" "C14663"
+			(at 166.37 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 166.37 33.02 0)
 			(effects
 				(font
@@ -9326,6 +9542,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 81.28 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "48cb5f97-cf00-477c-9229-1c8fabafa5ed")
 		)
@@ -9403,6 +9628,15 @@
 			)
 		)
 		(property "LCSC" "C23189"
+			(at 138.43 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 138.43 125.73 0)
 			(effects
 				(font
@@ -9560,6 +9794,15 @@
 			)
 		)
 		(property "LCSC" "C42411033"
+			(at 156.21 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 156.21 128.27 0)
 			(effects
 				(font
@@ -9727,6 +9970,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 246.38 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "f63c946d-ada6-465d-82d6-0b6a0808b4a5")
 		)
@@ -9810,6 +10062,15 @@
 			)
 		)
 		(property "LCSC" "C22388684"
+			(at 40.64 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 40.64 33.02 0)
 			(effects
 				(font
@@ -10103,6 +10364,15 @@
 				(hide yes)
 			)
 		)
+		(property "TP_Label" ""
+			(at 62.23 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "5f3770e5-0650-4e04-ae86-eb169ccf046e")
 		)
@@ -10172,6 +10442,15 @@
 			)
 		)
 		(property "LCSC" "C2071056"
+			(at 152.4 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TP_Label" ""
 			(at 152.4 35.56 0)
 			(effects
 				(font
