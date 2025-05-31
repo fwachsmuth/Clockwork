@@ -13,19 +13,20 @@ For Rev.A:
 √ Test ESS in amp
 √ Test writing to the DAC_ENABLE_PIN
 √ Test Relay Board Detection
+√ Detect Projector Type — A0, 6 values from 5x 10k Resistors:
+    - No Projector connected
+    - Bauer Studioklasse (T610/T525/T510/T502) (12:1, 1.63 V)
+    - Bauer P8 (Custom:1, 1.63V)
+    - Bauer P8 Selecton (3:1, 1,63V
+    - Braun Visacustic (3:1, 1.89V)
+    - Reserve
+- Ext Imp Mode hinzufügen
 - Learn IR Codes
 - Send IR Codes
 - Test "Pause Button" SSR (is it shorting?)
 √ Read Guide/Follow Switch (D12)
     - Re-Read START_MODE_SWITCH_PIN when idling
 √ Detect Lamp Relais Board (D7/STOP_EN pulled to GND)
-- Detect Projector Type — A0, 6 values from 5x 10k Resistors:
-    - GND: No Projector connected
-    - 10k Bauer Studioklasse (T610/T525/T510/T502) (12:1, 1.63 V)
-    - 20k Bauer P8 (Custom:1, 1.63V)
-    - 30k Bauer P8 Selecton (3:1, 1,63V
-    - 40k Braun Visacustic (3:1, 1.89V)
-    - 50k Reserve
 - Fine Tune Potentiometer on Projector Board
 - Create ESS out on D11 (Square wave)
 
@@ -93,8 +94,8 @@ const byte FPS_PULSE_OUT_PIN = 11; //  12 on breadboard. Pulse when Crystal is e
 const byte DAC_ENABLE_PIN = 9;
 const byte START_MODE_SWITCH_PIN = 12;
 const byte STOP_EN_PIN = 7; // Flipping this HIGH stops the projector if DAC_ENABLE_PIN is HIGH too
-const byte LAMP_RELAY_DETECT = 7; // The same pin (in input mode) reflects if a Lamp Relais Board is connected
-
+const byte LAMP_RELAY_DETECT_PIN = 7; // The same pin (in input mode) reflects if a Lamp Relais Board is connected
+const byte PROJ_ID_PIN = A0; // This is used to detect the projector type, if one is connected
 
 // Use this for PID tuning with Pots
 // const byte P_PIN = A6;
@@ -288,7 +289,60 @@ to memory when needed.
 
 // !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
 
-long booted = 0; // millis() at boot time, used to detect a stop
+enum ProjectorType
+{
+    NONE,
+    BAUER_T,
+    P8,
+    SELECTON,
+    VISACUSTIC,
+    RESERVE
+};
+
+ProjectorType detectProjector(int adcValue)
+{
+ /* Reference Values:
+   0: None
+ 200: Bauer T
+ 390: P8
+ 586: Selecton
+ 792: Visacustic
+1000: Reserve
+*/
+    if (adcValue < 100)
+        return NONE;
+    else if (adcValue < 295)
+        return BAUER_T;
+    else if (adcValue < 488)
+        return P8;
+    else if (adcValue < 689)
+        return SELECTON;
+    else if (adcValue < 908)
+        return VISACUSTIC;
+    else
+        return RESERVE;
+}
+
+const char *projectorName(ProjectorType type)
+{
+    switch (type)
+    {
+    case NONE:
+        return "None";
+    case BAUER_T:
+        return "Bauer T";
+    case P8:
+        return "P8";
+    case SELECTON:
+        return "Selecton";
+    case VISACUSTIC:
+        return "Visacustic";
+    case RESERVE:
+        return "Reserve";
+    default:
+        return "Unknown";
+    }
+}
 
 void setup()
 {
@@ -309,11 +363,22 @@ void setup()
     pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
     pinMode(START_MODE_SWITCH_PIN, INPUT); // This is used to read the Follow/Guide switch
     pinMode(DAC_ENABLE_PIN, OUTPUT);
+    pinMode(PROJ_ID_PIN, INPUT);
 
+    // Let's read the projector board's voltage divider to detect the projector type.
+    int adcValue = analogRead(PROJ_ID_PIN);
+    ProjectorType proj = detectProjector(adcValue);
+
+    Serial.print(F("A0: "));
+    Serial.print(adcValue);
+    Serial.print(F(" → "));
+    Serial.println(projectorName(proj));
+    // Todo: Init the Projector Type constants
+    
     // Briefly configure Pin 7 as Input to detect a Lamp Relais Board
-    pinMode(LAMP_RELAY_DETECT, INPUT);
+    pinMode(LAMP_RELAY_DETECT_PIN, INPUT);
     // Check if the Lamp Relais Board is connected
-    if (digitalRead(LAMP_RELAY_DETECT) == HIGH)
+    if (digitalRead(LAMP_RELAY_DETECT_PIN) == HIGH)
     {
         Serial.println(F("No Lamp-Relais found. Disabling Follow Mode."));
     }
@@ -404,6 +469,8 @@ void loop()
     // Update display
     drawCurrentTime(shaft_frames, speed.end_freq, false);
     drawCurrentMode();
+
+
 }
 
 void controlSpeed(long current_pulse_difference)
