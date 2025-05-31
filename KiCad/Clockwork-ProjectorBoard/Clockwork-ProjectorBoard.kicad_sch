@@ -1874,7 +1874,7 @@
 				)
 			)
 		)
-		(symbol "Connector_Generic:Conn_01x05"
+		(symbol "Connector_Generic:Conn_01x06"
 			(pin_names
 				(offset 1.016) hide)
 			(exclude_from_sim no)
@@ -1888,8 +1888,8 @@
 					)
 				)
 			)
-			(property "Value" "Conn_01x05"
-				(at 0 -7.62 0)
+			(property "Value" "Conn_01x06"
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1914,7 +1914,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(property "Description" "Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1941,7 +1941,18 @@
 					(hide yes)
 				)
 			)
-			(symbol "Conn_01x05_1_1"
+			(symbol "Conn_01x06_1_1"
+				(rectangle
+					(start -1.27 -7.493)
+					(end 0 -7.747)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
 				(rectangle
 					(start -1.27 -4.953)
 					(end 0 -5.207)
@@ -1999,7 +2010,7 @@
 				)
 				(rectangle
 					(start -1.27 6.35)
-					(end 1.27 -6.35)
+					(end 1.27 -8.89)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -2091,6 +2102,24 @@
 						)
 					)
 					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -7.62 0)
+					(length 3.81)
+					(name "Pin_6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -5024,6 +5053,16 @@
 	)
 	(wire
 		(pts
+			(xy 248.92 49.53) (xy 241.3 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "99e2b1ba-b204-4f5c-aa79-1f77e5342fee")
+	)
+	(wire
+		(pts
 			(xy 238.76 44.45) (xy 241.3 44.45)
 		)
 		(stroke
@@ -5081,6 +5120,16 @@
 			(type default)
 		)
 		(uuid "abecb4ab-d194-4de9-9cc2-2eb2ff39f2e0")
+	)
+	(wire
+		(pts
+			(xy 241.3 49.53) (xy 241.3 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ad7da15c-3900-47a0-9345-db162489f057")
 	)
 	(wire
 		(pts
@@ -5211,6 +5260,16 @@
 			(type default)
 		)
 		(uuid "bf8f0ea6-b421-4f86-a641-2e5a545fafbc")
+	)
+	(wire
+		(pts
+			(xy 248.92 48.26) (xy 248.92 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c156d674-f209-45e3-9b5c-23d1b347a0d2")
 	)
 	(wire
 		(pts
@@ -5621,6 +5680,16 @@
 		)
 		(uuid "250cb7e4-41bd-4978-a59b-9bb1e822b12a")
 	)
+	(text "\n\n\n\n\n\n"
+		(exclude_from_sim no)
+		(at 214.63 118.11 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "25b308cc-1353-41e0-896b-c15d707d6097")
+	)
 	(text "> (3) 5V"
 		(exclude_from_sim no)
 		(at 58.166 32.512 0)
@@ -5645,7 +5714,7 @@
 	)
 	(text "Stop_EN is a misleading label here.\nTo stop the motor, we raise the \nvoltage on 6-7-8. Pulling the Gate\nup only disables the lamp \nprotection selenoid."
 		(exclude_from_sim no)
-		(at 195.58 137.414 0)
+		(at 201.422 82.55 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -5731,16 +5800,6 @@
 		)
 		(uuid "65019dbe-77fd-4bd8-9ddd-6cac89691d4b")
 	)
-	(text "4k7 probieren, weil sonst aus den 15V nur noch 10,9 bleiben"
-		(exclude_from_sim no)
-		(at 278.384 124.206 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "65088fe2-9007-4768-ab90-f728e9416407")
-	)
 	(text "GND: None\n10k: Bauer T\n20k: P8\n30k: Selecton\n40k: Visacustic\n50k: Reserve"
 		(exclude_from_sim no)
 		(at 55.118 69.596 0)
@@ -5807,6 +5866,16 @@
 			(justify left)
 		)
 		(uuid "7edbcc36-198f-4338-bb6a-6519e0bb50b7")
+	)
+	(text "alt. FDC6330L?"
+		(exclude_from_sim no)
+		(at 227.838 135.382 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "7f6d8754-ab12-4eec-aef7-e5946859422f")
 	)
 	(text "8"
 		(exclude_from_sim no)
@@ -6024,6 +6093,26 @@
 		)
 		(uuid "3b38456a-37f0-4044-a067-71a2fe014aa9")
 	)
+	(label "Overwrite_Relais"
+		(at 219.71 119.38 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "470ec47e-009a-4e89-a4e8-3b2e021e37f8")
+	)
+	(label "Overwrite_Relais"
+		(at 248.92 48.26 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4eb6fcfd-2ff2-4887-bfaf-786cf6030396")
+	)
 	(label "Stop_EN"
 		(at 241.3 41.91 180)
 		(effects
@@ -6145,17 +6234,6 @@
 				(hide yes)
 			)
 		)
-	)
-	(hierarchical_label "Stop_EN"
-		(shape input)
-		(at 219.71 119.38 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "f697524d-9ab4-440f-8e28-f94b6313b895")
 	)
 	(symbol
 		(lib_id "power:GNDD")
@@ -9802,7 +9880,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x05")
+		(lib_id "Connector_Generic:Conn_01x06")
 		(at 246.38 39.37 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -9826,7 +9904,7 @@
 				)
 			)
 		)
-		(property "Footprint" "easyEDA:CONN-TH_5P-P2.50_ZX-XH2.54-5PZZ"
+		(property "Footprint" "easyEDA:CONN-TH_6P-P2.54_ZX-XH2.54-6PZZ-R"
 			(at 246.38 39.37 0)
 			(effects
 				(font
@@ -9835,7 +9913,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2410121306_Megastar-ZX-XH2-54-5PZZ-R_C22388627.pdf"
+		(property "Datasheet" "~"
 			(at 246.38 39.37 0)
 			(effects
 				(font
@@ -9844,7 +9922,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" "Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"
 			(at 246.38 39.37 0)
 			(effects
 				(font
@@ -9853,7 +9931,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C22388627"
+		(property "LCSC" "C22388628"
 			(at 246.38 39.37 0)
 			(effects
 				(font
@@ -9876,6 +9954,9 @@
 		)
 		(pin "5"
 			(uuid "e9a32fd3-239b-487e-953f-800374fcd939")
+		)
+		(pin "6"
+			(uuid "2ce29cc5-9131-4b39-8d18-5d6daa58b1d1")
 		)
 		(instances
 			(project "SynCrystal_ProjectorBoard"
