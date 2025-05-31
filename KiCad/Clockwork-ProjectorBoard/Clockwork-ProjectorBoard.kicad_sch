@@ -2694,118 +2694,6 @@
 				)
 			)
 		)
-		(symbol "Peacemans Teile:TestPoint_named"
-			(pin_numbers hide)
-			(pin_names
-				(offset 0.762) hide)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "TP"
-				(at 0 6.858 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Value" "TestPoint"
-				(at 0 5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Footprint" "Peacemans_Footprints:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm_named"
-				(at 5.08 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 5.08 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "test point"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "TP_Label" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "test point tp"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "Pin* Test*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "TestPoint_named_0_1"
-				(circle
-					(center 0 3.302)
-					(radius 0.762)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "TestPoint_named_1_1"
-				(pin passive line
-					(at 0 0 90)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-		)
 		(symbol "Regulator_Switching:AP63205WU"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -4326,12 +4214,6 @@
 		(uuid "c4c0e76b-82e5-470a-8356-d0fbf731c8ed")
 	)
 	(junction
-		(at 167.64 130.81)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "c4e3e2f2-8fa0-4db9-8ae5-88b55a3a16fc")
-	)
-	(junction
 		(at 152.4 43.18)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5033,7 +4915,7 @@
 	)
 	(wire
 		(pts
-			(xy 168.91 130.81) (xy 167.64 130.81)
+			(xy 165.1 130.81) (xy 168.91 130.81)
 		)
 		(stroke
 			(width 0)
@@ -5280,16 +5162,6 @@
 			(type default)
 		)
 		(uuid "c1674a51-67e1-481b-aa46-b3b1591ca280")
-	)
-	(wire
-		(pts
-			(xy 167.64 130.81) (xy 165.1 130.81)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c18dc9ae-9b8c-4438-8813-f69d8dc99310")
 	)
 	(wire
 		(pts
@@ -5711,17 +5583,6 @@
 			(justify left)
 		)
 		(uuid "3758bae4-119f-4773-8e2c-c445a4044e4e")
-	)
-	(text "Stop_EN is a misleading label here.\nTo stop the motor, we raise the \nvoltage on 6-7-8. Pulling the Gate\nup only disables the lamp \nprotection selenoid."
-		(exclude_from_sim no)
-		(at 201.422 82.55 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "3c85aee9-5257-40fa-afc9-7adb18c16a21")
 	)
 	(text "2"
 		(exclude_from_sim no)
@@ -7741,80 +7602,6 @@
 			(project "SynCrystal-kicad"
 				(path "/904e3c46-2ed3-4778-9ca9-733b218304b0/b4ac20a2-eea5-4dd0-b1b6-8c6de2e0011b"
 					(reference "#FLG08")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Peacemans Teile:TestPoint_named")
-		(at 167.64 130.81 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "417306c3-e0d1-4902-b271-efe0a8bfe0d0")
-		(property "Reference" "TP1"
-			(at 167.64 137.668 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "678"
-			(at 169.418 134.112 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 162.56 130.81 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 162.56 130.81 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "test point"
-			(at 167.64 130.81 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TP_Label" ""
-			(at 167.64 130.81 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "24c097d7-cb5b-4841-88a7-a8f26dd1baae")
-		)
-		(instances
-			(project "SynCrystal_ProjectorBoard"
-				(path "/01bd7818-adef-4612-bb26-3dbff95808f6"
-					(reference "TP1")
 					(unit 1)
 				)
 			)
