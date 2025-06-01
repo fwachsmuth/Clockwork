@@ -23,7 +23,7 @@ Fuses für TCXO setzen:
     Braun Visacustic (3:1, 1.89V)
     Reserve
 √ Parametrize the per-projector settings in a struct, and use them, instead of static values
-- Add DAC init values for both 18 and 24 switchpos to the struct (and use them accordingly)
+√ Add DAC init values for both 18 and 24 switchpos to the struct (and use them accordingly)
 - Do we need to move the speed/dither configs to the projector struct, since they timer 
   osciallates and impulse freq (e.g. *12), or can we just tweak the timer factor?
 - Learn IR Codes
@@ -323,11 +323,19 @@ struct ProjectorConfig
     char name[8];                       // short name for debugging
     uint8_t pulses_per_rotation;        // The number of pulses per rotation of the projector's shaft
     uint16_t framecount_until_stable;   // The number of frames until the speed is considered stable
-    uint16_t dac_init_16;       // The initial DAC value for 16 2/3 fps
-    uint16_t dac_init_18;       // The initial DAC value for 18 fps
-    uint16_t dac_init_23;       // The initial DAC value for 23.976 fps
-    uint16_t dac_init_24;       // The initial DAC value for 24 fps
-    uint16_t dac_init_25;       // The initial DAC value for 25 fps
+ 
+    uint16_t dac_init18_16;       // The initial DAC value for 16 2/3 fps at switchpos 18
+    uint16_t dac_init18_18;       // The initial DAC value for 18 fps at switchpos 18
+    uint16_t dac_init18_23;       // The initial DAC value for 23.976 fps at switchpos 18
+    uint16_t dac_init18_24;       // The initial DAC value for 24 fps at switchpos 18
+    uint16_t dac_init18_25;       // The initial DAC value for 25 fps at switchpos 18
+
+    uint16_t dac_init24_16;      // The initial DAC value for 16 2/3 fps at switchpos 24
+    uint16_t dac_init24_18;      // The initial DAC value for 18 fps at switchpos 24
+    uint16_t dac_init24_23;      // The initial DAC value for 23.976 fps at switchpos 24
+    uint16_t dac_init24_24;      // The initial DAC value for 24 fps at switchpos 24
+    uint16_t dac_init24_25;      // The initial DAC value for 25 fps at switchpos 24
+
     double pid_p;   // PID values for the projector type
     double pid_i;
     double pid_d; 
@@ -339,12 +347,27 @@ static const ProjectorConfig PROGMEM s_projector_configs[] = {
     This is a table of projector-specific values. To save memory, we memcopy just struct of values
     to memory when needed.
     */
-    {"None", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},                      // No projector connected
-    {"Bauer T", 12, 4, 1915, 2130, 3000, 3060, 3235, 30, 50, 0}, // Bauer T610/T525/T510/T502
-    {"Bauer P8", 2, 8, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Bauer P8
-    {"Selecton", 3, 8, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Bauer P8 Selecton
-    {"Visacstc", 3, 4, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Braun Visacustic
-    {"Reserved", 0, 0, 0, 0, 0, 0, 0, 30, 50, 0},                // No projector connected
+    {"None", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // No projector connected
+    {"Bauer T", 12, 4, 
+        1915, 2130, 3000, 3060, 3235, // DAC speed values for switch at 18
+        1295, 1450, 2180, 2190, 2320, // DAC speed values for switch at 24
+        30, 50, 0}, // Bauer T610/T525/T510/T502
+    {"Bauer P8", 2, 8, 
+        1200, 1500, 2000, 2100, 2200,
+        1200, 1500, 2000, 2100, 2200, 
+        30, 50, 0}, // Bauer P8
+    {"Selecton", 3, 8, 
+        1200, 1500, 2000, 2100, 2200,
+        1200, 1500, 2000, 2100, 2200,
+        30, 50, 0}, // Bauer P8 Selecton
+    {"Visacstc", 3, 4, 
+        1200, 1500, 2000, 2100, 2200,
+        1200, 1500, 2000, 2100, 2200, 
+        30, 50, 0}, // Braun Visacustic
+    {"Reserved", 0, 0, 
+        0, 0, 0, 0, 0, 
+        0, 0, 0, 0, 0,
+        30, 50, 0},                // No projector connected
 };
 
 ProjectorType detectProjector(int adcValue)
@@ -440,7 +463,7 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
-    dac.setVoltage(projector_config.dac_init_18, false); // 18 fps and 24 fps share the same DAC init value
+    dac.setVoltage(projector_config.dac_init18_18, false); // 18 fps and 24 fps share the same DAC init value
 
     // Init the PID
     pid_input = 0;
@@ -448,7 +471,7 @@ void setup()
     myPID.SetOutputLimits(0, 4095);
     myPID.SetSampleTime(100);
     myPID.SetMode(MANUAL);
-    pid_output = projector_config.dac_init_18; // This avoids starting with a 0-Output signal
+    pid_output = projector_config.dac_init18_18; // This avoids starting with a 0-Output signal
     myPID.SetMode(AUTOMATIC);
 
     currently_selected_mode = FPS_AUTO;
@@ -581,9 +604,9 @@ void checkForStop()
         local_shaft_pulses = 0;
 
         // Reset DAC and PID
-        dac.setVoltage(projector_config.dac_init_18, false); // Reset the DAC to compensate for wound-up break corrections
+        dac.setVoltage(projector_config.dac_init18_18, false); // Reset the DAC to compensate for wound-up break corrections
         myPID.SetMode(MANUAL);
-        pid_output = projector_config.dac_init_18; //TODO: Do we know better than just using 18?
+        pid_output = projector_config.dac_init18_18; //TODO: Do we know better than just using 18?
         pid_input = 0;
         myPID.Compute();
         Serial.print(F("PID Reset to initial DAC value: "));
@@ -666,8 +689,12 @@ void checkProjectorRunningYet()
         if (currently_selected_mode == FPS_AUTO)
         { // Determine the mode based on the detected frequency
             uint8_t target_mode = (detected_frequency <= 21 * projector_config.pulses_per_rotation ? FPS_18 : FPS_24);
-            activateSpeedConfig(target_mode);
             projector_speed_switch = (target_mode == FPS_18 ? 18 : 24);
+            activateSpeedConfig(target_mode);
+            
+            Serial.print(F("*** Setting pSS to "));
+            Serial.println(projector_speed_switch);
+
             currently_selected_mode = (target_mode);
         }
         // Init the pulse timer to not lose those first frames
@@ -760,13 +787,32 @@ void activateSpeedConfig(byte next_speed)
     myPID.SetMode(MANUAL);
     // Use the correct DAC init value for the selected speed
     uint16_t dac_init = 0;
-    switch (next_speed) {
-        case FPS_16_2_3:  dac_init = projector_config.dac_init_16; break;
-        case FPS_18:      dac_init = projector_config.dac_init_18;     break;
-        case FPS_23_976:  dac_init = projector_config.dac_init_23; break;
-        case FPS_24:      dac_init = projector_config.dac_init_24;     break;
-        case FPS_25:      dac_init = projector_config.dac_init_25;     break;
-        default:          dac_init = projector_config.dac_init_18;     break;
+    Serial.print(F("Projector Speed Switch: "));
+    Serial.println(projector_speed_switch);
+
+    if (projector_speed_switch == 18)
+    {
+        // Use the DAC init values for switch position 18
+        switch (next_speed) {
+            case FPS_16_2_3:  dac_init = projector_config.dac_init18_16;    break;
+            case FPS_18:      dac_init = projector_config.dac_init18_18;    break;
+            case FPS_23_976:  dac_init = projector_config.dac_init18_23;    break;
+            case FPS_24:      dac_init = projector_config.dac_init18_24;    break;
+            case FPS_25:      dac_init = projector_config.dac_init18_25;    break;
+            default:          dac_init = projector_config.dac_init18_18;    break;
+        }
+    }
+    else
+    {
+        // Use the DAC init values for switch position 24
+        switch (next_speed) {
+            case FPS_16_2_3:  dac_init = projector_config.dac_init24_16;    break;
+            case FPS_18:      dac_init = projector_config.dac_init24_18;    break;
+            case FPS_23_976:  dac_init = projector_config.dac_init24_23;    break;
+            case FPS_24:      dac_init = projector_config.dac_init24_24;    break;
+            case FPS_25:      dac_init = projector_config.dac_init24_25;    break;
+            default:          dac_init = projector_config.dac_init24_18;    break;
+        }
     }
     pid_output = dac_init;
     myPID.Compute();
