@@ -201,8 +201,6 @@ volatile bool shaft_pulse_count_updated;
 
 // Instantiate the PID
 double pid_setpoint, pid_input, pid_output;
-//double pid_Kp = 30, pid_Ki = 50, pid_Kd = 0; // old PID values for frame based controlling
-// double pid_Kp, pid_Ki, pid_Kd;
 PID myPID(&pid_input, &pid_output, &pid_setpoint, 0, 0, 0, REVERSE);
 
 // Instantiate the DAC
@@ -289,7 +287,6 @@ struct SpeedConfig
     uint8_t timer_factor;   // a frequency multiplier for each timer config (some multiples give better accuracy)
     float end_freq;         // the actual frequency we get with this config as an approx. float
     bool dac_enable;        // to allow freewheeling (no speed controller impact)
-    uint16_t dac_init;      // approx dac values to start with
 };
 SpeedConfig speed;
 
@@ -298,14 +295,14 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
     This is a table of values needed to generate a certain speed. To save memory, we copy one just struct of values
     to memory when needed.
     */
-   {"Off", 2313, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
-   {"Ext Imp", 2313, 0xD0BE9C00, 3, 0, 1, 1700}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
-   {"Auto", 0, 0, 0, 0, 1, 2130},
-   {"16  fps", 9999, 0x00000000, 1, 16.666666, 1, 1915},
-   {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1, 2130},
-   {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1, 3000},
-   {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1, 3060},
-   {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1, 3235}};
+   {"Off", 2313, 0xD0BE9C00, 3, 0, 0}, /* Need dummy values here to not f up the timer. */
+   {"Ext Imp", 2313, 0xD0BE9C00, 3, 0, 1}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
+   {"Auto", 0, 0, 0, 0, 1},
+   {"16  fps", 9999, 0x00000000, 1, 16.666666, 1},
+   {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1},
+   {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1},
+   {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1},
+   {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1}};
    
    // !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
 
@@ -406,12 +403,9 @@ void setup()
     Serial.print(adcValue);
     Serial.print(F(" → "));
     Serial.println(projector_config.name);
+
     // TODO: Init the Projector Type constants. Read the DAC init values from EEPROM if available, otherwise use the defaults
     myPID.SetTunings(projector_config.pid_p, projector_config.pid_i, projector_config.pid_d); // Set the PID tunings based on the projector config
-    // pid_Kp = projector_config.pid_p;
-    // pid_Ki = projector_config.pid_i;
-    // pid_Kd = projector_config.pid_d;
-    // myPID.SetTunings(pid_Kp, pid_Ki, pid_Kd); // Set the PID tunings based on the projector config
 
 
     // Briefly configure Pin 7 as Input to detect a Lamp Relais Board
@@ -586,9 +580,9 @@ void checkForStop()
         local_shaft_pulses = 0;
 
         // Reset DAC and PID
-        dac.setVoltage(speed.dac_init, false); // Reset the DAC to compensate for wound-up break corrections
+        dac.setVoltage(projector_config.dac_init_18, false); // Reset the DAC to compensate for wound-up break corrections
         myPID.SetMode(MANUAL);
-        pid_output = speed.dac_init;
+        pid_output = projector_config.dac_init_18; //TODO: Do we know better than just using 18?
         pid_input = 0;
         myPID.Compute();
         Serial.print(F("PID Reset to initial DAC value: "));
@@ -762,12 +756,22 @@ void activateSpeedConfig(byte next_speed)
 
     // Init the PID with a start value to not start at 0
     myPID.SetMode(MANUAL);
-    pid_output = speed.dac_init;
+    // Use the correct DAC init value for the selected speed
+    uint16_t dac_init = 0;
+    switch (next_speed) {
+        case FPS_16_2_3:  dac_init = projector_config.dac_init_16_2_3; break;
+        case FPS_18:      dac_init = projector_config.dac_init_18;     break;
+        case FPS_23_976:  dac_init = projector_config.dac_init_23_976; break;
+        case FPS_24:      dac_init = projector_config.dac_init_24;     break;
+        case FPS_25:      dac_init = projector_config.dac_init_25;     break;
+        default:          dac_init = projector_config.dac_init_18;     break;
+    }
+    pid_output = dac_init;
     myPID.Compute();
     myPID.SetMode(AUTOMATIC);
 
     // Configure DAC
-    dac.setVoltage(speed.dac_init, false);      // false: Do not make this the default value of the DAC
+    dac.setVoltage(dac_init, false);      // false: Do not make this the default value of the DAC
     digitalWrite(DAC_ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
 }
 
