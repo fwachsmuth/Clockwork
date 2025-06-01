@@ -202,8 +202,8 @@ volatile bool shaft_pulse_count_updated;
 // Instantiate the PID
 double pid_setpoint, pid_input, pid_output;
 //double pid_Kp = 30, pid_Ki = 50, pid_Kd = 0; // old PID values for frame based controlling
-double pid_Kp, pid_Ki, pid_Kd;
-PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
+// double pid_Kp, pid_Ki, pid_Kd;
+PID myPID(&pid_input, &pid_output, &pid_setpoint, 0, 0, 0, REVERSE);
 
 // Instantiate the DAC
 Adafruit_MCP4725 dac;
@@ -407,13 +407,12 @@ void setup()
     Serial.print(F(" → "));
     Serial.println(projector_config.name);
     // TODO: Init the Projector Type constants. Read the DAC init values from EEPROM if available, otherwise use the defaults
-    pid_Kp = projector_config.pid_p;
-    pid_Ki = projector_config.pid_i;
-    pid_Kd = projector_config.pid_d;
-    myPID.SetTunings(pid_Kp, pid_Ki, pid_Kd); // Set the PID tunings based on the projector config
-    // myPID is already declared as a global variable above:
-    // PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
-    // No need to declare it again here.
+    myPID.SetTunings(projector_config.pid_p, projector_config.pid_i, projector_config.pid_d); // Set the PID tunings based on the projector config
+    // pid_Kp = projector_config.pid_p;
+    // pid_Ki = projector_config.pid_i;
+    // pid_Kd = projector_config.pid_d;
+    // myPID.SetTunings(pid_Kp, pid_Ki, pid_Kd); // Set the PID tunings based on the projector config
+
 
     // Briefly configure Pin 7 as Input to detect a Lamp Relais Board
     pinMode(LAMP_RELAY_DETECT_PIN, INPUT);
