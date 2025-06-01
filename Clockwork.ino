@@ -22,7 +22,8 @@ Fuses für TCXO setzen:
     Bauer P8 Selecton (3:1, 1,63V
     Braun Visacustic (3:1, 1.89V)
     Reserve
-- Parametrize the per-projector settings in a struct, and use them, instead of static values
+√ Parametrize the per-projector settings in a struct, and use them, instead of static values
+- Add DAC init values for both 18 and 24 switchpos to the struct (and use them accordingly)
 - Do we need to move the speed/dither configs to the projector struct, since they timer 
   osciallates and impulse freq (e.g. *12), or can we just tweak the timer factor?
 - Learn IR Codes
@@ -104,7 +105,7 @@ Notes:
 // projector specific constants
 // const uint16_t DAC_INITIAL_VALUE = 1500; // This should equal a voltage that leads to approx 16-20 fps (on 18 fps) or 22-26 fps (on 24).
 const unsigned long STOP_THRESHOLD = 25000; // microseconds until a stop will be detected
-constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Window. We use 12 to capture one entire shaft revolution
+// uint8_t shaft_pulse_count = 12;             // Size of the Median Window. We use 12 to capture one entire shaft revolution
 
 
 // pin consts
@@ -112,7 +113,7 @@ const byte SHAFT_PULSE_PIN = 2;  // aka INT0
 const byte LED_RED_PIN = 5; //  Out of Sync
 const byte FPS_PULSE_OUT_PIN = 11; //  12 on breadboard. Pulse when Crystal is enabled. Todo: This still needs to be coded
 const byte DAC_ENABLE_PIN = 9;
-const byte START_MODE_SWITCH_PIN = 12;
+const byte AUDIOMODE_SWITCH_PIN = 12;
 const byte STOP_EN_PIN = 7; // Flipping this HIGH stops the projector if DAC_ENABLE_PIN is HIGH too
 const byte LAMP_RELAY_DETECT_PIN = 7; // The same pin (in input mode) reflects if a Lamp Relais Board is connected
 const byte PROJ_ID_PIN = A0; // This is used to detect the projector type, if one is connected
@@ -319,15 +320,15 @@ enum ProjectorType
 
 struct ProjectorConfig
 {
-    char name[8];                      // short name for debugging
-    uint8_t pulses_per_rotation;      // The number of pulses per rotation of the projector's shaft
-    uint16_t framecount_until_stable; // The number of frames until the speed is considered stable
-    uint16_t dac_init_16_2_3; // The initial DAC value for 16  chat2/3 fps
-    uint16_t dac_init_18;     // The initial DAC value for 18 fps
-    uint16_t dac_init_23_976; // The initial DAC value for 23.976 fps
-    uint16_t dac_init_24;     // The initial DAC value for 24 fps
-    uint16_t dac_init_25;     // The initial DAC value for 25 fps
-    double pid_p;             // PID values for the projector type
+    char name[8];                       // short name for debugging
+    uint8_t pulses_per_rotation;        // The number of pulses per rotation of the projector's shaft
+    uint16_t framecount_until_stable;   // The number of frames until the speed is considered stable
+    uint16_t dac_init_16;       // The initial DAC value for 16 2/3 fps
+    uint16_t dac_init_18;       // The initial DAC value for 18 fps
+    uint16_t dac_init_23;       // The initial DAC value for 23.976 fps
+    uint16_t dac_init_24;       // The initial DAC value for 24 fps
+    uint16_t dac_init_25;       // The initial DAC value for 25 fps
+    double pid_p;   // PID values for the projector type
     double pid_i;
     double pid_d; 
 };
@@ -388,7 +389,7 @@ void setup()
     pinMode(RIGHT_BTTN_PIN, INPUT_PULLUP);
     pinMode(DROP_BACK_BTTN_PIN, INPUT_PULLUP);
     pinMode(CATCH_UP_BTTN_PIN, INPUT_PULLUP);
-    pinMode(START_MODE_SWITCH_PIN, INPUT); // This is used to read the Follow/Guide switch
+    pinMode(AUDIOMODE_SWITCH_PIN, INPUT); // This is used to read the Follow/Guide switch
     pinMode(DAC_ENABLE_PIN, OUTPUT);
     pinMode(PROJ_ID_PIN, INPUT);
 
@@ -404,7 +405,7 @@ void setup()
     Serial.print(F(" → "));
     Serial.println(projector_config.name);
 
-    // TODO: Init the Projector Type constants. Read the DAC init values from EEPROM if available, otherwise use the defaults
+    // TODO: Read the DAC init values from EEPROM if available, otherwise use the defaults
     myPID.SetTunings(projector_config.pid_p, projector_config.pid_i, projector_config.pid_d); // Set the PID tunings based on the projector config
 
 
@@ -418,7 +419,7 @@ void setup()
     else
     {
         Serial.println(F("** Lamp-Relais found!"));
-        if (digitalRead(START_MODE_SWITCH_PIN) == LOW)
+        if (digitalRead(AUDIOMODE_SWITCH_PIN) == LOW)
         {
             Serial.println(F("Guide-Mode enabled. We will start the Music."));
         }
@@ -628,7 +629,8 @@ void checkProjectorRunningYet()
 
     FreqMeasure.begin();
 
-    while (freq_count <= 47) // collect 48 samples (4 frames) // TODO: use framecount_until_stable!
+    // collect e.g. 48 samples (4 frames à 12 imps)
+    while (freq_count < (projector_config.pulses_per_rotation * projector_config.framecount_until_stable)) 
     {
         if (FreqMeasure.available())
         {
@@ -659,11 +661,11 @@ void checkProjectorRunningYet()
     {
         float detected_frequency = FreqMeasure.countToFrequency(freq_sum / freq_count);
         Serial.print(F("Detected freq (FreqMeasure): "));
-        Serial.println(detected_frequency / SHAFT_SEGMENT_COUNT);
+        Serial.println(detected_frequency / projector_config.pulses_per_rotation, 6);
 
         if (currently_selected_mode == FPS_AUTO)
         { // Determine the mode based on the detected frequency
-            uint8_t target_mode = (detected_frequency <= 21 * SHAFT_SEGMENT_COUNT ? FPS_18 : FPS_24);
+            uint8_t target_mode = (detected_frequency <= 21 * projector_config.pulses_per_rotation ? FPS_18 : FPS_24);
             activateSpeedConfig(target_mode);
             projector_speed_switch = (target_mode == FPS_18 ? 18 : 24);
             currently_selected_mode = (target_mode);
@@ -759,9 +761,9 @@ void activateSpeedConfig(byte next_speed)
     // Use the correct DAC init value for the selected speed
     uint16_t dac_init = 0;
     switch (next_speed) {
-        case FPS_16_2_3:  dac_init = projector_config.dac_init_16_2_3; break;
+        case FPS_16_2_3:  dac_init = projector_config.dac_init_16; break;
         case FPS_18:      dac_init = projector_config.dac_init_18;     break;
-        case FPS_23_976:  dac_init = projector_config.dac_init_23_976; break;
+        case FPS_23_976:  dac_init = projector_config.dac_init_23; break;
         case FPS_24:      dac_init = projector_config.dac_init_24;     break;
         case FPS_25:      dac_init = projector_config.dac_init_25;     break;
         default:          dac_init = projector_config.dac_init_18;     break;
@@ -791,13 +793,13 @@ void handleButtonTap(Button2 &btn)
         if (btn == dropBackButton)
         {
             noInterrupts();
-            shaft_pulses += SHAFT_SEGMENT_COUNT;
+            shaft_pulses += projector_config.pulses_per_rotation; // Add one full rotation
             interrupts();
         }
         else if (btn == catchUpButton)
         {
             noInterrupts();
-            shaft_pulses -= SHAFT_SEGMENT_COUNT;
+            shaft_pulses -= projector_config.pulses_per_rotation; // Subtract one full rotation
             interrupts();
         }
     }
@@ -816,7 +818,7 @@ void onShaftImpulseISR()
         shaft_frames++;
     }
     shaft_modulus++;
-    shaft_modulus %= (SHAFT_SEGMENT_COUNT);
+    shaft_modulus %= (projector_config.pulses_per_rotation);
 }
 
 ISR(TIMER1_COMPA_vect)
