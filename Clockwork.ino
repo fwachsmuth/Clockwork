@@ -201,7 +201,8 @@ volatile bool shaft_pulse_count_updated;
 
 // Instantiate the PID
 double pid_setpoint, pid_input, pid_output;
-double pid_Kp = 30, pid_Ki = 50, pid_Kd = 0; // old PID values for frame based controlling
+//double pid_Kp = 30, pid_Ki = 50, pid_Kd = 0; // old PID values for frame based controlling
+double pid_Kp, pid_Ki, pid_Kd;
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
 // Instantiate the DAC
@@ -299,7 +300,7 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
     */
    {"Off", 2313, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
    {"Ext Imp", 2313, 0xD0BE9C00, 3, 0, 1, 1700}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
-   {"Auto", 0, 0, 0, 0, 1, 1500},
+   {"Auto", 0, 0, 0, 0, 1, 2130},
    {"16  fps", 9999, 0x00000000, 1, 16.666666, 1, 1915},
    {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1, 2130},
    {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1, 3000},
@@ -341,7 +342,7 @@ static const ProjectorConfig PROGMEM s_projector_configs[] = {
     to memory when needed.
     */
     {"None", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},                      // No projector connected
-    {"Bauer T", 12, 4, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Bauer T610/T525/T510/T502
+    {"Bauer T", 12, 4, 1915, 2130, 3000, 3060, 3235, 30, 50, 0}, // Bauer T610/T525/T510/T502
     {"Bauer P8", 2, 8, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Bauer P8
     {"Selecton", 3, 8, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Bauer P8 Selecton
     {"Visacstc", 3, 4, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Braun Visacustic
@@ -406,6 +407,13 @@ void setup()
     Serial.print(F(" → "));
     Serial.println(projector_config.name);
     // TODO: Init the Projector Type constants. Read the DAC init values from EEPROM if available, otherwise use the defaults
+    pid_Kp = projector_config.pid_p;
+    pid_Ki = projector_config.pid_i;
+    pid_Kd = projector_config.pid_d;
+    myPID.SetTunings(pid_Kp, pid_Ki, pid_Kd); // Set the PID tunings based on the projector config
+    // myPID is already declared as a global variable above:
+    // PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
+    // No need to declare it again here.
 
     // Briefly configure Pin 7 as Input to detect a Lamp Relais Board
     pinMode(LAMP_RELAY_DETECT_PIN, INPUT);
