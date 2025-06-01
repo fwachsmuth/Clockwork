@@ -300,11 +300,11 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
    {"Off", 2313, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
    {"Ext Imp", 2313, 0xD0BE9C00, 3, 0, 1, 1700}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
    {"Auto", 0, 0, 0, 0, 1, 1500},
-   {"16  fps", 9999, 0x00000000, 1, 16.666666, 1, 1200},
-   {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1, 1500},
-   {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1, 2000},
-   {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1, 2100},
-   {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
+   {"16  fps", 9999, 0x00000000, 1, 16.666666, 1, 1915},
+   {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1, 2130},
+   {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1, 3000},
+   {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1, 3060},
+   {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1, 3235}};
    
    // !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
 
@@ -438,7 +438,7 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(SHAFT_PULSE_PIN), onShaftImpulseISR, RISING); // We only want one edge of the signal to not be duty cycle dependent
     dac.begin(0x60);
 
-    dac.setVoltage(speed.dac_init, false); // 1537 is petty much 18 fps and 24 fps
+    dac.setVoltage(projector_config.dac_init_18, false); // 18 fps and 24 fps share the same DAC init value
 
     // Init the PID
     pid_input = 0;
@@ -446,7 +446,7 @@ void setup()
     myPID.SetOutputLimits(0, 4095);
     myPID.SetSampleTime(100);
     myPID.SetMode(MANUAL);
-    pid_output = speed.dac_init; // This avoids starting with a 0-Output signal
+    pid_output = projector_config.dac_init_18; // This avoids starting with a 0-Output signal
     myPID.SetMode(AUTOMATIC);
 
     currently_selected_mode = FPS_AUTO;
