@@ -7697,6 +7697,12 @@
 		(uuid "dd710670-6c4e-4d1a-8097-304cfaed2cb8")
 	)
 	(junction
+		(at 209.55 184.15)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "e09a726d-5a31-45bd-8f6d-68d7e3522727")
+	)
+	(junction
 		(at 331.47 96.52)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7735,10 +7741,6 @@
 	(no_connect
 		(at 78.74 194.31)
 		(uuid "2c881856-7cd7-474c-aa91-5b3021b574b2")
-	)
-	(no_connect
-		(at 204.47 176.53)
-		(uuid "c4b33c83-33bd-4680-a47d-69083c316777")
 	)
 	(wire
 		(pts
@@ -8812,6 +8814,16 @@
 	)
 	(wire
 		(pts
+			(xy 204.47 176.53) (xy 209.55 176.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "615e4f96-2848-41a1-993c-96843162869d")
+	)
+	(wire
+		(pts
 			(xy 306.07 186.69) (xy 307.34 186.69)
 		)
 		(stroke
@@ -8829,6 +8841,16 @@
 			(type default)
 		)
 		(uuid "6271a973-dd5c-4a6a-8741-5c7ddb63cb1b")
+	)
+	(wire
+		(pts
+			(xy 209.55 184.15) (xy 212.09 184.15)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "62f062bf-abb3-4cc4-a588-bbbacdef8f2a")
 	)
 	(wire
 		(pts
@@ -8902,7 +8924,7 @@
 	)
 	(wire
 		(pts
-			(xy 204.47 184.15) (xy 212.09 184.15)
+			(xy 204.47 184.15) (xy 209.55 184.15)
 		)
 		(stroke
 			(width 0)
@@ -9309,6 +9331,16 @@
 			(type default)
 		)
 		(uuid "8a2a09cc-fad4-44f9-aef4-5aa10171a982")
+	)
+	(wire
+		(pts
+			(xy 209.55 176.53) (xy 209.55 184.15)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8a7714f5-7eaf-4c32-afbe-1f6094e50d78")
 	)
 	(wire
 		(pts
@@ -10444,7 +10476,7 @@
 	)
 	(text "Other imagineable pulse sources:\n- S/PDIF / TOSLINK Clock\n- Video FBAS\n- Pulse Head\n- Start Beep"
 		(exclude_from_sim no)
-		(at 268.478 173.482 0)
+		(at 223.012 150.622 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -10641,7 +10673,7 @@
 	)
 	(text "Works with 1000 Hz Bursts as well as square waves from 3-99% duty cylce"
 		(exclude_from_sim no)
-		(at 265.43 164.592 0)
+		(at 261.366 157.48 0)
 		(effects
 			(font
 				(size 1.27 1.27)
