@@ -9,21 +9,41 @@ Fuses für TCXO setzen:
 
 /* Todo
 
-For Rev.A:
-√ Test ESS in amp
+√ Test ESS-in signal amp
+- Test it with actual audio levels
+- Erkenne ich einen T510?
+√ Summierverstärker hinzufügen
 √ Test writing to the DAC_ENABLE_PIN
 √ Test Relay Board Detection
 √ Detect Projector Type — A0, 6 values from 5x 10k Resistors:
-    - No Projector connected
-    - Bauer Studioklasse (T610/T525/T510/T502) (12:1, 1.63 V)
-    - Bauer P8 (Custom:1, 1.63V)
-    - Bauer P8 Selecton (3:1, 1,63V
-    - Braun Visacustic (3:1, 1.89V)
-    - Reserve
-- Ext Imp Mode hinzufügen
+    No Projector connected
+    Bauer Studioklasse (T610/T525/T510/T502) (12:1, 1.63 V)
+    Bauer P8 (Custom:1, 1.63V)
+    Bauer P8 Selecton (3:1, 1,63V
+    Braun Visacustic (3:1, 1.89V)
+    Reserve
+- Parametrize the per-projector settings in a struct, and use them, instead of static values
+- Do we need to move the speed/dither configs to the projector struct, since they timer 
+  osciallates and impulse freq (e.g. *12), or can we just tweak the timer factor?
 - Learn IR Codes
-- Send IR Codes
+- Send IR Code when projector starts (or Follow Audio / Start beep?)
+- Implement Ext. Imp Mode
+    Attach INT1 ISR, counting up
+    Follow INT1 count, not the timer_pulses
+    Detect Follow/Guide Switch position
+    If Follow:
+        Enable STOP_EN_PIN
+        On first Impulse, Disable STOP_EN_PIN
+    If Guide:
+        On first Impulse, send learned IR code
+    FreqMeasure (like in Auto Mode)
+    Update Timecode Display
+    Stop Detection
+- Test & Design Lamp Relay Board
+- Allow disabling Lamp Relay Board / Restore native "Programming Mode" (Din-Connector-Connector Tap?)
 - Test "Pause Button" SSR (is it shorting?)
+- Save "good" DAC values for a given FPS in EEPROM after a while
+- Use smaller font for less resource usage
 √ Read Guide/Follow Switch (D12)
     - Re-Read START_MODE_SWITCH_PIN when idling
 √ Detect Lamp Relais Board (D7/STOP_EN pulled to GND)
@@ -87,7 +107,7 @@ const unsigned long STOP_THRESHOLD = 25000; // microseconds until a stop will be
 constexpr size_t SHAFT_SEGMENT_COUNT = 12;             // Size of the Median Window. We use 12 to capture one entire shaft revolution
 
 
-// pins and consts
+// pin consts
 const byte SHAFT_PULSE_PIN = 2;  // aka INT0
 const byte LED_RED_PIN = 5; //  Out of Sync
 const byte FPS_PULSE_OUT_PIN = 11; //  12 on breadboard. Pulse when Crystal is enabled. Todo: This still needs to be coded
@@ -97,15 +117,15 @@ const byte STOP_EN_PIN = 7; // Flipping this HIGH stops the projector if DAC_ENA
 const byte LAMP_RELAY_DETECT_PIN = 7; // The same pin (in input mode) reflects if a Lamp Relais Board is connected
 const byte PROJ_ID_PIN = A0; // This is used to detect the projector type, if one is connected
 
-// Use this for PID tuning with Pots
-// const byte P_PIN = A6;
-// const byte I_PIN = A7;
-// const byte D_PIN = A2;
-
 const byte LEFT_BTTN_PIN = 10;
 const byte RIGHT_BTTN_PIN = A3;     // 13 on breadboard
 const byte DROP_BACK_BTTN_PIN = 4;  // 11 on breadboard
 const byte CATCH_UP_BTTN_PIN = 6;   // 12 on breadboard
+
+// Use this for PID tuning with Pots
+// const byte P_PIN = A6;
+// const byte I_PIN = A7;
+// const byte D_PIN = A2;
 
 #define BTTN_NONE 0
 #define BTTN_LEFT 1
@@ -119,7 +139,7 @@ const byte CATCH_UP_BTTN_PIN = 6;   // 12 on breadboard
 #define numberOfMinutes(_time_) ((_time_ / SECS_PER_MIN) % SECS_PER_MIN)
 #define numberOfHours(_time_) ((_time_ % SECS_PER_DAY) / SECS_PER_HOUR)
 
-// --- some custome gfx fro the display 
+// --- some custome gfx for the display 
 /*
 const uint8_t unlockedLockTop[24] = {
     0b00000000, 
@@ -179,11 +199,9 @@ uint8_t projector_speed_switch = 0;  // To track the detected position of the pr
 // flags to assure reading only once both ISRs have done their duty
 volatile bool shaft_pulse_count_updated;
 
-// PID stuff
+// Instantiate the PID
 double pid_setpoint, pid_input, pid_output;
 double pid_Kp = 30, pid_Ki = 50, pid_Kd = 0; // old PID values for frame based controlling
-
-// PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 PID myPID(&pid_input, &pid_output, &pid_setpoint, pid_Kp, pid_Ki, pid_Kd, REVERSE);
 
 // Instantiate the DAC
@@ -216,26 +234,26 @@ byte blend_mode = BLEND_SEPMAG;
 // Name the indices of the speed config struct
 // Make sure these align with the SpeedConfig struct array below.
 #define FPS_NONE    0
-#define FPS_AUTO    1
-#define FPS_16_2_3  2   // => 200 Hz
-#define FPS_18      3   // => 216 Hz
-#define FPS_23_976  4   // => ~287.712 Hz
-#define FPS_24      5   // => 288 Hz
-#define FPS_25      6   // => 300 Hz
-#define MODES_COUNT 7   // to know where to roll over in the menu
+#define FPS_EXTERN  1
+#define FPS_AUTO    2
+#define FPS_16_2_3  3   // => 200 Hz
+#define FPS_18      4   // => 216 Hz
+#define FPS_23_976  5   // => ~287.712 Hz
+#define FPS_24      6   // => 288 Hz
+#define FPS_25      7   // => 300 Hz
+#define MODES_COUNT 8   // to know where to roll over in the menu
 
 // Struct with all the information we need to configure the controller for a speed:
 struct SpeedConfig
 {
     /*
-
     The dither pair is used to approximate an impossible speed that the Timer1 could not precisely generate at 16 MHz.
-    They are all claculated for prescaler 8 (2 MHz) to achieve high precision at manageable CPU load.
+    They are all calculated for prescaler 8 (2 MHz) to achieve high precision at manageable CPU load.
     The values are tailored for “fps * 12” = final frequency, since the Bauer's shaft has 12 segments per revolution.
     Explanation:
         - base = floor( (2000000 / (target freq)) ) or floor( (2000000 / (a multiple)) )
         - frac32 = (decimal point * 2^32) (UQ0.32 fixed decimal point)
-        - timerFactor => Software divider in the ISR, some multiples of the target frq give higher precision.
+        - timerFactor => Software divider in the ISR, some multiples of the target freq give higher precision.
 
     Examples:
         - FPS_9 => 108 Hz = 864 Hz ISR / 8
@@ -275,28 +293,59 @@ struct SpeedConfig
 SpeedConfig speed;
 
 static const SpeedConfig PROGMEM s_speed_table[] = {
-/*
-This is a table of values needed to generate a certain speed. To save memory, copy one just struct of values
-to memory when needed.
-*/
-    {"Off", 2313, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
-    {"Auto", 0, 0, 0, 0, 1, 1500},
-    {"16  fps", 9999, 0x00000000, 1, 16.666666, 1, 1200},
-    {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1, 1500},
-    {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1, 2000},
-    {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1, 2100},
-    {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
-
-// !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
+    /*
+    This is a table of values needed to generate a certain speed. To save memory, we copy one just struct of values
+    to memory when needed.
+    */
+   {"Off", 2313, 0xD0BE9C00, 3, 0, 0, 0}, /* Need dummy values here to not f up the timer. */
+   {"Ext Imp", 2313, 0xD0BE9C00, 3, 0, 1, 1700}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
+   {"Auto", 0, 0, 0, 0, 1, 1500},
+   {"16  fps", 9999, 0x00000000, 1, 16.666666, 1, 1200},
+   {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1, 1500},
+   {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1, 2000},
+   {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1, 2100},
+   {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1, 2200}};
+   
+   // !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
 
 enum ProjectorType
 {
+    // These are the projector types we can detect via the voltage divider on A0
     NONE,
     BAUER_T,
     P8,
     SELECTON,
     VISACUSTIC,
     RESERVE
+};
+
+struct ProjectorConfig
+{
+    char name[8];                      // short name for debugging
+    uint8_t pulses_per_rotation;      // The number of pulses per rotation of the projector's shaft
+    uint16_t framecount_until_stable; // The number of frames until the speed is considered stable
+    uint16_t dac_init_16_2_3; // The initial DAC value for 16  chat2/3 fps
+    uint16_t dac_init_18;     // The initial DAC value for 18 fps
+    uint16_t dac_init_23_976; // The initial DAC value for 23.976 fps
+    uint16_t dac_init_24;     // The initial DAC value for 24 fps
+    uint16_t dac_init_25;     // The initial DAC value for 25 fps
+    double pid_p;             // PID values for the projector type
+    double pid_i;
+    double pid_d; 
+};
+ProjectorConfig projector_config;
+
+static const ProjectorConfig PROGMEM s_projector_configs[] = {
+    /*
+    This is a table of projector-specific values. To save memory, we memcopy just struct of values
+    to memory when needed.
+    */
+    {"None", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},                      // No projector connected
+    {"Bauer T", 12, 4, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Bauer T610/T525/T510/T502
+    {"Bauer P8", 2, 8, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Bauer P8
+    {"Selecton", 3, 8, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Bauer P8 Selecton
+    {"Visacstc", 3, 4, 1200, 1500, 2000, 2100, 2200, 30, 50, 0}, // Braun Visacustic
+    {"Reserved", 0, 0, 0, 0, 0, 0, 0, 30, 50, 0},                // No projector connected
 };
 
 ProjectorType detectProjector(int adcValue)
@@ -323,26 +372,6 @@ ProjectorType detectProjector(int adcValue)
         return RESERVE;
 }
 
-const char *projectorName(ProjectorType type)
-{
-    switch (type)
-    {
-    case NONE:
-        return "None";
-    case BAUER_T:
-        return "Bauer T";
-    case P8:
-        return "P8";
-    case SELECTON:
-        return "Selecton";
-    case VISACUSTIC:
-        return "Visacustic";
-    case RESERVE:
-        return "Reserve";
-    default:
-        return "Unknown";
-    }
-}
 
 void setup()
 {
@@ -369,12 +398,15 @@ void setup()
     int adcValue = analogRead(PROJ_ID_PIN);
     ProjectorType proj = detectProjector(adcValue);
 
+    // Copy the projector config for the detected type
+    memcpy_P(&projector_config, &s_projector_configs[proj], sizeof(ProjectorConfig));
+
     Serial.print(F("A0: "));
     Serial.print(adcValue);
     Serial.print(F(" → "));
-    Serial.println(projectorName(proj));
-    // Todo: Init the Projector Type constants
-    
+    Serial.println(projector_config.name);
+    // TODO: Init the Projector Type constants. Read the DAC init values from EEPROM if available, otherwise use the defaults
+
     // Briefly configure Pin 7 as Input to detect a Lamp Relais Board
     pinMode(LAMP_RELAY_DETECT_PIN, INPUT);
     // Check if the Lamp Relais Board is connected
@@ -569,34 +601,6 @@ void checkForStop()
     }
 }
 
-void unused_measureFrequency()
-{
-    static double sum = 0;
-    static int count = 48;
-    
-    if (FreqMeasure.available())
-    {
-        // average several reading together
-        sum += FreqMeasure.read();
-        count++;
-        if (count > 48) // 48 impulses = 4 frames
-        {
-            float frequency = FreqMeasure.countToFrequency(sum / count);
-
-            // Buffer to hold the formatted string
-            char buffer[20];
-            // Convert float to string with 5 decimal places
-            dtostrf(frequency / 12, 8, 5, buffer); // (value, width, precision, buffer)
-
-            Serial.println(buffer);
-            u8x8.drawString(0, 1, buffer);
-            sum = 0;
-            count = 0;
-        }
-    }
-    // FreqMeasure.end();
-}
-
 void initializeButton(Button2 &button, byte pin)
 {
     button.begin(pin);
@@ -623,7 +627,7 @@ void checkProjectorRunningYet()
 
     FreqMeasure.begin();
 
-    while (freq_count <= 47)    // collect 48 samples (4 frames)
+    while (freq_count <= 47) // collect 48 samples (4 frames) // TODO: use framecount_until_stable!
     {
         if (FreqMeasure.available())
         {
@@ -650,7 +654,7 @@ void checkProjectorRunningYet()
     FreqMeasure.end();
 
     // Only process if a full set of data was collected
-    if (freq_count >= 48)
+    if (freq_count >= 48) // TODO: use framecount_until_stable!
     {
         float detected_frequency = FreqMeasure.countToFrequency(freq_sum / freq_count);
         Serial.print(F("Detected freq (FreqMeasure): "));
