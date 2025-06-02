@@ -24,6 +24,7 @@ Fuses für TCXO setzen:
     Reserve
 √ Parametrize the per-projector settings in a struct, and use them, instead of static values
 √ Add DAC init values for both 18 and 24 switchpos to the struct (and use them accordingly)
+√ Make sure the DAC is disabled on first cold start (FreqMeasure), we often get a false 18 here
 - Do we need to move the speed/dither configs to the projector struct, since they timer 
   osciallates and impulse freq (e.g. *12), or can we just tweak the timer factor?
 - Learn IR Codes
@@ -298,7 +299,7 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
     */
    {"Off", 2313, 0xD0BE9C00, 3, 0, 0}, /* Need dummy values here to not f up the timer. */
    {"Ext Imp", 2313, 0xD0BE9C00, 3, 0, 1}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
-   {"Auto", 0, 0, 0, 0, 1},
+   {"Auto", 0, 0, 0, 0, 0},
    {"16  fps", 9999, 0x00000000, 1, 16.666666, 1},
    {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1},
    {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1},
@@ -691,10 +692,6 @@ void checkProjectorRunningYet()
             uint8_t target_mode = (detected_frequency <= 21 * projector_config.pulses_per_rotation ? FPS_18 : FPS_24);
             projector_speed_switch = (target_mode == FPS_18 ? 18 : 24);
             activateSpeedConfig(target_mode);
-            
-            Serial.print(F("*** Setting pSS to "));
-            Serial.println(projector_speed_switch);
-
             currently_selected_mode = (target_mode);
         }
         // Init the pulse timer to not lose those first frames
