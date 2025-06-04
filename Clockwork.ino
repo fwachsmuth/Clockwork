@@ -78,6 +78,9 @@ make the 5 call of updateDigit more efficient: stop calculating if a digit did n
         + good for telecine (which could also just restart though)
         - loses sync with any sepmag audio
     Timecode would restart at 0:00:00.00
+- Add FPS_EXTERN to skip list in selectNextMode()
+- Mode Selection Bug in Idle State: Forward skips 0/Off, Backwards skips 1/ExtImp
+
 - Rangieren (slow) (idea: could get enabled by pressing +/- buttons while turning the projector tho "thread" pos)
 - "start the audio" IR
 - ESS in
@@ -142,43 +145,6 @@ const byte CATCH_UP_BTTN_PIN = 6;   // 12 on breadboard
 #define numberOfHours(_time_) ((_time_ % SECS_PER_DAY) / SECS_PER_HOUR)
 
 // --- some custome gfx for the display 
-/*
-const uint8_t unlockedLockTop[24] = {
-    0b00000000, 
-    0b00000000, 
-    0b10000000, 
-    0b10000000, 
-    0b10000000, 
-    0b10000000, 
-    0b10000000, 
-    0b10000000,
-    0b10000000, 
-    0b10000000, 
-    0b10000000, 
-    0b11100000, 
-    0b11111000, 
-    0b10001100, 
-    0b00000110, 
-    0b00000110,
-    0b00000110, 
-    0b00000110, 
-    0b00001100, 
-    0b11111000, 
-    0b11100000, 
-    0b00000000, 
-    0b00000000, 
-    0b00000000};
-const uint8_t lockedLockTop[16] = {
-    0b00000000, 0b00000000, 0b10000000, 0b11100000, 0b11111000, 0b10001100, 0b10000110, 0b10000110,
-    0b10000110, 0b10000110, 0b10001100, 0b11111000, 0b11100000, 0b10000000, 0b00000000, 0b00000000};
-const uint8_t lockBottom[16] = {
-    0b00000000, 0b00000000, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b01011001, 0b01000000,
-    0b01000000, 0b01011001, 0b01111111, 0b01111111, 0b01111111, 0b01111111, 0b00000000, 0b00000000};
-const uint8_t twoThirdsTop[8] = {
-    0b01000010, 0b01100001, 0b01010001, 0b01001110, 0b10000000, 0b01000000, 0b00100000, 0b00010000};
-const uint8_t twoThirdsBottom[8] = {
-    0b00001000, 0b00000100, 0b00000010, 0b00000001, 0b00100010, 0b01001001, 0b01001001, 0b00110110};
-*/
 const uint8_t emptyTile[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // Timer Variables
@@ -298,7 +264,7 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
     to memory when needed.
     */
    {"Off", 2313, 0xD0BE9C00, 3, 0, 0}, /* Need dummy values here to not f up the timer. */
-   {"Ext Imp", 2313, 0xD0BE9C00, 3, 0, 1}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
+   {"Ext Imp", 0, 0, 0, 0, 1}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
    {"Auto", 0, 0, 0, 0, 0},
    {"16  fps", 9999, 0x00000000, 1, 16.666666, 1},
    {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1},
@@ -479,7 +445,7 @@ void setup()
     activateSpeedConfig(currently_selected_mode);
 
     u8x8.begin();
-    u8x8.setFont(u8x8_font_profont29_2x3_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
+    u8x8.setFont(u8x8_font_inr21_2x4_n); // https://github.com/olikraus/u8g2/wiki/fntlist8x8
     drawCurrentTime(0, 0, true); // Init the Display
 
     // u8x8.setFont(u8x8_font_5x8_r);
@@ -715,16 +681,17 @@ void checkProjectorRunningYet()
 
 void selectNextMode(Button2 &btn)
 {
+    // Determine if left or right button was pressed
     int8_t change = (btn == leftButton) ? -1 : 1;
 
-    // Determine if left or right button was pressed
-    currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
-    // Skip mode FPS_AUTO if projector is running, Auto Mode is only selctable when idling
-    if (projector_state == PROJ_RUNNING && currently_selected_mode == FPS_AUTO)
+    // Skip some modes that don't make sense while the projector is running
+    do
     {
-        // select next adjacent mode
         currently_selected_mode = (currently_selected_mode + change + MODES_COUNT) % MODES_COUNT;
-    }
+    } while (
+        projector_state == PROJ_RUNNING &&
+        (currently_selected_mode == FPS_AUTO || currently_selected_mode == FPS_EXTERN));
+
     Serial.print(F("New Mode: "));
     Serial.println(currently_selected_mode);
 
@@ -919,9 +886,10 @@ void drawCurrentMode()
     if (currently_selected_mode != prev_selected_mode)
     {
         prev_selected_mode = currently_selected_mode;
-
-        u8x8.setFont(u8x8_font_inr21_2x4_r/*u8x8_font_profont29_2x3_r*/);
+        u8x8.setFont(u8x8_font_7x14_1x2_r /*u8x8_font_profont29_2x3_r*/);
         u8x8.setCursor(0, 0);
+        u8x8.print("Bauer T610");
+        u8x8.setCursor(0, 2);
         printCentered(u8x8, speed.name, 8);
     }
 }
@@ -953,7 +921,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
     if (shaft_frames != prev_shaft_frames) {
         prev_shaft_frames = shaft_frames;
 
-        u8x8.setFont(u8x8_font_inr21_2x4_r /*u8x8_font_courR18_2x3_n*/);
+        u8x8.setFont(u8x8_font_inr21_2x4_n /*u8x8_font_courR18_2x3_n*/);
 
         if (fps_rn != 50 / 3.0)
         {
@@ -1014,7 +982,7 @@ void drawCurrentTime(int32_t frame_count, float fps_rn, bool force_redraw)
         //
         if (frame_count >= 0)
         {
-            u8x8.setFont(u8x8_font_7x14_1x2_n);    // just numbers
+            u8x8.setFont(u8x8_font_7x14_1x2_r);    // just numbers
             // u8x8.setFont(u8x8_font_7x14_1x2_r); // full charset
             u8x8.setCursor(14, 4);
             if (current_sub_frame < 10 && fps_rn != 9)
