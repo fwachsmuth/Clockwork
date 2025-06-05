@@ -78,8 +78,6 @@ make the 5 call of updateDigit more efficient: stop calculating if a digit did n
         + good for telecine (which could also just restart though)
         - loses sync with any sepmag audio
     Timecode would restart at 0:00:00.00
-- Add FPS_EXTERN to skip list in selectNextMode()
-- Mode Selection Bug in Idle State: Forward skips 0/Off, Backwards skips 1/ExtImp
 
 - Rangieren (slow) (idea: could get enabled by pressing +/- buttons while turning the projector tho "thread" pos)
 - "start the audio" IR
@@ -263,16 +261,16 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
     This is a table of values needed to generate a certain speed. To save memory, we copy one just struct of values
     to memory when needed.
     */
-   {"Off", 2313, 0xD0BE9C00, 3, 0, 0}, /* Need dummy values here to not f up the timer. */
-   {"Ext Imp", 0, 0, 0, 0, 1}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
-   {"Auto", 0, 0, 0, 0, 0},
-   {"16  fps", 9999, 0x00000000, 1, 16.666666, 1},
-   {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1},
-   {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1},
-   {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1},
-   {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1}};
-   
-   // !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
+    {"Off", 4711, 0xDEADBEEF, 1, 0, 0},     /* Need dummy values here to not f up the timer. */
+    {"Ext Imp", 4711, 0xDEADBEEF, 1, 0, 1}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
+    {"Auto", 4711, 0xDEADBEEF, 1, 0, 1},
+    {"16  fps", 9999, 0x00000000, 1, 16.666666, 1},
+    {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1},
+    {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1},
+    {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1},
+    {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1}};
+
+// !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
 
 enum ProjectorType
 {
@@ -707,42 +705,64 @@ void activateSpeedConfig(byte next_speed)
 {
     float previous_avg_freq;
     
-    // Copy next config from PROGMEM to struct
-    memcpy_P(&speed, &s_speed_table[next_speed], sizeof(SpeedConfig));
-
-    // To keep the sync Sepmag-style, we need to correct the timer to teh new speed
-    float timer_correction_factor;
-    if (projector_state == PROJ_RUNNING)
+    // Check if the next_speed is a timer-based mode
+    if (next_speed == FPS_16_2_3 || next_speed == FPS_18 || next_speed == FPS_NONE ||
+        next_speed == FPS_23_976 || next_speed == FPS_24 || next_speed == FPS_25)
     {
-        // work with ints as long as possible
-        uint32_t now = millis();
-        uint32_t shaft_frames_now = shaft_frames;
-        unsigned long elapsed_time_ms = now - projector_start_millis;
-        unsigned long frames_per_1000_ms = (unsigned long)shaft_frames_now * 1000; // inflate shaft_frames to improve acuracy
-        float previous_avg_freq = (float)frames_per_1000_ms / elapsed_time_ms;
-
-        Serial.print(F("Frames * 1000 so far: "));
-        Serial.print(frames_per_1000_ms);
-        Serial.print(F(", seconds running: "));
-        Serial.println((float)elapsed_time_ms / 1000, 6);
-
-        Serial.print(F("   -> Calcualted prev. Freq: "));
-        Serial.println(previous_avg_freq, 6);
-
-        timer_correction_factor = speed.end_freq / previous_avg_freq;
-
-        Serial.print(F("Timer Factor: "));
-        Serial.print(speed.end_freq, 6);
-        Serial.print(F(" / "));
-        Serial.print(F("before: "));
-        Serial.print(previous_avg_freq, 6);
-        Serial.print(F(" = "));
-        Serial.println(timer_correction_factor, 6);
+        // Copy next config from PROGMEM to struct, if it's a crystal-based speed mode
+        Serial.print(F("Activating Timer-based Speed: "));
+        Serial.println(next_speed);
+        memcpy_P(&speed, &s_speed_table[next_speed], sizeof(SpeedConfig));
+        // Set the timer to the correct prescaler and mode
+        Serial.println(F("Now starting Timer1."));
+        startTimer1();
+        // To keep the sync Sepmag-style, we need to correct the timer to the new speed
+        float timer_correction_factor;
+        if (projector_state == PROJ_RUNNING) // TODO: Isn't this a redundant check?
+        {
+            // work with ints as long as possible
+            uint32_t now = millis();
+            uint32_t shaft_frames_now = shaft_frames;
+            unsigned long elapsed_time_ms = now - projector_start_millis;
+            unsigned long frames_per_1000_ms = (unsigned long)shaft_frames_now * 1000; // inflate shaft_frames to improve acuracy
+            float previous_avg_freq = (float)frames_per_1000_ms / elapsed_time_ms;
+    
+            Serial.print(F("Frames * 1000 so far: "));
+            Serial.print(frames_per_1000_ms);
+            Serial.print(F(", seconds running: "));
+            Serial.println((float)elapsed_time_ms / 1000, 6);
+    
+            Serial.print(F("   -> Calcualted prev. Freq: "));
+            Serial.println(previous_avg_freq, 6);
+    
+            timer_correction_factor = speed.end_freq / previous_avg_freq;
+    
+            Serial.print(F("Timer Factor: "));
+            Serial.print(speed.end_freq, 6);
+            Serial.print(F(" / "));
+            Serial.print(F("before: "));
+            Serial.print(previous_avg_freq, 6);
+            Serial.print(F(" = "));
+            Serial.println(timer_correction_factor, 6);
+        }
+        else
+        {
+            timer_correction_factor = 1;
+        }
     }
     else
     {
-        timer_correction_factor = 1;
+        // Init speed.name, speed.dac_enable manually for next_mode
+        memcpy_P(&speed.name, &s_speed_table[next_speed].name, sizeof(speed.name));
+        memcpy_P(&speed.dac_enable, &s_speed_table[next_speed].dac_enable, sizeof(speed.dac_enable));
+        
+        // Stop the timer if we are switching to an external pulse input mode
+        Serial.println(F("Stopping Timer1 for freewheeling or external pulse input."));
+        stopTimer1();
+
+    
     }
+
 
     Serial.print(F("Mode Name: "));
     Serial.println(speed.name);
@@ -783,7 +803,7 @@ void activateSpeedConfig(byte next_speed)
     myPID.SetMode(AUTOMATIC);
 
     // Configure DAC
-    dac.setVoltage(dac_init, false);      // false: Do not make this the default value of the DAC
+    dac.setVoltage(dac_init, false);      // false: Do not make this the default value of the DAC EEPROM
     digitalWrite(DAC_ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
 }
 
