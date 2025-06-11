@@ -196,17 +196,19 @@ enum BlendModes
 byte blend_mode = BLEND_SEPMAG;
 
 
-// Name the indices of the speed config struct
+// Name the indices of the speed config struct as an enum
 // Make sure these align with the SpeedConfig struct array below.
-#define FPS_NONE    0
-#define FPS_EXTERN  1
-#define FPS_AUTO    2
-#define FPS_16_2_3  3   // => 200 Hz
-#define FPS_18      4   // => 216 Hz
-#define FPS_23_976  5   // => ~287.712 Hz
-#define FPS_24      6   // => 288 Hz
-#define FPS_25      7   // => 300 Hz
-#define MODES_COUNT 8   // to know where to roll over in the menu
+enum SpeedMode {
+    FPS_NONE = 0,
+    FPS_EXTERN,
+    FPS_AUTO,
+    FPS_16_2_3,   // => 200 Hz
+    FPS_18,       // => 216 Hz
+    FPS_23_976,   // => ~287.712 Hz
+    FPS_24,       // => 288 Hz
+    FPS_25,       // => 300 Hz
+    MODES_COUNT   // to know where to roll over in the menu
+};
 
 // Struct with all the information we need to configure the controller for a speed:
 struct SpeedConfig
@@ -247,12 +249,12 @@ struct SpeedConfig
     Check dither-conf.py to generate more tuples.
 
     */
-    char name[8];           // short name for debugging
+    //char name[8];           // short name for debugging
     volatile uint16_t dither_base;   // Grundwert für OCR1A
     volatile uint32_t dither_frac32; // fractional part (UQ0.32), 0..(2^32-1)
     uint8_t timer_factor;   // a frequency multiplier for each timer config (some multiples give better accuracy)
     float end_freq;         // the actual frequency we get with this config as an approx. float
-    bool dac_enable;        // to allow freewheeling (no speed controller impact)
+    //bool dac_enable;        // to allow freewheeling (no speed controller impact)
 };
 SpeedConfig speed;
 
@@ -261,16 +263,25 @@ static const SpeedConfig PROGMEM s_speed_table[] = {
     This is a table of values needed to generate a certain speed. To save memory, we copy one just struct of values
     to memory when needed.
     */
-    {"Off", 4711, 0xDEADBEEF, 1, 0, 0},     /* Need dummy values here to not f up the timer. */
-    {"Ext Imp", 4711, 0xDEADBEEF, 1, 0, 1}, // External Pulse Input Mode — Todo: Not sure about the timer init values here.
-    {"Auto", 4711, 0xDEADBEEF, 1, 0, 1},
-    {"16  fps", 9999, 0x00000000, 1, 16.666666, 1},
-    {"18 fps", 2313, 0xD0BE9C00, 4, 18.000000, 1},
-    {"23.976", 6950, 0x638E38E4, 1, 23.976024, 1},
-    {"24 fps", 2313, 0xD0BE9C00, 3, 24.000000, 1},
-    {"25 fps", 6665, 0xAAAAAAAB, 1, 25.000000, 1}};
+    {9999, 0x00000000, 1, 16.666666},
+    {2313, 0xD0BE9C00, 4, 18.000000},
+    {6950, 0x638E38E4, 1, 23.976024},
+    {2313, 0xD0BE9C00, 3, 24.000000},
+    {6665, 0xAAAAAAAB, 1, 25.000000}
 
-// !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
+    // !!!!!  Reduced all base values by 1 for exact acuracy. Not sure yet why... off by 1 it is ¯\_(ツ)_/¯
+};
+
+const char* mode_name[] = {
+    "Off", 
+    "Ext. Imp.", 
+    "Auto", 
+    "16 fps", 
+    "18 fps", 
+    "23.976 fps", 
+    "24 fps", 
+    "25 fps"
+};
 
 enum ProjectorType
 {
@@ -525,7 +536,7 @@ void controlSpeed(long current_pulse_difference)
         if (millis() % 100 == 1)
         {
             Serial.print(F("Mode: "));
-            Serial.print(speed.name);
+            Serial.print(mode_name[currently_selected_mode]);
             Serial.print(F(", Error: "));
             Serial.print(current_pulse_difference);
             Serial.print(F(", DAC: "));
@@ -665,7 +676,7 @@ void checkProjectorRunningYet()
         projector_start_millis = millis();  // we lose the time for 4 frames here
         projector_state = PROJ_RUNNING;
         Serial.print(F("Setting up Timer for "));
-        Serial.println(speed.name);
+        Serial.println(mode_name[currently_selected_mode]);
         startTimer1();
         digitalWrite(DAC_ENABLE_PIN, HIGH);
     }
@@ -706,14 +717,13 @@ void activateSpeedConfig(byte next_speed)
     float previous_avg_freq;
     
     // Check if the next_speed is a timer-based mode
-    if (next_speed == FPS_16_2_3 || next_speed == FPS_18 || next_speed == FPS_NONE ||
-        next_speed == FPS_23_976 || next_speed == FPS_24 || next_speed == FPS_25)
+    if (next_speed >= FPS_16_2_3 && next_speed <= FPS_25)
     {
         // Copy next config from PROGMEM to struct, if it's a crystal-based speed mode
         Serial.print(F("Activating Timer-based Speed: "));
         Serial.println(next_speed);
-        memcpy_P(&speed, &s_speed_table[next_speed], sizeof(SpeedConfig));
-        // Set the timer to the correct prescaler and mode
+        // load the next speed config from s_speed_table in PROGMEM
+        memcpy_P(&speed, &s_speed_table[next_speed - 3], sizeof(SpeedConfig));  // -3 to skip the first three modes (NONE, EXTERN, AUTO) which have no SpeedConfig
         Serial.println(F("Now starting Timer1."));
         startTimer1();
         // To keep the sync Sepmag-style, we need to correct the timer to the new speed
@@ -753,9 +763,9 @@ void activateSpeedConfig(byte next_speed)
     else
     {
         // Init speed.name, speed.dac_enable manually for next_mode
-        memcpy_P(&speed.name, &s_speed_table[next_speed].name, sizeof(speed.name));
-        memcpy_P(&speed.dac_enable, &s_speed_table[next_speed].dac_enable, sizeof(speed.dac_enable));
-        
+        // memcpy_P(&speed.name, &s_speed_table[next_speed].name, sizeof(speed.name));
+        // memcpy_P(&speed.dac_enable, &s_speed_table[next_speed].dac_enable, sizeof(speed.dac_enable));
+
         // Stop the timer if we are switching to an external pulse input mode
         Serial.println(F("Stopping Timer1 for freewheeling or external pulse input."));
         stopTimer1();
@@ -765,7 +775,7 @@ void activateSpeedConfig(byte next_speed)
 
 
     Serial.print(F("Mode Name: "));
-    Serial.println(speed.name);
+    Serial.println(mode_name[next_speed]);
 
     // Init the PID with a start value to not start at 0
     myPID.SetMode(MANUAL);
@@ -804,7 +814,9 @@ void activateSpeedConfig(byte next_speed)
 
     // Configure DAC
     dac.setVoltage(dac_init, false);      // false: Do not make this the default value of the DAC EEPROM
-    digitalWrite(DAC_ENABLE_PIN, speed.dac_enable); // only 0 for NONE mode. Todo: Shave of 6 Bytes by checking for it's name
+    
+    // Disable the DAC if we are in NONE mode
+    digitalWrite(DAC_ENABLE_PIN, (next_speed != FPS_NONE) ? 1 : 0);
 }
 
 void handleButtonTap(Button2 &btn)
@@ -910,7 +922,7 @@ void drawCurrentMode()
         u8x8.setCursor(0, 0);
         u8x8.print("Bauer T610");
         u8x8.setCursor(0, 2);
-        printCentered(u8x8, speed.name, 8);
+        printCentered(u8x8, mode_name[currently_selected_mode], 10);
     }
 }
 
